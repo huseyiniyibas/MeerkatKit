@@ -1,14 +1,26 @@
 # MeerkatKit
 
-Swift package for collecting in-app feedback on iOS.
+Swift package for collecting in-app feedback on Apple platforms.
 
-Drop in a sticky button or use shake-to-trigger. Feedback is sent through Mail with device metadata in the header. Comes with bug report and feature request templates in English and Turkish.
+Drop in a sticky button or use shake-to-trigger on iPhone and iPad. Feedback is sent through Mail with device metadata in the header. Comes with bug report and feature request templates in English and Turkish.
 
 ## Requirements
 
-- iOS 15+
-- Swift 5.9+
-- Xcode 15+
+| | Minimum | Tested |
+|---|---|---|
+| **iOS / iPadOS** | 17.0 | 17, 18, 26 |
+| **macOS** | 14.0 | 14, 15, 26 |
+| **tvOS** | 17.0 | 17, 18, 26 |
+| **Swift** | 6.0 | 6.0+ |
+| **Xcode** | 16.0 | 16 – 26 |
+
+Supports the three most recent major OS releases on each platform. iPadOS uses the same iOS build — no separate package.
+
+Platform notes:
+
+- **iOS / iPadOS** — sticky button, shake-to-trigger, in-app Mail composer (mailto fallback when Mail is unavailable)
+- **macOS** — sticky button, mailto delivery
+- **tvOS** — sticky button, mailto delivery (shake is not available)
 
 ## Installation
 
@@ -59,7 +71,7 @@ struct MyApp: App {
 }
 ```
 
-### Shake instead of button
+### Shake instead of button (iOS only)
 
 ```swift
 MeerkatConfiguration(
@@ -81,7 +93,7 @@ Button("Feedback") {
 
 | | |
 |---|---|
-| `trigger` | `.stickyButton(position:)`, `.shake`, `.manual` |
+| `trigger` | `.stickyButton(position:)`, `.shake` (iOS only), `.manual` |
 | `delivery` | `.mailComposer(...)` or `.custom { payload in ... }` |
 | `placement` | Label for the screen — shows up in the email subject |
 | `templates` | `.bugReport`, `.featureRequest`, `.general` |

@@ -1,7 +1,11 @@
 import Foundation
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
+#endif
+
+#if os(macOS)
+import AppKit
 #endif
 
 enum MetadataCollector {
@@ -34,27 +38,50 @@ enum MetadataCollector {
         case "buildnumber":
             return Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
         case "devicemodel":
-            #if canImport(UIKit)
-            return UIDevice.current.model
-            #else
-            return "unknown"
-            #endif
+            return deviceModel
         case "osversion":
-            #if canImport(UIKit)
-            return UIDevice.current.systemVersion
-            #else
-            return ProcessInfo.processInfo.operatingSystemVersionString
-            #endif
+            return osVersion
         case "devicename":
-            #if canImport(UIKit)
-            return UIDevice.current.name
-            #else
-            return Host.current().localizedName ?? "unknown"
-            #endif
+            return deviceName
         case "bundleid":
             return Bundle.main.bundleIdentifier ?? "unknown"
         default:
             return "—"
         }
+    }
+
+    private static var deviceModel: String {
+        #if canImport(UIKit) && !os(watchOS)
+        return UIDevice.current.model
+        #elseif os(macOS)
+        var size = 0
+        sysctlbyname("hw.model", nil, &size, nil, 0)
+        var model = [CChar](repeating: 0, count: size)
+        sysctlbyname("hw.model", &model, &size, nil, 0)
+        return String(cString: model)
+        #else
+        return "unknown"
+        #endif
+    }
+
+    private static var osVersion: String {
+        #if canImport(UIKit) && !os(watchOS)
+        return UIDevice.current.systemVersion
+        #elseif os(macOS)
+        let version = ProcessInfo.processInfo.operatingSystemVersion
+        return "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
+        #else
+        return ProcessInfo.processInfo.operatingSystemVersionString
+        #endif
+    }
+
+    private static var deviceName: String {
+        #if canImport(UIKit) && !os(watchOS)
+        return UIDevice.current.name
+        #elseif os(macOS)
+        return Host.current().localizedName ?? "Mac"
+        #else
+        return Host.current().localizedName ?? "unknown"
+        #endif
     }
 }

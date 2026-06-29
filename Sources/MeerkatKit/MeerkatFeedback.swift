@@ -69,9 +69,7 @@ public enum MeerkatFeedback {
         switch config.delivery {
         case .mailComposer:
             presentationHandler = { payload in
-                #if canImport(UIKit)
-                MailFeedbackPresenter.present(payload: payload, configuration: config)
-                #endif
+                FeedbackMailDelivery.present(payload: payload, configuration: config)
             }
         case let .custom(handler):
             presentationHandler = handler

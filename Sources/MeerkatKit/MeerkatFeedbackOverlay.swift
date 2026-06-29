@@ -15,11 +15,13 @@ public struct MeerkatFeedbackOverlayModifier: ViewModifier {
                 }
             }
             .background {
+                #if os(iOS)
                 if controller.isShakeEnabled {
                     ShakeResponderBridge {
                         MeerkatFeedback.present()
                     }
                 }
+                #endif
             }
             .onAppear { controller.refresh() }
     }
@@ -48,7 +50,7 @@ private struct ShakeResponderBridge: View {
     let onShake: () -> Void
 
     var body: some View {
-        #if canImport(UIKit)
+        #if os(iOS)
         ShakeResponderView(onShake: onShake)
             .frame(width: 0, height: 0)
             .accessibilityHidden(true)

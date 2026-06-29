@@ -9,10 +9,27 @@ on:
 jobs:
   build-and-test:
     runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - destination: "platform=iOS Simulator,name=iPhone 16 Pro,OS=18.6"
+            name: iOS 18
+          - destination: "platform=macOS"
+            name: macOS
+          - destination: "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=18.5"
+            name: tvOS 18
+    name: ${{ matrix.name }}
     steps:
       - uses: actions/checkout@v4
       - name: Build and Test
         run: |
-          xcodebuild -scheme MeerkatKit \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.6' \
-            build test
+          if [ "${{ matrix.name }}" = "iOS 18" ]; then
+            xcodebuild -scheme MeerkatKit \
+              -destination '${{ matrix.destination }}' \
+              build test
+          else
+            xcodebuild -scheme MeerkatKit \
+              -destination '${{ matrix.destination }}' \
+              build
+          fi
