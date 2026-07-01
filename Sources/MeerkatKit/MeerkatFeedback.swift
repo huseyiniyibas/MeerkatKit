@@ -77,6 +77,7 @@ public enum MeerkatFeedback {
     }
 }
 
+@MainActor
 enum FeedbackPayloadBuilder {
     static func build(
         configuration: MeerkatConfiguration,

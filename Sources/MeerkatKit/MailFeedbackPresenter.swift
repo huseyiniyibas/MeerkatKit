@@ -28,12 +28,14 @@ enum MailFeedbackPresenter {
 private final class MailComposeDelegate: NSObject, MFMailComposeViewControllerDelegate, @unchecked Sendable {
     static let shared = MailComposeDelegate()
 
-    func mailComposeController(
+    nonisolated func mailComposeController(
         _ controller: MFMailComposeViewController,
         didFinishWith result: MFMailComposeResult,
         error: Error?
     ) {
-        controller.dismiss(animated: true)
+        Task { @MainActor in
+            controller.dismiss(animated: true)
+        }
     }
 }
 

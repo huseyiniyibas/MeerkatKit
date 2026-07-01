@@ -8,6 +8,7 @@ import UIKit
 import AppKit
 #endif
 
+@MainActor
 enum MetadataCollector {
     static func collect(
         headerKeys: [String],
