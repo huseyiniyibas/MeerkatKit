@@ -28,8 +28,14 @@ jobs:
       - name: Build and Test
         run: |
           if [ "${{ matrix.run_tests }}" = "true" ]; then
+            IOS_UDID=$(xcrun simctl list devices available iOS | awk -F '[()]' '/iPhone/ { print $2; exit }')
+            if [ -z "$IOS_UDID" ]; then
+              echo "No available iOS Simulator device found on runner."
+              xcrun simctl list devices available
+              exit 1
+            fi
             xcodebuild -scheme MeerkatKit \
-              -destination '${{ matrix.destination }}' \
+              -destination "id=$IOS_UDID" \
               build test
           else
             xcodebuild -scheme MeerkatKit \
