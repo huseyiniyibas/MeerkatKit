@@ -4,12 +4,18 @@ public struct MeerkatFeedbackModifier: ViewModifier {
     let screen: String
     let minimumDwell: Duration?
     let revealAfter: Duration?
+    let enableShake: Bool
 
     @StateObject private var visibility = MeerkatFeedbackVisibilityController()
     @State private var isDismissedThisVisit = false
 
+    private var usesShakeTrigger: Bool {
+        enableShake || MeerkatFeedback.isShakeEnabled
+    }
+
     private var isVisible: Bool {
-        MeerkatFeedback.canShowStickyButton
+        !usesShakeTrigger
+            && MeerkatFeedback.canShowStickyButton
             && visibility.isReady
             && !isDismissedThisVisit
     }
@@ -33,7 +39,7 @@ public struct MeerkatFeedbackModifier: ViewModifier {
             .animation(.easeOut(duration: 0.2), value: isVisible)
             .background {
                 #if os(iOS)
-                if MeerkatFeedback.isShakeEnabled {
+                if usesShakeTrigger {
                     ShakeResponderBridge {
                         MeerkatFeedback.present(screen: screen)
                     }
@@ -64,16 +70,19 @@ public extension View {
     ///   - revealAfter: Show once this much time has passed since the screen was first shown
     ///     in the app session, even if the user navigates away and comes back.
     ///     When both are set, whichever completes first wins.
+    ///   - enableShake: On iOS, shake the device to open feedback on this screen (hides the sticky button here).
     func meerkatFeedback(
         screen: String,
         minimumDwell: Duration? = nil,
-        revealAfter: Duration? = nil
+        revealAfter: Duration? = nil,
+        enableShake: Bool = false
     ) -> some View {
         modifier(
             MeerkatFeedbackModifier(
                 screen: screen,
                 minimumDwell: minimumDwell,
-                revealAfter: revealAfter
+                revealAfter: revealAfter,
+                enableShake: enableShake
             )
         )
     }

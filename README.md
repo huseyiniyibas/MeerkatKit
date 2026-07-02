@@ -172,6 +172,7 @@ Fallback: region-specific locales map to base language (e.g. `pt-BR` → `pt`); 
 |---|---|
 | `minimumDwell` | `nil` (show immediately) |
 | `revealAfter` | `nil` (show immediately) |
+| `enableShake` | `false` (iOS shake on this screen; hides sticky button here) |
 
 See the table under **Usage** for what each timing parameter means.
 
