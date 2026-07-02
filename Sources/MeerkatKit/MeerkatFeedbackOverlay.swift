@@ -2,10 +2,16 @@ import SwiftUI
 
 public struct MeerkatFeedbackModifier: ViewModifier {
     let screen: String
+    let minimumDwell: Duration?
+    let revealAfter: Duration?
+
+    @StateObject private var visibility = MeerkatFeedbackVisibilityController()
     @State private var isDismissedThisVisit = false
 
     private var isVisible: Bool {
-        MeerkatFeedback.canShowStickyButton && !isDismissedThisVisit
+        MeerkatFeedback.canShowStickyButton
+            && visibility.isReady
+            && !isDismissedThisVisit
     }
 
     private var alignment: Alignment {
@@ -36,14 +42,40 @@ public struct MeerkatFeedbackModifier: ViewModifier {
             }
             .onAppear {
                 isDismissedThisVisit = false
+                visibility.begin(
+                    screen: screen,
+                    minimumDwell: minimumDwell,
+                    revealAfter: revealAfter
+                )
+            }
+            .onDisappear {
+                visibility.pauseDwell()
             }
     }
 }
 
 public extension View {
     /// Floating feedback button for this screen. Requires `MeerkatFeedback.bootstrap(...)` once at launch.
-    func meerkatFeedback(screen: String) -> some View {
-        modifier(MeerkatFeedbackModifier(screen: screen))
+    ///
+    /// - Parameters:
+    ///   - screen: Screen name included in feedback metadata.
+    ///   - minimumDwell: Show after the user **stays on this screen** for at least this long.
+    ///     Leaving cancels this timer until they return.
+    ///   - revealAfter: Show once this much time has passed since the screen was first shown
+    ///     in the app session, even if the user navigates away and comes back.
+    ///     When both are set, whichever completes first wins.
+    func meerkatFeedback(
+        screen: String,
+        minimumDwell: Duration? = nil,
+        revealAfter: Duration? = nil
+    ) -> some View {
+        modifier(
+            MeerkatFeedbackModifier(
+                screen: screen,
+                minimumDwell: minimumDwell,
+                revealAfter: revealAfter
+            )
+        )
     }
 }
 

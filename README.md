@@ -24,11 +24,20 @@ See [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for the full deployment target po
 - When Apple ships `26.6` stable → minimum iOS becomes `17.6`
 - Package semver (`0.0.x`) is unrelated to deployment targets
 
-To sync targets after a new stable OS release:
+### Updating minimum OS versions (the sync script)
+
+When Apple releases a new **stable** iOS/macOS/tvOS version, you only update one file:
+`scripts/platform-targets.json` (set `latestStable` and adjust `supportedMajors` if a major is dropped).
+
+Then run:
 
 ```bash
 node scripts/sync-platform-targets.mjs
 ```
+
+**What it does in plain terms:** reads that JSON and rewrites the `platforms:` block in `Package.swift` automatically — so you don't hand-edit three version strings. It applies the rule *“oldest supported major + latest stable minor”* (e.g. iOS 26.5 stable → min iOS **17.5**).
+
+You still commit the changed `Package.swift` + JSON yourself; the script does not tag releases or touch the README table.
 
 ## Platform notes
 
@@ -52,7 +61,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.4")
+    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.5")
 ]
 ```
 
@@ -75,6 +84,32 @@ MeerkatFeedback.bootstrap(
 SettingsView()
     .meerkatFeedback(screen: "Settings")
 ```
+
+Show the button only after the user stays on the screen for a while (optional):
+
+```swift
+HomeView()
+    .meerkatFeedback(screen: "Home", minimumDwell: .seconds(8))
+```
+
+Or reveal on a fixed schedule after the screen appears:
+
+```swift
+ProfileView()
+    .meerkatFeedback(screen: "Profile", revealAfter: .seconds(12))
+```
+
+Both can be combined — whichever completes first shows the button:
+
+```swift
+CheckoutView()
+    .meerkatFeedback(screen: "Checkout", minimumDwell: .seconds(20), revealAfter: .seconds(8))
+```
+
+| Parameter | Meaning |
+|---|---|
+| `minimumDwell` | User must **stay on this screen continuously** for this long. Leave → timer resets. |
+| `revealAfter` | Button may appear after this much time since the screen was **first opened in the session**, even if the user navigates away in between. |
 
 That is the full integration for the default floating button.
 
@@ -132,6 +167,13 @@ Please type your feedback below:
 - Arabic (`ar`)
 
 Fallback: region-specific locales map to base language (e.g. `pt-BR` → `pt`); unknown locales fall back to English.
+
+| Parameter | Default |
+|---|---|
+| `minimumDwell` | `nil` (show immediately) |
+| `revealAfter` | `nil` (show immediately) |
+
+See the table under **Usage** for what each timing parameter means.
 
 ### Optional bootstrap settings
 

@@ -95,8 +95,8 @@ enum MeerkatLocalizer {
             .labelAppStoreID: "ID App Store"
         ],
         "de": [
-            .feedbackButton: "Feedback",
-            .subjectFeedback: "Feedback",
+            .feedbackButton: "Rückmeldung",
+            .subjectFeedback: "Rückmeldung",
             .subjectBugReport: "Fehlerbericht",
             .subjectFeatureRequest: "Feature-Anfrage",
             .bodyPrefixFeedback: "Dein Feedback:\n\n",

@@ -48,6 +48,8 @@ final class MeerkatKitTests: XCTestCase {
         XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "zh-Hans"), "反馈")
         XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "zh-Hant"), "回饋")
         XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "ar"), "ملاحظات")
+        XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "de"), "Rückmeldung")
+        XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "de-DE"), "Rückmeldung")
         XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "pt-BR"), "Feedback")
         XCTAssertEqual(MeerkatLocalizer.text(.labelVersion, languageCode: "pt-BR"), "Versão")
         XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "xx-YY"), "Feedback")
@@ -86,5 +88,23 @@ final class MeerkatKitTests: XCTestCase {
         XCTAssertTrue(payload.body.contains(String(repeating: "=", count: 40)))
         XCTAssertTrue(payload.body.contains("Screen: Settings"))
         XCTAssertFalse(payload.body.contains("bundleId"))
+    }
+
+    @MainActor
+    func testRevealTrackerSessionDeadline() {
+        #if DEBUG
+        MeerkatFeedbackRevealTracker.resetAll()
+        let clock = ContinuousClock()
+        let now = clock.now
+        let deadline = MeerkatFeedbackRevealTracker.deadline(
+            for: "Home",
+            revealAfter: .seconds(8),
+            now: now
+        )
+        XCTAssertGreaterThan(deadline, now)
+        XCTAssertFalse(MeerkatFeedbackRevealTracker.hasRevealed(screen: "Home"))
+        MeerkatFeedbackRevealTracker.markRevealed("Home")
+        XCTAssertTrue(MeerkatFeedbackRevealTracker.hasRevealed(screen: "Home"))
+        #endif
     }
 }
