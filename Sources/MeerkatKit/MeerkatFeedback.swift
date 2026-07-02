@@ -2,77 +2,105 @@ import Foundation
 
 @MainActor
 public enum MeerkatFeedback {
-    private static var configuration: MeerkatConfiguration?
-    private static var isDismissedByUser = false
-    private static var presentationHandler: ((FeedbackPayload) -> Void)?
+    private static var bootstrap: MeerkatBootstrap?
 
-    public static var currentConfiguration: MeerkatConfiguration? {
-        configuration
+    public static var isBootstrapped: Bool {
+        bootstrap != nil
     }
 
+    public static var canShowStickyButton: Bool {
+        guard let bootstrap, bootstrap.isEnabled else { return false }
+        return !bootstrap.enableShake
+    }
+
+    /// Backward-compatible alias.
     public static var shouldShowStickyButton: Bool {
-        guard let configuration, configuration.isEnabled, !isDismissedByUser else {
-            return false
-        }
-        if case .stickyButton = configuration.trigger {
-            return true
-        }
-        return false
+        canShowStickyButton
     }
 
     public static var isShakeEnabled: Bool {
-        guard let configuration, configuration.isEnabled else { return false }
-        if case .shake = configuration.trigger { return true }
-        return false
+        guard let bootstrap, bootstrap.isEnabled else { return false }
+        return bootstrap.enableShake
     }
 
-    public static func configure(_ config: MeerkatConfiguration) {
-        configuration = config
-        isDismissedByUser = false
-        wireDeliveryHandler(for: config)
+    /// Call once at app launch (e.g. `AppDelegate` or `@main` `App` `init`).
+    public static func bootstrap(
+        recipients: [String],
+        appStoreID: String? = nil,
+        headerMetadata: [String] = [],
+        footerMetadata: [String] = [],
+        templates: [FeedbackTemplate] = [.general],
+        locale: FeedbackLocale = .current,
+        buttonPosition: FeedbackPosition = .bottomTrailing,
+        enableShake: Bool = false,
+        isEnabled: Bool = true
+    ) {
+        MetadataCollector.setAppStoreID(appStoreID)
+        let resolvedHeader = headerMetadata.isEmpty
+            ? FeedbackEmailComposer.defaultMetadataKeys
+            : headerMetadata
+
+        bootstrap = .mail(
+            recipients: recipients,
+            headerMetadata: resolvedHeader,
+            footerMetadata: footerMetadata,
+            templates: templates,
+            locale: locale,
+            buttonPosition: buttonPosition,
+            enableShake: enableShake,
+            isEnabled: isEnabled
+        )
+    }
+
+    /// Custom delivery instead of Mail.
+    public static func bootstrap(
+        customDelivery: @escaping @MainActor (FeedbackPayload) -> Void,
+        appStoreID: String? = nil,
+        templates: [FeedbackTemplate] = [.general],
+        locale: FeedbackLocale = .current,
+        buttonPosition: FeedbackPosition = .bottomTrailing,
+        enableShake: Bool = false,
+        isEnabled: Bool = true
+    ) {
+        MetadataCollector.setAppStoreID(appStoreID)
+        bootstrap = .custom(
+            customDelivery,
+            templates: templates,
+            locale: locale,
+            buttonPosition: buttonPosition,
+            enableShake: enableShake,
+            isEnabled: isEnabled
+        )
     }
 
     public static func setEnabled(_ enabled: Bool) {
-        configuration?.isEnabled = enabled
-    }
-
-    public static func dismissByUser() {
-        isDismissedByUser = true
-    }
-
-    public static func resetUserDismissal() {
-        isDismissedByUser = false
+        bootstrap?.isEnabled = enabled
     }
 
     public static func present(
-        from placement: String? = nil,
+        screen: String,
         template: FeedbackTemplate? = nil
     ) {
-        guard let configuration, configuration.isEnabled else { return }
+        guard let bootstrap, bootstrap.isEnabled else { return }
+        let configuration = bootstrap.configuration(placement: screen)
         let payload = FeedbackPayloadBuilder.build(
             configuration: configuration,
-            placementOverride: placement,
+            placementOverride: screen,
             templateOverride: template
         )
-        presentationHandler?(payload)
+        deliver(payload, configuration: configuration)
     }
 
     public static func stickyButtonPosition() -> FeedbackPosition {
-        guard let configuration,
-              case let .stickyButton(position) = configuration.trigger else {
-            return .bottomTrailing
-        }
-        return position
+        bootstrap?.buttonPosition ?? .bottomTrailing
     }
 
-    private static func wireDeliveryHandler(for config: MeerkatConfiguration) {
-        switch config.delivery {
+    private static func deliver(_ payload: FeedbackPayload, configuration: MeerkatConfiguration) {
+        switch configuration.delivery {
         case .mailComposer:
-            presentationHandler = { payload in
-                FeedbackMailDelivery.present(payload: payload, configuration: config)
-            }
+            FeedbackMailDelivery.present(payload: payload, configuration: configuration)
         case let .custom(handler):
-            presentationHandler = handler
+            handler(payload)
         }
     }
 }
@@ -86,16 +114,25 @@ enum FeedbackPayloadBuilder {
     ) -> FeedbackPayload {
         let template = templateOverride ?? configuration.templates.first ?? .general
         let placement = placementOverride ?? configuration.placement
+        let headerKeys = headerKeys(from: configuration)
+        let footerKeys = footerKeys(from: configuration)
+        let includesAppStoreID = MetadataCollector.includesConfiguredAppStoreID
         let metadata = MetadataCollector.collect(
-            headerKeys: headerKeys(from: configuration),
-            footerKeys: footerKeys(from: configuration),
+            headerKeys: headerKeys,
+            footerKeys: footerKeys,
             placement: placement
         )
-        let headerBlock = MetadataCollector.formatBlock(metadata: metadata, title: "Info")
+        let orderedKeys = MetadataCollector.orderedKeys(
+            headerKeys: headerKeys,
+            footerKeys: footerKeys,
+            includesAppStoreID: includesAppStoreID
+        )
         let subject = template.subject(for: configuration.locale)
-        let body = headerBlock
-            + "\n\n"
-            + template.bodyPrefix(for: configuration.locale)
+        let body = FeedbackEmailComposer.composeBody(
+            metadata: metadata,
+            locale: configuration.locale,
+            orderedKeys: orderedKeys
+        )
 
         return FeedbackPayload(
             placement: placement,

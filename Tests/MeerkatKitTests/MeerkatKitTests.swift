@@ -3,40 +3,32 @@ import XCTest
 
 @MainActor
 final class MeerkatKitTests: XCTestCase {
-    func testStickyButtonVisibility() {
-        MeerkatFeedback.configure(
-            MeerkatConfiguration(
-                trigger: .stickyButton(position: .bottomTrailing),
-                delivery: .mailComposer(recipients: ["test@example.com"]),
-                placement: "TestScreen"
-            )
-        )
-        XCTAssertTrue(MeerkatFeedback.shouldShowStickyButton)
-        MeerkatFeedback.dismissByUser()
-        XCTAssertFalse(MeerkatFeedback.shouldShowStickyButton)
+    override func setUp() {
+        super.setUp()
+        MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
+        MeerkatFeedback.setEnabled(true)
+    }
+
+    func testStickyButtonAvailability() {
+        XCTAssertTrue(MeerkatFeedback.canShowStickyButton)
     }
 
     func testShakeTriggerEnabled() {
-        MeerkatFeedback.configure(
-            MeerkatConfiguration(
-                trigger: .shake,
-                delivery: .mailComposer(recipients: ["test@example.com"])
-            )
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            enableShake: true
         )
         XCTAssertTrue(MeerkatFeedback.isShakeEnabled)
-        XCTAssertFalse(MeerkatFeedback.shouldShowStickyButton)
+        XCTAssertFalse(MeerkatFeedback.canShowStickyButton)
     }
 
     func testDeveloperDisable() {
-        MeerkatFeedback.configure(
-            MeerkatConfiguration(
-                trigger: .stickyButton(position: .bottomLeading),
-                delivery: .mailComposer(recipients: ["test@example.com"]),
-                isEnabled: true
-            )
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            buttonPosition: .bottomLeading
         )
         MeerkatFeedback.setEnabled(false)
-        XCTAssertFalse(MeerkatFeedback.shouldShowStickyButton)
+        XCTAssertFalse(MeerkatFeedback.canShowStickyButton)
     }
 
     func testTemplateLocalization() {
@@ -45,20 +37,49 @@ final class MeerkatKitTests: XCTestCase {
         XCTAssertEqual(FeedbackTemplate.featureRequest.subject(for: .english), "Feature Request")
     }
 
-    func testPayloadIncludesPlacement() {
+
+    func testLocalizationFallbackAndTurkish() {
+        XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, locale: .turkish), "Geri Bildirim")
+        XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, locale: .english), "Feedback")
+    }
+
+    func testLocalizationLanguageCoverageAndFallbacks() {
+        XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "zh-Hans"), "反馈")
+        XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "zh-Hant"), "回饋")
+        XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "ar"), "ملاحظات")
+        XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "pt-BR"), "Feedback")
+        XCTAssertEqual(MeerkatLocalizer.text(.labelVersion, languageCode: "pt-BR"), "Versão")
+        XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, languageCode: "xx-YY"), "Feedback")
+    }
+
+    func testPayloadIncludesScreenName() {
         let expectation = expectation(description: "custom delivery")
-        MeerkatFeedback.configure(
-            MeerkatConfiguration(
-                trigger: .manual,
-                delivery: .custom { payload in
-                    XCTAssertEqual(payload.placement, "Checkout")
-                    XCTAssertEqual(payload.metadata["placement"], "Checkout")
-                    expectation.fulfill()
-                },
-                placement: "Home"
-            )
-        )
-        MeerkatFeedback.present(from: "Checkout", template: .bugReport)
+        MeerkatFeedback.bootstrap(customDelivery: { payload in
+            XCTAssertEqual(payload.placement, "Checkout")
+            XCTAssertEqual(payload.metadata["placement"], "Checkout")
+            expectation.fulfill()
+        })
+        MeerkatFeedback.present(screen: "Checkout", template: .bugReport)
         wait(for: [expectation], timeout: 1)
+    }
+
+    func testEmailBodyFormat() {
+        MetadataCollector.setAppStoreID("1234567890")
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            appStoreID: "1234567890"
+        )
+        let configuration = MeerkatBootstrap.mail(recipients: ["test@example.com"]).configuration(placement: "Settings")
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "Settings",
+            templateOverride: .general
+        )
+
+        XCTAssertEqual(payload.subject, "Feedback")
+        XCTAssertTrue(payload.body.contains("Please type your feedback below:"))
+        XCTAssertTrue(payload.body.contains(String(repeating: "=", count: 40)))
+        XCTAssertTrue(payload.body.contains("Screen: Settings"))
+        XCTAssertFalse(payload.body.contains("bundleId"))
     }
 }

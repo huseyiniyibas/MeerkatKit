@@ -1,48 +1,49 @@
 import SwiftUI
 
-public struct MeerkatFeedbackOverlayModifier: ViewModifier {
-    @StateObject private var controller = MeerkatOverlayController()
+public struct MeerkatFeedbackModifier: ViewModifier {
+    let screen: String
+    @State private var isDismissedThisVisit = false
+
+    private var isVisible: Bool {
+        MeerkatFeedback.canShowStickyButton && !isDismissedThisVisit
+    }
+
+    private var alignment: Alignment {
+        MeerkatFeedback.stickyButtonPosition().alignment
+    }
 
     public func body(content: Content) -> some View {
         content
-            .overlay(alignment: controller.alignment) {
-                if controller.isVisible {
+            .overlay(alignment: alignment) {
+                if isVisible {
                     StickyFeedbackButton(
-                        onTap: { MeerkatFeedback.present() },
-                        onDismiss: { MeerkatFeedback.dismissByUser() }
+                        onTap: { MeerkatFeedback.present(screen: screen) },
+                        onDismiss: { isDismissedThisVisit = true }
                     )
                     .padding(16)
+                    .transition(.opacity.combined(with: .scale))
                 }
             }
+            .animation(.easeOut(duration: 0.2), value: isVisible)
             .background {
                 #if os(iOS)
-                if controller.isShakeEnabled {
+                if MeerkatFeedback.isShakeEnabled {
                     ShakeResponderBridge {
-                        MeerkatFeedback.present()
+                        MeerkatFeedback.present(screen: screen)
                     }
                 }
                 #endif
             }
-            .onAppear { controller.refresh() }
+            .onAppear {
+                isDismissedThisVisit = false
+            }
     }
 }
 
 public extension View {
-    func meerkatFeedbackOverlay() -> some View {
-        modifier(MeerkatFeedbackOverlayModifier())
-    }
-}
-
-@MainActor
-final class MeerkatOverlayController: ObservableObject {
-    @Published private(set) var isVisible = false
-    @Published private(set) var alignment: Alignment = .bottomTrailing
-    @Published private(set) var isShakeEnabled = false
-
-    func refresh() {
-        isVisible = MeerkatFeedback.shouldShowStickyButton
-        alignment = MeerkatFeedback.stickyButtonPosition().alignment
-        isShakeEnabled = MeerkatFeedback.isShakeEnabled
+    /// Floating feedback button for this screen. Requires `MeerkatFeedback.bootstrap(...)` once at launch.
+    func meerkatFeedback(screen: String) -> some View {
+        modifier(MeerkatFeedbackModifier(screen: screen))
     }
 }
 
@@ -78,7 +79,7 @@ struct StickyFeedbackButton: View {
     var body: some View {
         HStack(spacing: 0) {
             Button(action: onTap) {
-                Label("Feedback", systemImage: "binoculars.fill")
+                Label(MeerkatLocalizer.text(.feedbackButton, locale: .current), systemImage: "binoculars.fill")
                     .font(.subheadline.weight(.semibold))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 10)

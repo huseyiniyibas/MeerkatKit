@@ -4,9 +4,9 @@ import PackageDescription
 let package = Package(
     name: "MeerkatKit",
     platforms: [
-        .iOS(.v17),
-        .macOS(.v14),
-        .tvOS(.v17)
+        .iOS("17.5"),
+        .macOS("14.5"),
+        .tvOS("17.5")
     ],
     products: [
         .library(

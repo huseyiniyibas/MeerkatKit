@@ -10,40 +10,72 @@ import AppKit
 
 @MainActor
 enum MetadataCollector {
+    private static var configuredAppStoreID: String?
+
+    static func setAppStoreID(_ appStoreID: String?) {
+        configuredAppStoreID = appStoreID?.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    static var includesConfiguredAppStoreID: Bool {
+        guard let configuredAppStoreID else { return false }
+        return !configuredAppStoreID.isEmpty
+    }
+
     static func collect(
         headerKeys: [String],
         footerKeys: [String],
         placement: String
     ) -> [String: String] {
-        var metadata: [String: String] = ["placement": placement]
-        for key in headerKeys {
+        var metadata: [String: String] = [
+            "screen": placement,
+            "placement": placement
+        ]
+
+        let keys = Set(headerKeys + footerKeys)
+        for key in keys {
             metadata[key] = resolveValue(for: key)
         }
-        for key in footerKeys where metadata[key] == nil {
-            metadata[key] = resolveValue(for: key)
+
+        if let appStoreID = configuredAppStoreID, !appStoreID.isEmpty {
+            metadata["appStoreID"] = appStoreID
         }
+
         return metadata
     }
 
-    static func formatBlock(metadata: [String: String], title: String) -> String {
-        let lines = metadata.map { key, value in
-            "\(key): \(value)"
-        }.sorted()
-        return ([title + ":"] + lines).joined(separator: "\n")
+    static func orderedKeys(
+        headerKeys: [String],
+        footerKeys: [String],
+        includesAppStoreID: Bool
+    ) -> [String] {
+        var keys = headerKeys.isEmpty ? FeedbackEmailComposer.defaultMetadataKeys : headerKeys
+        if includesAppStoreID, !keys.contains(where: { $0.lowercased() == "appstoreid" }) {
+            keys.append("appStoreID")
+        }
+        if !keys.contains(where: { $0.lowercased() == "screen" }) {
+            keys.insert("screen", at: min(3, keys.count))
+        }
+        return keys
     }
 
     private static func resolveValue(for key: String) -> String {
         switch key.lowercased() {
+        case "appname":
+            return appName
         case "appversion":
             return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         case "buildnumber":
             return Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
         case "devicemodel":
-            return deviceModel
+            return DeviceModelCatalog.displayName()
         case "osversion":
-            return osVersion
+            return formattedOSVersion
+        case "appstoreid":
+            return configuredAppStoreID ?? "—"
         case "devicename":
             return deviceName
+        case "screen", "placement":
+            return "—"
         case "bundleid":
             return Bundle.main.bundleIdentifier ?? "unknown"
         default:
@@ -51,21 +83,37 @@ enum MetadataCollector {
         }
     }
 
-    private static var deviceModel: String {
-        #if canImport(UIKit) && !os(watchOS)
-        return UIDevice.current.model
-        #elseif os(macOS)
-        var size = 0
-        sysctlbyname("hw.model", nil, &size, nil, 0)
-        var model = [CChar](repeating: 0, count: size)
-        sysctlbyname("hw.model", &model, &size, nil, 0)
-        return String(cString: model)
-        #else
+    private static var appName: String {
+        let bundle = Bundle.main
+        if let displayName = bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String,
+           !displayName.isEmpty {
+            return displayName
+        }
+        if let name = bundle.object(forInfoDictionaryKey: "CFBundleName") as? String,
+           !name.isEmpty {
+            return name
+        }
         return "unknown"
+    }
+
+    private static var formattedOSVersion: String {
+        let version = rawOSVersion
+        return "\(platformName) \(version)"
+    }
+
+    private static var platformName: String {
+        #if os(iOS)
+        return "iOS"
+        #elseif os(tvOS)
+        return "tvOS"
+        #elseif os(macOS)
+        return "macOS"
+        #else
+        return "OS"
         #endif
     }
 
-    private static var osVersion: String {
+    private static var rawOSVersion: String {
         #if canImport(UIKit) && !os(watchOS)
         return UIDevice.current.systemVersion
         #elseif os(macOS)

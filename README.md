@@ -2,29 +2,47 @@
 
 Swift package for collecting in-app feedback on Apple platforms.
 
-Drop in a sticky button or use shake-to-trigger on iPhone and iPad. Feedback is sent through Mail with device metadata in the header. Comes with bug report and feature request templates in English and Turkish.
+Drop in a floating feedback button per screen, or use shake-to-trigger on iOS. Feedback is delivered through Mail (with mailto fallback) or a custom handler. Device and app metadata are included automatically.
 
 ## Requirements
 
-| | Minimum | Tested |
+| | Minimum | Tested majors (stable) |
 |---|---|---|
-| **iOS / iPadOS** | 17.0 | 17, 18, 26 |
-| **macOS** | 14.0 | 14, 15, 26 |
-| **tvOS** | 17.0 | 17, 18, 26 |
+| **iOS / iPadOS** | 17.5 | 17, 18, 26 |
+| **macOS** | 14.5 | 14, 15, 26 |
+| **tvOS** | 17.5 | 17, 18, 26 |
 | **Swift** | 6.0 | 6.0+ |
 | **Xcode** | 16.0 | 16 – 26 |
 
-Supports the three most recent major OS releases on each platform. iPadOS uses the same iOS build — no separate package.
+See [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for the full deployment target policy.
 
-Platform notes:
+## Deployment policy
 
-- **iOS / iPadOS** — sticky button, shake-to-trigger, in-app Mail composer (mailto fallback when Mail is unavailable)
-- **macOS** — sticky button, mailto delivery
-- **tvOS** — sticky button, mailto delivery (shake is not available)
+- We support the latest **3 stable major** OS versions (betas excluded).
+- Minimum deployment follows: `oldestSupportedMajor.latestStableMinor`
+- Example: latest stable iOS `26.5.x` → minimum iOS `17.5`
+- When Apple ships `26.6` stable → minimum iOS becomes `17.6`
+- Package semver (`0.0.x`) is unrelated to deployment targets
+
+To sync targets after a new stable OS release:
+
+```bash
+node scripts/sync-platform-targets.mjs
+```
+
+## Platform notes
+
+| Platform | Sticky button | Shake | Delivery |
+|---|---|---|---|
+| iOS / iPadOS | Yes | Yes | Mail composer + mailto fallback |
+| macOS | Yes | No | mailto |
+| tvOS | Yes | No | mailto |
+
+iPadOS uses the same iOS build — no separate package.
 
 ## Installation
 
-In Xcode: **File → Add Package Dependencies** and paste:
+In Xcode: **File → Add Package Dependencies**
 
 ```
 https://github.com/huseyiniyibas/MeerkatKit.git
@@ -34,71 +52,113 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.1")
+    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.4")
 ]
 ```
 
 ## Usage
 
-Configure once at launch, then attach the overlay to your root view.
+**1. Once at app launch** — recipients and metadata (`AppDelegate` or `App` init):
 
 ```swift
-import SwiftUI
 import MeerkatKit
 
-@main
-struct MyApp: App {
-    init() {
-        MeerkatFeedback.configure(
-            MeerkatConfiguration(
-                trigger: .stickyButton(position: .bottomTrailing),
-                delivery: .mailComposer(
-                    recipients: ["feedback@yourapp.com"],
-                    headerMetadata: ["appVersion", "deviceModel", "osVersion"]
-                ),
-                placement: "HomeScreen",
-                templates: [.bugReport, .featureRequest]
-            )
-        )
-    }
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .meerkatFeedbackOverlay()
-        }
-    }
-}
-```
-
-### Shake instead of button (iOS only)
-
-```swift
-MeerkatConfiguration(
-    trigger: .shake,
-    delivery: .mailComposer(recipients: ["feedback@yourapp.com"]),
-    placement: "Settings"
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    appStoreID: "1234567890"
 )
 ```
 
-### Your own button
+**2. Per screen** — add the modifier with a screen name:
 
 ```swift
-Button("Feedback") {
-    MeerkatFeedback.present(from: "Profile")
+SettingsView()
+    .meerkatFeedback(screen: "Settings")
+```
+
+That is the full integration for the default floating button.
+
+### AppDelegate example
+
+```swift
+import MeerkatKit
+
+func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+) -> Bool {
+    MeerkatFeedback.bootstrap(
+        recipients: ["feedback@yourapp.com"],
+        appStoreID: "1234567890"
+    )
+    return true
 }
 ```
 
-## Options
+### Mail body format
 
-| | |
+The default mail body includes localized labels and a typing area:
+
+```
+App: YourApp
+Version: 1.2.0 (42)
+Screen: Settings
+Device: iPhone 17 Pro
+OS: iOS 26.5.2
+App Store ID: 1234567890
+
+Please type your feedback below:
+========================================
+
+
+
+```
+
+### Supported UI languages
+
+- English (`en`)
+- Turkish (`tr`)
+- Spanish (`es`)
+- French (`fr`)
+- German (`de`)
+- Japanese (`ja`)
+- Italian (`it`)
+- Portuguese (`pt`) — covers `pt-BR`
+- Russian (`ru`)
+- Korean (`ko`)
+- Chinese Simplified (`zh-Hans`)
+- Chinese Traditional (`zh-Hant`)
+- Dutch (`nl`)
+- Arabic (`ar`)
+
+Fallback: region-specific locales map to base language (e.g. `pt-BR` → `pt`); unknown locales fall back to English.
+
+### Optional bootstrap settings
+
+| Parameter | Default |
 |---|---|
-| `trigger` | `.stickyButton(position:)`, `.shake` (iOS only), `.manual` |
-| `delivery` | `.mailComposer(...)` or `.custom { payload in ... }` |
-| `placement` | Label for the screen — shows up in the email subject |
-| `templates` | `.bugReport`, `.featureRequest`, `.general` |
-| `locale` | `.english`, `.turkish`, `.current` |
-| `isEnabled` | Turn the whole thing off without removing code |
+| `appStoreID` | `nil` |
+| `headerMetadata` | app name, version, device, OS |
+| `footerMetadata` | `[]` |
+| `templates` | `.general` |
+| `locale` | `.current` (follows device language) |
+| `buttonPosition` | `.bottomTrailing` |
+| `enableShake` | `false` |
+| `isEnabled` | `true` |
+
+### Custom delivery
+
+```swift
+MeerkatFeedback.bootstrap(customDelivery: { payload in
+    // send payload to your backend
+})
+```
+
+### Manual trigger
+
+```swift
+MeerkatFeedback.present(screen: "Profile", template: .bugReport)
+```
 
 ## License
 

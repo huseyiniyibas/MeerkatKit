@@ -25,52 +25,24 @@ public enum FeedbackTemplate: String, Sendable, CaseIterable {
     case general
 
     func subject(for locale: FeedbackLocale) -> String {
-        switch (self, locale.resolved) {
-        case (.bugReport, .english):
-            return "Bug Report"
-        case (.bugReport, .turkish):
-            return "Hata Bildirimi"
-        case (.featureRequest, .english):
-            return "Feature Request"
-        case (.featureRequest, .turkish):
-            return "Özellik İsteği"
-        case (.general, .english):
-            return "Feedback"
-        case (.general, .turkish):
-            return "Geri Bildirim"
-        case (_, .current):
-            return subject(for: locale.resolved)
+        switch self {
+        case .bugReport:
+            return MeerkatLocalizer.text(.subjectBugReport, locale: locale)
+        case .featureRequest:
+            return MeerkatLocalizer.text(.subjectFeatureRequest, locale: locale)
+        case .general:
+            return MeerkatLocalizer.text(.subjectFeedback, locale: locale)
         }
     }
 
     func bodyPrefix(for locale: FeedbackLocale) -> String {
-        switch (self, locale.resolved) {
-        case (.bugReport, .english):
-            return "Describe the bug:\n\n"
-        case (.bugReport, .turkish):
-            return "Hatayı açıklayın:\n\n"
-        case (.featureRequest, .english):
-            return "Describe your idea:\n\n"
-        case (.featureRequest, .turkish):
-            return "Fikrinizi açıklayın:\n\n"
-        case (.general, .english):
-            return "Your feedback:\n\n"
-        case (.general, .turkish):
-            return "Geri bildiriminiz:\n\n"
-        case (_, .current):
-            return bodyPrefix(for: locale.resolved)
-        }
-    }
-}
-
-private extension FeedbackLocale {
-    var resolved: FeedbackLocale {
         switch self {
-        case .current:
-            let code = Locale.preferredLanguages.first?.prefix(2) ?? "en"
-            return code == "tr" ? .turkish : .english
-        case .english, .turkish:
-            return self
+        case .bugReport:
+            return MeerkatLocalizer.text(.bodyPrefixBugReport, locale: locale)
+        case .featureRequest:
+            return MeerkatLocalizer.text(.bodyPrefixFeatureRequest, locale: locale)
+        case .general:
+            return MeerkatLocalizer.text(.bodyPrefixFeedback, locale: locale)
         }
     }
 }
@@ -81,7 +53,7 @@ public enum FeedbackDelivery {
         headerMetadata: [String] = [],
         footerMetadata: [String] = []
     )
-    case custom((FeedbackPayload) -> Void)
+    case custom(@MainActor (FeedbackPayload) -> Void)
 }
 
 public struct MeerkatConfiguration {
@@ -96,7 +68,7 @@ public struct MeerkatConfiguration {
         trigger: FeedbackTrigger = .stickyButton(position: .bottomTrailing),
         delivery: FeedbackDelivery,
         placement: String = "Default",
-        templates: [FeedbackTemplate] = [.bugReport, .featureRequest],
+        templates: [FeedbackTemplate] = [.general],
         locale: FeedbackLocale = .current,
         isEnabled: Bool = true
     ) {
