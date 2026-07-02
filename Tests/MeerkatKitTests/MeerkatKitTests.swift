@@ -3,10 +3,12 @@ import XCTest
 
 @MainActor
 final class MeerkatKitTests: XCTestCase {
-    override func setUp() {
-        super.setUp()
-        MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
-        MeerkatFeedback.setEnabled(true)
+    override func setUp() async throws {
+        try await super.setUp()
+        await MainActor.run {
+            MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
+            MeerkatFeedback.setEnabled(true)
+        }
     }
 
     func testStickyButtonAvailability() {
