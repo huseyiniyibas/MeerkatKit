@@ -33,7 +33,7 @@ enum DeviceModelCatalog {
     private static func fallbackName(for identifier: String) -> String {
         if identifier == "arm64" || identifier == "x86_64" {
             #if canImport(UIKit) && !os(watchOS)
-            return UIDevice.current.model
+            return "iOS Simulator"
             #else
             return "Unknown Device"
             #endif

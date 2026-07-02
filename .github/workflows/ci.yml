@@ -13,18 +13,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - destination: "platform=iOS Simulator,name=iPhone 16 Pro,OS=18.6"
-            name: iOS 18
+          - destination: "generic/platform=iOS Simulator"
+            name: iOS
+            run_tests: true
           - destination: "platform=macOS"
             name: macOS
+            run_tests: false
           - destination: "generic/platform=tvOS Simulator"
             name: tvOS
+            run_tests: false
     name: ${{ matrix.name }}
     steps:
       - uses: actions/checkout@v4
       - name: Build and Test
         run: |
-          if [ "${{ matrix.name }}" = "iOS 18" ]; then
+          if [ "${{ matrix.run_tests }}" = "true" ]; then
             xcodebuild -scheme MeerkatKit \
               -destination '${{ matrix.destination }}' \
               build test
