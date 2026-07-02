@@ -41,7 +41,9 @@ Patch releases (26.5.1 → 26.5.2) do **not** change the minimum unless the mino
 
 ## CI
 
-CI builds against recent simulator OS versions (e.g. iOS 18.6, generic tvOS). That is **testing** coverage, not the declared minimum in `Package.swift`.
+Job names show the **minimum deployment** from `Package.swift` (e.g. `iOS (deploy ≥17.5)`).
+
+The runner picks an available iOS Simulator (often iOS 18.x on `macos-15`) to **build and test** the package. Simulator OS version is not the same as the deployment target — xcodebuild still compiles with `-target …-ios17.5-simulator`.
 
 ## Current targets (auto-synced)
 

@@ -14,13 +14,13 @@ jobs:
       matrix:
         include:
           - destination: "generic/platform=iOS Simulator"
-            name: iOS
+            name: "iOS (deploy ≥17.5)"
             run_tests: true
           - destination: "platform=macOS"
-            name: macOS
+            name: "macOS (deploy ≥14.5)"
             run_tests: false
           - destination: "generic/platform=tvOS Simulator"
-            name: tvOS
+            name: "tvOS (deploy ≥17.5)"
             run_tests: false
     name: ${{ matrix.name }}
     steps:
@@ -34,9 +34,11 @@ jobs:
               xcrun simctl list devices available
               exit 1
             fi
+            echo "Package minimum deployment: iOS 17.5 (Package.swift)"
+            xcrun simctl list devices available | grep "$IOS_UDID" || true
             xcodebuild -scheme MeerkatKit \
               -destination "id=$IOS_UDID" \
-              build test
+              test
           else
             xcodebuild -scheme MeerkatKit \
               -destination '${{ matrix.destination }}' \
