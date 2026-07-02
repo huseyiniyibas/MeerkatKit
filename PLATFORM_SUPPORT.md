@@ -2,6 +2,8 @@
 
 MeerkatKit tracks **Apple’s latest stable OS releases** (betas excluded). Package semver (`0.0.x`) is unrelated to deployment targets.
 
+**Links:** [README](README.md) · [Repository](https://github.com/huseyiniyibas/MeerkatKit) · [`platform-targets.json`](scripts/platform-targets.json)
+
 ## Supported major versions (3)
 
 We support the **three most recent major OS releases** per platform (stable only).
@@ -34,8 +36,8 @@ Patch releases (26.5.1 → 26.5.2) do **not** change the minimum unless the mino
 
 ## Maintenance
 
-1. Update `scripts/platform-targets.json` when Apple releases a new **stable** version (not beta).
-2. Run: `node scripts/sync-platform-targets.mjs`
+1. Update [`scripts/platform-targets.json`](scripts/platform-targets.json) when Apple releases a new **stable** version (not beta).
+2. Run: `node scripts/sync-platform-targets.mjs` (see [README — sync script](README.md#updating-minimum-os-versions-the-sync-script))
 3. Verify: `xcodebuild -scheme MeerkatKit … build test`
 4. Commit `Package.swift` + `platform-targets.json` (not tied to `0.0.x` package tags unless you choose to release).
 
@@ -47,4 +49,4 @@ The runner picks an available iOS Simulator (often iOS 18.x on `macos-15`) to **
 
 ## Current targets (auto-synced)
 
-See `scripts/platform-targets.json` for the source of truth used by `sync-platform-targets.mjs`.
+See [`scripts/platform-targets.json`](scripts/platform-targets.json) for the source of truth used by `sync-platform-targets.mjs`.

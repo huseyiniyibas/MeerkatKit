@@ -4,6 +4,8 @@ Swift package for collecting in-app feedback on Apple platforms.
 
 Drop in a floating feedback button per screen, or use shake-to-trigger on iOS. Feedback is delivered through Mail (with mailto fallback) or a custom handler. Device and app metadata are included automatically.
 
+**Links:** [Repository](https://github.com/huseyiniyibas/MeerkatKit) · [Releases](https://github.com/huseyiniyibas/MeerkatKit/releases) · [Platform policy](PLATFORM_SUPPORT.md) · [License](LICENSE)
+
 ## Requirements
 
 | | Minimum | Tested majors (stable) |
@@ -27,7 +29,7 @@ See [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for the full deployment target po
 ### Updating minimum OS versions (the sync script)
 
 When Apple releases a new **stable** iOS/macOS/tvOS version, you only update one file:
-`scripts/platform-targets.json` (set `latestStable` and adjust `supportedMajors` if a major is dropped).
+[`scripts/platform-targets.json`](scripts/platform-targets.json) (set `latestStable` and adjust `supportedMajors` if a major is dropped).
 
 Then run:
 
@@ -51,11 +53,9 @@ iPadOS uses the same iOS build — no separate package.
 
 ## Installation
 
-In Xcode: **File → Add Package Dependencies**
+In Xcode: **File → Add Package Dependencies**, then paste:
 
-```
-https://github.com/huseyiniyibas/MeerkatKit.git
-```
+**[https://github.com/huseyiniyibas/MeerkatKit.git](https://github.com/huseyiniyibas/MeerkatKit.git)**
 
 Or in `Package.swift`:
 
@@ -204,4 +204,4 @@ MeerkatFeedback.present(screen: "Profile", template: .bugReport)
 
 ## License
 
-MIT
+[MIT](LICENSE)
