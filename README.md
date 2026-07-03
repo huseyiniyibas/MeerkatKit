@@ -110,8 +110,31 @@ CheckoutView()
 |---|---|
 | `minimumDwell` | User must **stay on this screen continuously** for this long. Leave → timer resets. |
 | `revealAfter` | Button may appear after this much time since the screen was **first opened in the session**, even if the user navigates away in between. |
+| `dismissCooldown` | After the user taps **✕**, the sticky button stays hidden on that screen for this long. `nil` = bootstrap default (24h). `.zero` = current visit only. |
 
-That is the full integration for the default floating button.
+Hide the sticky button for 24 hours after dismiss (default):
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    dismissCooldown: .seconds(86_400)  // 24 hours — this is the default
+)
+
+SettingsView()
+    .meerkatFeedback(screen: "Settings")
+```
+
+Per-screen override, or hide only until the user leaves:
+
+```swift
+SettingsView()
+    .meerkatFeedback(screen: "Settings", dismissCooldown: .seconds(604_800))  // 7 days
+
+DebugView()
+    .meerkatFeedback(screen: "Debug", dismissCooldown: .zero)  // ✕ hides until next appear only
+```
+
+Dismiss cooldown applies to the **sticky button only** — shake-to-feedback is unaffected.
 
 ### AppDelegate example
 
