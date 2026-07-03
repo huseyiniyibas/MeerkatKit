@@ -5,19 +5,29 @@ public struct MeerkatFeedbackModifier: ViewModifier {
     let minimumDwell: Duration?
     let revealAfter: Duration?
     let enableShake: Bool
+    let dismissCooldown: Duration?
 
     @StateObject private var visibility = MeerkatFeedbackVisibilityController()
     @State private var isDismissedThisVisit = false
 
+    private var resolvedDismissCooldown: Duration {
+        MeerkatFeedback.effectiveDismissCooldown(override: dismissCooldown)
+    }
+
     private var usesShakeTrigger: Bool {
         enableShake || MeerkatFeedback.isShakeEnabled
+    }
+
+    private var isSuppressedByDismiss: Bool {
+        isDismissedThisVisit
+            || MeerkatDismissCooldown.isActive(screen: screen, cooldown: resolvedDismissCooldown)
     }
 
     private var isVisible: Bool {
         !usesShakeTrigger
             && MeerkatFeedback.canShowStickyButton
             && visibility.isReady
-            && !isDismissedThisVisit
+            && !isSuppressedByDismiss
     }
 
     private var alignment: Alignment {
@@ -30,7 +40,7 @@ public struct MeerkatFeedbackModifier: ViewModifier {
                 if isVisible {
                     StickyFeedbackButton(
                         onTap: { MeerkatFeedback.present(screen: screen) },
-                        onDismiss: { isDismissedThisVisit = true }
+                        onDismiss: dismissStickyButton
                     )
                     .padding(16)
                     .transition(.opacity.combined(with: .scale))
@@ -58,6 +68,14 @@ public struct MeerkatFeedbackModifier: ViewModifier {
                 visibility.pauseDwell()
             }
     }
+
+    private func dismissStickyButton() {
+        isDismissedThisVisit = true
+        MeerkatDismissCooldown.recordDismiss(
+            screen: screen,
+            cooldown: resolvedDismissCooldown
+        )
+    }
 }
 
 public extension View {
@@ -71,18 +89,22 @@ public extension View {
     ///     in the app session, even if the user navigates away and comes back.
     ///     When both are set, whichever completes first wins.
     ///   - enableShake: On iOS, shake the device to open feedback on this screen (hides the sticky button here).
+    ///   - dismissCooldown: Override how long the sticky button stays hidden after the user taps ✕.
+    ///     `nil` uses the value from `bootstrap`. Pass `.zero` to hide for the current visit only.
     func meerkatFeedback(
         screen: String,
         minimumDwell: Duration? = nil,
         revealAfter: Duration? = nil,
-        enableShake: Bool = false
+        enableShake: Bool = false,
+        dismissCooldown: Duration? = nil
     ) -> some View {
         modifier(
             MeerkatFeedbackModifier(
                 screen: screen,
                 minimumDwell: minimumDwell,
                 revealAfter: revealAfter,
-                enableShake: enableShake
+                enableShake: enableShake,
+                dismissCooldown: dismissCooldown
             )
         )
     }
@@ -110,32 +132,5 @@ private extension FeedbackPosition {
         case .bottomLeading: return .bottomLeading
         case .bottomTrailing: return .bottomTrailing
         }
-    }
-}
-
-struct StickyFeedbackButton: View {
-    let onTap: () -> Void
-    let onDismiss: () -> Void
-
-    var body: some View {
-        HStack(spacing: 0) {
-            Button(action: onTap) {
-                Label(MeerkatLocalizer.text(.feedbackButton, locale: .current), systemImage: "binoculars.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-            }
-            .accessibilityIdentifier("meerkat_feedback_button")
-
-            Button(action: onDismiss) {
-                Image(systemName: "xmark")
-                    .font(.caption.weight(.bold))
-                    .padding(10)
-            }
-            .accessibilityIdentifier("meerkat_feedback_dismiss")
-        }
-        .foregroundStyle(.white)
-        .background(.black.opacity(0.82), in: Capsule())
-        .shadow(color: .black.opacity(0.18), radius: 8, y: 4)
     }
 }

@@ -33,7 +33,8 @@ public enum MeerkatFeedback {
         locale: FeedbackLocale = .current,
         buttonPosition: FeedbackPosition = .bottomTrailing,
         enableShake: Bool = false,
-        isEnabled: Bool = true
+        isEnabled: Bool = true,
+        dismissCooldown: Duration = .seconds(86_400)
     ) {
         MetadataCollector.setAppStoreID(appStoreID)
         let resolvedHeader = headerMetadata.isEmpty
@@ -48,7 +49,8 @@ public enum MeerkatFeedback {
             locale: locale,
             buttonPosition: buttonPosition,
             enableShake: enableShake,
-            isEnabled: isEnabled
+            isEnabled: isEnabled,
+            dismissCooldown: dismissCooldown
         )
     }
 
@@ -60,7 +62,8 @@ public enum MeerkatFeedback {
         locale: FeedbackLocale = .current,
         buttonPosition: FeedbackPosition = .bottomTrailing,
         enableShake: Bool = false,
-        isEnabled: Bool = true
+        isEnabled: Bool = true,
+        dismissCooldown: Duration = .seconds(86_400)
     ) {
         MetadataCollector.setAppStoreID(appStoreID)
         bootstrap = .custom(
@@ -69,7 +72,8 @@ public enum MeerkatFeedback {
             locale: locale,
             buttonPosition: buttonPosition,
             enableShake: enableShake,
-            isEnabled: isEnabled
+            isEnabled: isEnabled,
+            dismissCooldown: dismissCooldown
         )
     }
 
@@ -93,6 +97,10 @@ public enum MeerkatFeedback {
 
     public static func stickyButtonPosition() -> FeedbackPosition {
         bootstrap?.buttonPosition ?? .bottomTrailing
+    }
+
+    static func effectiveDismissCooldown(override: Duration?) -> Duration {
+        override ?? bootstrap?.dismissCooldown ?? .zero
     }
 
     private static func deliver(_ payload: FeedbackPayload, configuration: MeerkatConfiguration) {

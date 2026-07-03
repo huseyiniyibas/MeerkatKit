@@ -9,6 +9,7 @@ struct MeerkatBootstrap {
     var buttonPosition: FeedbackPosition
     var enableShake: Bool
     var isEnabled: Bool
+    var dismissCooldown: Duration
     var customDelivery: (@MainActor (FeedbackPayload) -> Void)?
 
     static func mail(
@@ -19,7 +20,8 @@ struct MeerkatBootstrap {
         locale: FeedbackLocale = .current,
         buttonPosition: FeedbackPosition = .bottomTrailing,
         enableShake: Bool = false,
-        isEnabled: Bool = true
+        isEnabled: Bool = true,
+        dismissCooldown: Duration = .seconds(86_400)
     ) -> MeerkatBootstrap {
         MeerkatBootstrap(
             recipients: recipients,
@@ -30,6 +32,7 @@ struct MeerkatBootstrap {
             buttonPosition: buttonPosition,
             enableShake: enableShake,
             isEnabled: isEnabled,
+            dismissCooldown: dismissCooldown,
             customDelivery: nil
         )
     }
@@ -40,7 +43,8 @@ struct MeerkatBootstrap {
         locale: FeedbackLocale = .current,
         buttonPosition: FeedbackPosition = .bottomTrailing,
         enableShake: Bool = false,
-        isEnabled: Bool = true
+        isEnabled: Bool = true,
+        dismissCooldown: Duration = .seconds(86_400)
     ) -> MeerkatBootstrap {
         MeerkatBootstrap(
             recipients: [],
@@ -51,6 +55,7 @@ struct MeerkatBootstrap {
             buttonPosition: buttonPosition,
             enableShake: enableShake,
             isEnabled: isEnabled,
+            dismissCooldown: dismissCooldown,
             customDelivery: handler
         )
     }

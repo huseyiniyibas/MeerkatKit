@@ -173,6 +173,7 @@ Fallback: region-specific locales map to base language (e.g. `pt-BR` → `pt`); 
 | `minimumDwell` | `nil` (show immediately) |
 | `revealAfter` | `nil` (show immediately) |
 | `enableShake` | `false` (iOS shake on this screen; hides sticky button here) |
+| `dismissCooldown` | `nil` (uses bootstrap default) |
 
 See the table under **Usage** for what each timing parameter means.
 
@@ -188,6 +189,7 @@ See the table under **Usage** for what each timing parameter means.
 | `buttonPosition` | `.bottomTrailing` |
 | `enableShake` | `false` |
 | `isEnabled` | `true` |
+| `dismissCooldown` | 24 hours (`.seconds(86_400)`) — sticky button hidden after ✕ until this elapses (per screen). Pass `.zero` to hide for the current visit only. |
 
 ### Custom delivery
 

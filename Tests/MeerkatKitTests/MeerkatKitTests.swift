@@ -107,4 +107,25 @@ final class MeerkatKitTests: XCTestCase {
         XCTAssertTrue(MeerkatFeedbackRevealTracker.hasRevealed(screen: "Home"))
         #endif
     }
+
+    @MainActor
+    func testDismissCooldownPersistence() {
+        #if DEBUG
+        MeerkatDismissCooldown.resetAll()
+        XCTAssertFalse(MeerkatDismissCooldown.isActive(screen: "Settings", cooldown: .seconds(60)))
+        MeerkatDismissCooldown.recordDismiss(screen: "Settings", cooldown: .seconds(60))
+        XCTAssertTrue(MeerkatDismissCooldown.isActive(screen: "Settings", cooldown: .seconds(60)))
+        MeerkatDismissCooldown.clear(screen: "Settings")
+        XCTAssertFalse(MeerkatDismissCooldown.isActive(screen: "Settings", cooldown: .seconds(60)))
+        #endif
+    }
+
+    @MainActor
+    func testZeroDismissCooldownDoesNotPersist() {
+        #if DEBUG
+        MeerkatDismissCooldown.resetAll()
+        MeerkatDismissCooldown.recordDismiss(screen: "Home", cooldown: .zero)
+        XCTAssertFalse(MeerkatDismissCooldown.isActive(screen: "Home", cooldown: .zero))
+        #endif
+    }
 }
