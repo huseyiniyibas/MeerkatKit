@@ -9,6 +9,15 @@ public struct MeerkatFeedbackModifier: ViewModifier {
 
     @StateObject private var visibility = MeerkatFeedbackVisibilityController()
     @State private var isDismissedThisVisit = false
+    @State private var showTemplatePicker = false
+
+    private func requestFeedback() {
+        if MeerkatFeedback.shouldShowTemplatePicker {
+            showTemplatePicker = true
+        } else {
+            MeerkatFeedback.present(screen: screen)
+        }
+    }
 
     private var resolvedDismissCooldown: Duration {
         MeerkatFeedback.effectiveDismissCooldown(override: dismissCooldown)
@@ -39,7 +48,7 @@ public struct MeerkatFeedbackModifier: ViewModifier {
             .overlay(alignment: alignment) {
                 if isVisible {
                     StickyFeedbackButton(
-                        onTap: { MeerkatFeedback.present(screen: screen) },
+                        onTap: requestFeedback,
                         onDismiss: dismissStickyButton
                     )
                     .padding(16)
@@ -51,11 +60,12 @@ public struct MeerkatFeedbackModifier: ViewModifier {
                 #if os(iOS)
                 if usesShakeTrigger {
                     ShakeResponderBridge {
-                        MeerkatFeedback.present(screen: screen)
+                        requestFeedback()
                     }
                 }
                 #endif
             }
+            .modifier(MeerkatFeedbackSheets(screen: screen, showTemplatePicker: $showTemplatePicker))
             .onAppear {
                 isDismissedThisVisit = false
                 visibility.begin(

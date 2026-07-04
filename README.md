@@ -4,7 +4,7 @@ Swift package for collecting in-app feedback on Apple platforms.
 
 Drop in a floating feedback button per screen, or use shake-to-trigger on iOS. Feedback is delivered through Mail (with mailto fallback) or a custom handler. Device and app metadata are included automatically.
 
-**Links:** [Repository](https://github.com/huseyiniyibas/MeerkatKit) · [Releases](https://github.com/huseyiniyibas/MeerkatKit/releases) · [Platform policy](PLATFORM_SUPPORT.md) · [License](LICENSE)
+**Links:** [Repository](https://github.com/huseyiniyibas/MeerkatKit) · [Releases](https://github.com/huseyiniyibas/MeerkatKit/releases) · [Changelog](CHANGELOG.md) · [Platform policy](PLATFORM_SUPPORT.md) · [License](LICENSE)
 
 ## Requirements
 
@@ -61,7 +61,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.5")
+    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.7")
 ]
 ```
 
@@ -135,6 +135,23 @@ DebugView()
 ```
 
 Dismiss cooldown applies to the **sticky button only** — shake-to-feedback is unaffected.
+
+### Template picker
+
+Pass multiple templates at bootstrap — users pick before Mail opens:
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    templates: [.bugReport, .featureRequest, .general]
+)
+```
+
+With a single template, feedback opens immediately (no sheet).
+
+### API documentation (DocC)
+
+Open the package in Xcode → **Product → Build Documentation**, or browse `Sources/MeerkatKit/MeerkatKit.docc/` (Getting Started, timing & dismiss).
 
 ### AppDelegate example
 

@@ -1,38 +1,7 @@
-#if os(iOS)
 import SwiftUI
+
+#if os(iOS)
 import UIKit
-
-final class ShakeDetector {
-    private var isMonitoring = false
-    private var onShake: (() -> Void)?
-
-    func start(onShake: @escaping () -> Void) {
-        guard !isMonitoring else { return }
-        self.onShake = onShake
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleShake),
-            name: .meerkatDeviceDidShake,
-            object: nil
-        )
-        isMonitoring = true
-    }
-
-    func stop() {
-        guard isMonitoring else { return }
-        NotificationCenter.default.removeObserver(self)
-        isMonitoring = false
-        onShake = nil
-    }
-
-    @objc private func handleShake() {
-        onShake?()
-    }
-}
-
-extension Notification.Name {
-    static let meerkatDeviceDidShake = Notification.Name("MeerkatKit.deviceDidShake")
-}
 
 struct ShakeResponderView: UIViewControllerRepresentable {
     let onShake: () -> Void
@@ -61,7 +30,6 @@ final class ShakeResponderViewController: UIViewController {
     override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         if motion == .motionShake {
             onShake?()
-            NotificationCenter.default.post(name: .meerkatDeviceDidShake, object: nil)
         }
         super.motionEnded(motion, with: event)
     }

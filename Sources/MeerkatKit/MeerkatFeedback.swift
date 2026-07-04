@@ -99,6 +99,21 @@ public enum MeerkatFeedback {
         bootstrap?.buttonPosition ?? .bottomTrailing
     }
 
+    /// Templates configured at ``bootstrap(recipients:appStoreID:...)``. Used by the template picker.
+    public static var configuredTemplates: [FeedbackTemplate] {
+        bootstrap?.templates ?? [.general]
+    }
+
+    /// When `true`, the UI should show a template picker before delivery.
+    public static var shouldShowTemplatePicker: Bool {
+        configuredTemplates.count > 1
+    }
+
+    /// Locale from bootstrap; used by template picker labels.
+    public static var configuredLocale: FeedbackLocale {
+        bootstrap?.locale ?? .current
+    }
+
     static func effectiveDismissCooldown(override: Duration?) -> Duration {
         override ?? bootstrap?.dismissCooldown ?? .zero
     }

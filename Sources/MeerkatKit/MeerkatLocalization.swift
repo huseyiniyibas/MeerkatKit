@@ -15,6 +15,8 @@ enum MeerkatLocalizedKey {
     case labelDevice
     case labelOS
     case labelAppStoreID
+    case templatePickerTitle
+    case templatePickerCancel
 }
 
 enum MeerkatLocalizer {
@@ -44,7 +46,9 @@ enum MeerkatLocalizer {
             .labelScreen: "Screen",
             .labelDevice: "Device",
             .labelOS: "OS",
-            .labelAppStoreID: "App Store ID"
+            .labelAppStoreID: "App Store ID",
+            .templatePickerTitle: "What kind of feedback?",
+            .templatePickerCancel: "Cancel"
         ],
         "tr": [
             .feedbackButton: "Geri Bildirim",
@@ -60,7 +64,9 @@ enum MeerkatLocalizer {
             .labelScreen: "Ekran",
             .labelDevice: "Cihaz",
             .labelOS: "İşletim Sistemi",
-            .labelAppStoreID: "App Store ID"
+            .labelAppStoreID: "App Store ID",
+            .templatePickerTitle: "Ne tür geri bildirim?",
+            .templatePickerCancel: "İptal"
         ],
         "es": [
             .feedbackButton: "Comentarios",

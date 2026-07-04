@@ -30,10 +30,24 @@ final class MeerkatKitTests: XCTestCase {
     }
 
     @MainActor
-    func testTemplateLocalization() {
-        XCTAssertEqual(FeedbackTemplate.bugReport.subject(for: .english), "Bug Report")
-        XCTAssertEqual(FeedbackTemplate.bugReport.subject(for: .turkish), "Hata Bildirimi")
-        XCTAssertEqual(FeedbackTemplate.featureRequest.subject(for: .english), "Feature Request")
+    func testTemplatePickerEligibility() {
+        MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
+        XCTAssertFalse(MeerkatFeedback.shouldShowTemplatePicker)
+        XCTAssertEqual(MeerkatFeedback.configuredTemplates, [.general])
+
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            templates: [.bugReport, .featureRequest, .general]
+        )
+        XCTAssertTrue(MeerkatFeedback.shouldShowTemplatePicker)
+        XCTAssertEqual(MeerkatFeedback.configuredTemplates.count, 3)
+    }
+
+    @MainActor
+    func testTemplateTitlesArePublic() {
+        XCTAssertEqual(FeedbackTemplate.bugReport.title(for: .english), "Bug Report")
+        XCTAssertEqual(FeedbackTemplate.bugReport.title(for: .turkish), "Hata Bildirimi")
+        XCTAssertEqual(FeedbackTemplate.featureRequest.title(for: .english), "Feature Request")
     }
 
 

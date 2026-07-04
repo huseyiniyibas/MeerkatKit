@@ -24,7 +24,12 @@ public enum FeedbackTemplate: String, Sendable, CaseIterable {
     case featureRequest
     case general
 
-    func subject(for locale: FeedbackLocale) -> String {
+    /// Localized label for template picker rows and mail subjects.
+    public func title(for locale: FeedbackLocale) -> String {
+        subject(for: locale)
+    }
+
+    public func subject(for locale: FeedbackLocale) -> String {
         switch self {
         case .bugReport:
             return MeerkatLocalizer.text(.subjectBugReport, locale: locale)
