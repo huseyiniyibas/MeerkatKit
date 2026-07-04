@@ -82,6 +82,10 @@ enum FeedbackEmailComposer {
             return MeerkatLocalizer.text(.labelOS, locale: locale)
         case "appstoreid":
             return MeerkatLocalizer.text(.labelAppStoreID, locale: locale)
+        case "userid":
+            return "User ID"
+        case "email":
+            return "Email"
         default:
             return key
         }

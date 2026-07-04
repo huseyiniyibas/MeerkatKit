@@ -58,6 +58,7 @@ public enum FeedbackDelivery {
         headerMetadata: [String] = [],
         footerMetadata: [String] = []
     )
+    case api(FeedbackAPIConfiguration)
     case custom(@MainActor (FeedbackPayload) -> Void)
 }
 
@@ -93,6 +94,7 @@ public struct FeedbackPayload: Sendable {
     public let body: String
     public let metadata: [String: String]
     public let userInput: FeedbackUserInput?
+    public let attachments: [FeedbackAttachment]
 
     public init(
         placement: String,
@@ -100,7 +102,8 @@ public struct FeedbackPayload: Sendable {
         subject: String,
         body: String,
         metadata: [String: String],
-        userInput: FeedbackUserInput? = nil
+        userInput: FeedbackUserInput? = nil,
+        attachments: [FeedbackAttachment] = []
     ) {
         self.placement = placement
         self.template = template
@@ -108,5 +111,6 @@ public struct FeedbackPayload: Sendable {
         self.body = body
         self.metadata = metadata
         self.userInput = userInput
+        self.attachments = attachments
     }
 }

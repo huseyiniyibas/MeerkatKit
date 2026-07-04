@@ -8,6 +8,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         screen: String,
         template: FeedbackTemplate,
         locale: FeedbackLocale,
+        offerScreenshot: Bool,
         onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void
     ) {
         guard let presenter = TopViewControllerFinder.topViewController() else {
@@ -18,6 +19,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         let sheet = MeerkatFeedbackFormSheet(
             template: template,
             locale: locale,
+            offerScreenshot: offerScreenshot,
             onSubmit: onSubmit
         )
         let host = UIHostingController(rootView: sheet)
@@ -39,11 +41,13 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         screen: String,
         template: FeedbackTemplate,
         locale: FeedbackLocale,
+        offerScreenshot: Bool,
         onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void
     ) {
         let sheet = MeerkatFeedbackFormSheet(
             template: template,
             locale: locale,
+            offerScreenshot: offerScreenshot,
             onSubmit: onSubmit
         )
         let host = NSHostingController(rootView: sheet)

@@ -1,0 +1,262 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E10000010000000000000001 /* MeerkatKitExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000110000000000000001 /* MeerkatKitExampleApp.swift */; };
+		E10000010000000000000002 /* ExampleHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000110000000000000002 /* ExampleHomeView.swift */; };
+		E10000010000000000000003 /* ExampleSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000110000000000000003 /* ExampleSettingsView.swift */; };
+		E10000010000000000000004 /* ExampleBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000110000000000000004 /* ExampleBootstrap.swift */; };
+		E10000010000000000000005 /* MeerkatKit in Frameworks */ = {isa = PBXBuildFile; productRef = E10000310000000000000001 /* MeerkatKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		E10000110000000000000001 /* MeerkatKitExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeerkatKitExampleApp.swift; sourceTree = "<group>"; };
+		E10000110000000000000002 /* ExampleHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleHomeView.swift; sourceTree = "<group>"; };
+		E10000110000000000000003 /* ExampleSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleSettingsView.swift; sourceTree = "<group>"; };
+		E10000110000000000000004 /* ExampleBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleBootstrap.swift; sourceTree = "<group>"; };
+		E10000210000000000000001 /* MeerkatKitExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MeerkatKitExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E10000410000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E10000010000000000000005 /* MeerkatKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E10000510000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				E10000510000000000000002 /* Shared */,
+				E10000510000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E10000510000000000000002 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				E10000110000000000000001 /* MeerkatKitExampleApp.swift */,
+				E10000110000000000000002 /* ExampleHomeView.swift */,
+				E10000110000000000000003 /* ExampleSettingsView.swift */,
+				E10000110000000000000004 /* ExampleBootstrap.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		E10000510000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E10000210000000000000001 /* MeerkatKitExample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E10000610000000000000001 /* MeerkatKitExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E10000810000000000000003 /* Build configuration list for PBXNativeTarget "MeerkatKitExample" */;
+			buildPhases = (
+				E10000710000000000000001 /* Sources */,
+				E10000410000000000000001 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MeerkatKitExample;
+			packageProductDependencies = (
+				E10000310000000000000001 /* MeerkatKit */,
+			);
+			productName = MeerkatKitExample;
+			productReference = E10000210000000000000001 /* MeerkatKitExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E10000910000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = E10000810000000000000001 /* Build configuration list for PBXProject "MeerkatKitExample" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E10000510000000000000001;
+			packageReferences = (
+				E10000A10000000000000001 /* XCLocalSwiftPackageReference "../../" */,
+			);
+			productRefGroup = E10000510000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E10000610000000000000001 /* MeerkatKitExample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E10000710000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E10000010000000000000001 /* MeerkatKitExampleApp.swift in Sources */,
+				E10000010000000000000002 /* ExampleHomeView.swift in Sources */,
+				E10000010000000000000003 /* ExampleSettingsView.swift in Sources */,
+				E10000010000000000000004 /* ExampleBootstrap.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		E10000B10000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx appletvos appletvsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TVOS_DEPLOYMENT_TARGET = 17.5;
+			};
+			name = Debug;
+		};
+		E10000B10000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx appletvos appletvsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				TVOS_DEPLOYMENT_TARGET = 17.5;
+			};
+			name = Release;
+		};
+		E10000B10000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MeerkatKitExample;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.MeerkatKitExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+			};
+			name = Debug;
+		};
+		E10000B10000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MeerkatKitExample;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.MeerkatKitExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E10000810000000000000001 /* Build configuration list for PBXProject "MeerkatKitExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E10000B10000000000000001 /* Debug */,
+				E10000B10000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E10000810000000000000003 /* Build configuration list for PBXNativeTarget "MeerkatKitExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E10000B10000000000000003 /* Debug */,
+				E10000B10000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		E10000A10000000000000001 /* XCLocalSwiftPackageReference "../../" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E10000310000000000000001 /* MeerkatKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E10000A10000000000000001 /* XCLocalSwiftPackageReference "../../" */;
+			productName = MeerkatKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = E10000910000000000000001 /* Project object */;
+}

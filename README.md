@@ -61,7 +61,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.9")
+    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.1.0")
 ]
 ```
 
@@ -212,7 +212,60 @@ From UIKit or anywhere else on the same screen:
 MeerkatFeedback.requestFeedback(screen: "Settings")
 ```
 
-`requestFeedback` runs the template picker (if configured) then opens Mail — same path as the default button.
+`requestFeedback` runs the template picker (if configured), in-app form, then delivery.
+
+### REST API delivery
+
+Post JSON to your backend instead of Mail:
+
+```swift
+MeerkatFeedback.bootstrap(
+    api: URL(string: "https://api.yourapp.com/feedback")!,
+    headers: ["Authorization": "Bearer token"],
+    offlineRetryEnabled: true
+)
+```
+
+Failed submissions are queued locally and retried via ``MeerkatFeedback/flushOfflineQueue()``.
+
+### User identity
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    userIdentity: FeedbackUserIdentity(userId: "u_123", email: "user@example.com")
+)
+
+// or anonymous
+MeerkatFeedback.setUserIdentity(.anonymous)
+```
+
+### Screenshots & logs
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    offerScreenshotInForm: true,
+    crashLogPath: "/path/to/last-crash.log"
+)
+MeerkatFeedback.setLogProvider { MyLogger.recentLines() }
+```
+
+Attachments are included in Mail, share sheet text context, and API JSON (`attachments[].dataBase64`).
+
+### UIKit integration
+
+```swift
+navigationItem.rightBarButtonItem = MeerkatFeedbackUIKit.makeBarButtonItem(screen: "Profile")
+// or
+meerkatRequestFeedback(screen: "Checkout")
+```
+
+See `MeerkatKit.docc/UIKitIntegration.md`.
+
+### Example app
+
+Open `Examples/MeerkatKitExample/MeerkatKitExample.xcodeproj` — demonstrates floating, shake, integrated mode, and API bootstrap (Debug).
 
 ### API documentation (DocC)
 

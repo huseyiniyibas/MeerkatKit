@@ -22,6 +22,7 @@ enum MeerkatLocalizedKey {
     case formCancel
     case formRatingLabel
     case formMessagePlaceholder
+    case formIncludeScreenshot
     case labelRating
     case labelRecipients
 }
@@ -61,6 +62,7 @@ enum MeerkatLocalizer {
             .formCancel: "Cancel",
             .formRatingLabel: "How would you rate your experience?",
             .formMessagePlaceholder: "Tell us more…",
+            .formIncludeScreenshot: "Include screenshot",
             .labelRating: "Rating",
             .labelRecipients: "Send to"
         ],
@@ -86,6 +88,7 @@ enum MeerkatLocalizer {
             .formCancel: "İptal",
             .formRatingLabel: "Deneyiminizi nasıl değerlendirirsiniz?",
             .formMessagePlaceholder: "Detayları yazın…",
+            .formIncludeScreenshot: "Ekran görüntüsü ekle",
             .labelRating: "Puan",
             .labelRecipients: "Alıcı"
         ],

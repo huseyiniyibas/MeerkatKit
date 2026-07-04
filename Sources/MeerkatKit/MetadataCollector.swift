@@ -11,10 +11,25 @@ import AppKit
 @MainActor
 enum MetadataCollector {
     private static var configuredAppStoreID: String?
+    private static var userIdentity: FeedbackUserIdentity = .anonymous
 
     static func setAppStoreID(_ appStoreID: String?) {
         configuredAppStoreID = appStoreID?.trimmingCharacters(in: .whitespacesAndNewlines)
     }
+
+    static func setUserIdentity(_ identity: FeedbackUserIdentity) {
+        userIdentity = identity
+    }
+
+    static var currentUserIdentity: FeedbackUserIdentity {
+        userIdentity
+    }
+
+    #if DEBUG
+    static func resetUserIdentity() {
+        userIdentity = .anonymous
+    }
+    #endif
 
     static var includesConfiguredAppStoreID: Bool {
         guard let configuredAppStoreID else { return false }
@@ -33,11 +48,24 @@ enum MetadataCollector {
 
         let keys = Set(headerKeys + footerKeys)
         for key in keys {
+            let normalized = key.lowercased()
+            if userIdentity.isAnonymous, normalized == "userid" || normalized == "email" {
+                continue
+            }
             metadata[key] = resolveValue(for: key)
         }
 
         if let appStoreID = configuredAppStoreID, !appStoreID.isEmpty {
             metadata["appStoreID"] = appStoreID
+        }
+
+        if !userIdentity.isAnonymous {
+            if let userId = userIdentity.userId, !userId.isEmpty {
+                metadata["userId"] = userId
+            }
+            if let email = userIdentity.email, !email.isEmpty {
+                metadata["email"] = email
+            }
         }
 
         return metadata
@@ -72,6 +100,10 @@ enum MetadataCollector {
             return formattedOSVersion
         case "appstoreid":
             return configuredAppStoreID ?? "—"
+        case "userid":
+            return userIdentity.isAnonymous ? "—" : (userIdentity.userId ?? "—")
+        case "email":
+            return userIdentity.isAnonymous ? "—" : (userIdentity.email ?? "—")
         case "devicename":
             return deviceName
         case "screen", "placement":

@@ -75,6 +75,7 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
                     MeerkatFeedbackFormSheet(
                         template: template,
                         locale: MeerkatFeedback.configuredLocale,
+                        offerScreenshot: MeerkatFeedback.shouldOfferScreenshotInForm,
                         onSubmit: session.submitForm
                     )
                 }

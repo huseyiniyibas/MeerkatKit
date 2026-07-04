@@ -15,6 +15,13 @@ enum MailFeedbackPresenter {
             composer.setToRecipients(recipients)
             composer.setSubject("[\(payload.placement)] \(payload.subject)")
             composer.setMessageBody(payload.body, isHTML: false)
+            for attachment in payload.attachments {
+                composer.addAttachmentData(
+                    attachment.data,
+                    mimeType: attachment.mimeType,
+                    fileName: attachment.filename
+                )
+            }
             composer.mailComposeDelegate = MailComposeDelegate.shared
 
             presenter.present(composer, animated: true)

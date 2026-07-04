@@ -3,11 +3,13 @@ import SwiftUI
 struct MeerkatFeedbackFormSheet: View {
     let template: FeedbackTemplate
     let locale: FeedbackLocale
+    let offerScreenshot: Bool
     let onSubmit: (FeedbackUserInput) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var message = ""
     @State private var rating: Int?
+    @State private var includeScreenshot = false
 
     var body: some View {
         NavigationStack {
@@ -22,6 +24,12 @@ struct MeerkatFeedbackFormSheet: View {
                         placeholder: MeerkatLocalizer.text(.formMessagePlaceholder, locale: locale),
                         text: $message
                     )
+                    if offerScreenshot {
+                        FeedbackScreenshotToggle(
+                            label: MeerkatLocalizer.text(.formIncludeScreenshot, locale: locale),
+                            isOn: $includeScreenshot
+                        )
+                    }
                 }
                 .padding()
             }
@@ -53,7 +61,13 @@ struct MeerkatFeedbackFormSheet: View {
 
     private func submit() {
         let trimmed = message.trimmingCharacters(in: .whitespacesAndNewlines)
-        onSubmit(FeedbackUserInput(message: trimmed, rating: rating))
+        onSubmit(
+            FeedbackUserInput(
+                message: trimmed,
+                rating: rating,
+                includeScreenshot: includeScreenshot
+            )
+        )
         dismiss()
     }
 }
@@ -71,6 +85,17 @@ private struct FeedbackFormCategoryRow: View {
                 .font(.headline)
         }
         .accessibilityElement(children: .combine)
+    }
+}
+
+private struct FeedbackScreenshotToggle: View {
+    let label: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            Label(label, systemImage: "camera.viewfinder")
+        }
     }
 }
 
