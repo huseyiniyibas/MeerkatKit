@@ -29,7 +29,7 @@ enum FeedbackOfflineQueue {
     }
 
     static func flush(using session: URLSession = APIFeedbackDelivery.urlSession) async -> Int {
-        var queue = load()
+        let queue = load()
         guard !queue.isEmpty else { return 0 }
 
         var delivered = 0

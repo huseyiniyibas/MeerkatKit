@@ -51,8 +51,10 @@ struct MeerkatFeedbackFormSheet: View {
                 }
             }
         }
+        #if os(iOS)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        #endif
     }
 
     private var canSubmit: Bool {
@@ -105,6 +107,15 @@ private struct FeedbackFormMessageField: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            #if os(tvOS)
+            TextField(placeholder, text: $text, axis: .vertical)
+                .lineLimit(5 ... 10)
+                .padding(8)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(.quaternary, lineWidth: 1)
+                }
+            #else
             TextEditor(text: $text)
                 .frame(minHeight: 120)
                 .padding(8)
@@ -121,6 +132,7 @@ private struct FeedbackFormMessageField: View {
                             .allowsHitTesting(false)
                     }
                 }
+            #endif
         }
     }
 }

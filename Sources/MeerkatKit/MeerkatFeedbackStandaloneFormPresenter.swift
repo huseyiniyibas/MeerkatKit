@@ -1,4 +1,4 @@
-#if canImport(UIKit)
+#if os(iOS)
 import SwiftUI
 import UIKit
 
@@ -28,6 +28,35 @@ enum MeerkatFeedbackStandaloneFormPresenter {
             sheetController.detents = [.medium(), .large()]
             sheetController.prefersGrabberVisible = true
         }
+        presenter.present(host, animated: true)
+    }
+}
+#elseif os(tvOS)
+import SwiftUI
+import UIKit
+
+@MainActor
+enum MeerkatFeedbackStandaloneFormPresenter {
+    static func present(
+        screen: String,
+        template: FeedbackTemplate,
+        locale: FeedbackLocale,
+        offerScreenshot: Bool,
+        onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void
+    ) {
+        guard let presenter = TopViewControllerFinder.topViewController() else {
+            MeerkatFeedback.submitFeedback(screen: screen, template: template, userInput: nil)
+            return
+        }
+
+        let sheet = MeerkatFeedbackFormSheet(
+            template: template,
+            locale: locale,
+            offerScreenshot: offerScreenshot,
+            onSubmit: onSubmit
+        )
+        let host = UIHostingController(rootView: sheet)
+        host.modalPresentationStyle = .fullScreen
         presenter.present(host, animated: true)
     }
 }

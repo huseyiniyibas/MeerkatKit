@@ -11,15 +11,15 @@ enum ShareFeedbackPresenter {
 
         #if os(iOS)
         ShareFeedbackPresenterIOS.present(subject: subject, body: shareText)
+        #elseif os(tvOS)
+        ShareFeedbackPresenterTV.present(subject: subject, body: shareText)
         #elseif os(macOS)
         ShareFeedbackPresenterMac.present(subject: subject, body: shareText)
-        #elseif os(tvOS)
-        ShareFeedbackPresenterIOS.present(subject: subject, body: shareText)
         #endif
     }
 }
 
-#if canImport(UIKit)
+#if os(iOS)
 import UIKit
 
 private enum ShareFeedbackPresenterIOS {
@@ -42,6 +42,18 @@ private enum ShareFeedbackPresenterIOS {
             )
         }
         presenter.present(controller, animated: true)
+    }
+}
+#endif
+
+#if os(tvOS)
+import UIKit
+
+private enum ShareFeedbackPresenterTV {
+    @MainActor
+    static func present(subject: String, body: String) {
+        UIPasteboard.general.string = "\(subject)\n\n\(body)"
+        print("MeerkatKit: Feedback copied to pasteboard (tvOS share fallback).")
     }
 }
 #endif

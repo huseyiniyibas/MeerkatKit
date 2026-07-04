@@ -61,7 +61,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.1.0")
+    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.1.1")
 ]
 ```
 

@@ -3,6 +3,13 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.1.1] — 2026-07-04
+
+### Fixed
+
+- **tvOS CI build** — `TextEditor` / `presentationDetents` / `pageSheet` guarded per platform; share fallback uses pasteboard on tvOS.
+- Extracted ``TopViewControllerFinder`` for shared iOS + tvOS UIKit presentation.
+
 ## [0.1.0] — 2026-07-04
 
 ### Added
@@ -99,6 +106,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.1.1]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.9...v0.1.0
 [0.0.9]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.7...v0.0.8

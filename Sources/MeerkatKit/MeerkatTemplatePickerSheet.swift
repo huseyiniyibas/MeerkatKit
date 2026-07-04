@@ -31,8 +31,10 @@ struct MeerkatTemplatePickerSheet: View {
                 }
             }
         }
+        #if os(iOS)
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
+        #endif
     }
 }
 
