@@ -12,7 +12,9 @@ enum FeedbackEmailComposer {
     static func composeBody(
         metadata: [String: String],
         locale: FeedbackLocale,
-        orderedKeys: [String]
+        orderedKeys: [String],
+        template: FeedbackTemplate,
+        userInput: FeedbackUserInput?
     ) -> String {
         var consumedKeys = Set<String>()
         let infoLines = orderedKeys.compactMap { key -> String? in
@@ -46,16 +48,24 @@ enum FeedbackEmailComposer {
 
         let infoBlock = infoLines.joined(separator: "\n")
         let separator = String(repeating: "=", count: 40)
+        var sections: [String] = [infoBlock]
 
-        return """
-        \(infoBlock)
+        if let userInput {
+            if let rating = userInput.rating {
+                sections.append(
+                    "\(MeerkatLocalizer.text(.labelRating, locale: locale)): \(rating)/5"
+                )
+            }
+            let prefix = template.bodyPrefix(for: locale)
+            sections.append("\(prefix)\(userInput.message)")
+        } else {
+            sections.append(MeerkatLocalizer.text(.promptTypeBelow, locale: locale))
+            sections.append(separator)
+            sections.append("")
+            sections.append("")
+        }
 
-        \(MeerkatLocalizer.text(.promptTypeBelow, locale: locale))
-        \(separator)
-
-
-
-        """
+        return sections.joined(separator: "\n\n") + "\n"
     }
 
     private static func label(for key: String, locale: FeedbackLocale) -> String {

@@ -92,4 +92,21 @@ public struct FeedbackPayload: Sendable {
     public let subject: String
     public let body: String
     public let metadata: [String: String]
+    public let userInput: FeedbackUserInput?
+
+    public init(
+        placement: String,
+        template: FeedbackTemplate,
+        subject: String,
+        body: String,
+        metadata: [String: String],
+        userInput: FeedbackUserInput? = nil
+    ) {
+        self.placement = placement
+        self.template = template
+        self.subject = subject
+        self.body = body
+        self.metadata = metadata
+        self.userInput = userInput
+    }
 }

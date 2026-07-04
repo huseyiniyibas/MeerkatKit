@@ -61,7 +61,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.8")
+    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.9")
 ]
 ```
 
@@ -147,7 +147,38 @@ MeerkatFeedback.bootstrap(
 )
 ```
 
-With a single template, feedback opens immediately (no sheet).
+With a single template, feedback opens the in-app form (or Mail directly when `collectUserInput: false`).
+
+### In-app feedback form
+
+By default users fill a short form (message + optional star rating) before Mail or custom delivery:
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    collectUserInput: true  // default
+)
+```
+
+Disable for legacy immediate-mail behaviour:
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    collectUserInput: false
+)
+```
+
+### Mail unavailable fallback
+
+When Mail is not configured or mailto cannot open, MeerkatKit shows a **share sheet** with the formatted feedback text (default). Override at bootstrap:
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    mailUnavailableFallback: .shareSheet  // or .none
+)
+```
 
 ### Custom button UI
 

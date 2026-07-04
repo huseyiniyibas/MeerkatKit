@@ -3,6 +3,18 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.0.9] — 2026-07-04
+
+### Added
+
+- **In-app feedback form** — message + optional 1–5 star rating before delivery (default `collectUserInput: true` on bootstrap).
+- **Mail unavailable fallback** — share sheet when Mail / mailto cannot be used (`mailUnavailableFallback: .shareSheet`, default).
+
+### Changed
+
+- Mail body now includes user message and rating when collected in-app.
+- Set `collectUserInput: false` on bootstrap to restore immediate mail delivery (legacy behaviour).
+
 ## [0.0.8] — 2026-07-04
 
 ### Added
@@ -74,6 +86,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.0.9]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.5...v0.0.6

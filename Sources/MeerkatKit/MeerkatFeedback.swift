@@ -23,6 +23,11 @@ public enum MeerkatFeedback {
         return bootstrap.enableShake
     }
 
+    /// When `true`, users fill an in-app form before feedback is delivered.
+    public static var shouldCollectUserInput: Bool {
+        bootstrap?.collectUserInput ?? true
+    }
+
     /// Call once at app launch (e.g. `AppDelegate` or `@main` `App` `init`).
     public static func bootstrap(
         recipients: [String],
@@ -34,7 +39,9 @@ public enum MeerkatFeedback {
         buttonPosition: FeedbackPosition = .bottomTrailing,
         enableShake: Bool = false,
         isEnabled: Bool = true,
-        dismissCooldown: Duration = .seconds(86_400)
+        dismissCooldown: Duration = .seconds(86_400),
+        collectUserInput: Bool = true,
+        mailUnavailableFallback: MailUnavailableFallback = .shareSheet
     ) {
         MetadataCollector.setAppStoreID(appStoreID)
         let resolvedHeader = headerMetadata.isEmpty
@@ -50,7 +57,9 @@ public enum MeerkatFeedback {
             buttonPosition: buttonPosition,
             enableShake: enableShake,
             isEnabled: isEnabled,
-            dismissCooldown: dismissCooldown
+            dismissCooldown: dismissCooldown,
+            collectUserInput: collectUserInput,
+            mailUnavailableFallback: mailUnavailableFallback
         )
     }
 
@@ -63,7 +72,8 @@ public enum MeerkatFeedback {
         buttonPosition: FeedbackPosition = .bottomTrailing,
         enableShake: Bool = false,
         isEnabled: Bool = true,
-        dismissCooldown: Duration = .seconds(86_400)
+        dismissCooldown: Duration = .seconds(86_400),
+        collectUserInput: Bool = true
     ) {
         MetadataCollector.setAppStoreID(appStoreID)
         bootstrap = .custom(
@@ -73,7 +83,8 @@ public enum MeerkatFeedback {
             buttonPosition: buttonPosition,
             enableShake: enableShake,
             isEnabled: isEnabled,
-            dismissCooldown: dismissCooldown
+            dismissCooldown: dismissCooldown,
+            collectUserInput: collectUserInput
         )
     }
 
@@ -86,24 +97,55 @@ public enum MeerkatFeedback {
     }
 
     /// Opens the feedback flow for ``screen`` — template picker when multiple templates are configured.
-    ///
-    /// Prefer this from your own buttons. When the screen uses ``View/meerkatFeedback(screen:presentation:)``
-    /// with ``MeerkatFeedbackPresentation/integrated``, or ``EnvironmentValues/meerkatFeedbackRequest``.
     public static func requestFeedback(screen: String) {
         MeerkatFeedbackSessionRegistry.requestFeedback(screen: screen)
     }
 
-    /// Delivers feedback immediately, skipping the template picker.
+    /// Starts feedback for ``screen``. Shows the in-app form when ``shouldCollectUserInput`` is `true`.
     public static func present(
         screen: String,
         template: FeedbackTemplate? = nil
+    ) {
+        guard isEnabled else { return }
+        let resolvedTemplate = template ?? configuredTemplates.first ?? .general
+        MeerkatFeedbackSessionRegistry.beginFeedbackForm(
+            screen: screen,
+            template: resolvedTemplate
+        )
+    }
+
+    static func beginFeedbackWithoutSession(
+        screen: String,
+        template: FeedbackTemplate
+    ) {
+        guard let bootstrap, bootstrap.isEnabled else { return }
+
+        if bootstrap.collectUserInput {
+            MeerkatFeedbackStandaloneFormPresenter.present(
+                screen: screen,
+                template: template,
+                locale: bootstrap.locale,
+                onSubmit: { userInput in
+                    submitFeedback(screen: screen, template: template, userInput: userInput)
+                }
+            )
+        } else {
+            submitFeedback(screen: screen, template: template, userInput: nil)
+        }
+    }
+
+    static func submitFeedback(
+        screen: String,
+        template: FeedbackTemplate,
+        userInput: FeedbackUserInput?
     ) {
         guard let bootstrap, bootstrap.isEnabled else { return }
         let configuration = bootstrap.configuration(placement: screen)
         let payload = FeedbackPayloadBuilder.build(
             configuration: configuration,
             placementOverride: screen,
-            templateOverride: template
+            templateOverride: template,
+            userInput: userInput
         )
         deliver(payload, configuration: configuration)
     }
@@ -112,19 +154,20 @@ public enum MeerkatFeedback {
         bootstrap?.buttonPosition ?? .bottomTrailing
     }
 
-    /// Templates configured at ``bootstrap(recipients:appStoreID:...)``. Used by the template picker.
     public static var configuredTemplates: [FeedbackTemplate] {
         bootstrap?.templates ?? [.general]
     }
 
-    /// When `true`, the UI should show a template picker before delivery.
     public static var shouldShowTemplatePicker: Bool {
         configuredTemplates.count > 1
     }
 
-    /// Locale from bootstrap; used by template picker labels.
     public static var configuredLocale: FeedbackLocale {
         bootstrap?.locale ?? .current
+    }
+
+    static var mailUnavailableFallback: MailUnavailableFallback {
+        bootstrap?.mailUnavailableFallback ?? .shareSheet
     }
 
     static func effectiveDismissCooldown(override: Duration?) -> Duration {
@@ -146,7 +189,8 @@ enum FeedbackPayloadBuilder {
     static func build(
         configuration: MeerkatConfiguration,
         placementOverride: String?,
-        templateOverride: FeedbackTemplate?
+        templateOverride: FeedbackTemplate?,
+        userInput: FeedbackUserInput? = nil
     ) -> FeedbackPayload {
         let template = templateOverride ?? configuration.templates.first ?? .general
         let placement = placementOverride ?? configuration.placement
@@ -167,7 +211,9 @@ enum FeedbackPayloadBuilder {
         let body = FeedbackEmailComposer.composeBody(
             metadata: metadata,
             locale: configuration.locale,
-            orderedKeys: orderedKeys
+            orderedKeys: orderedKeys,
+            template: template,
+            userInput: userInput
         )
 
         return FeedbackPayload(
@@ -175,7 +221,8 @@ enum FeedbackPayloadBuilder {
             template: template,
             subject: subject,
             body: body,
-            metadata: metadata
+            metadata: metadata,
+            userInput: userInput
         )
     }
 

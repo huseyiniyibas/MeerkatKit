@@ -66,9 +66,18 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
                     templates: MeerkatFeedback.configuredTemplates,
                     locale: MeerkatFeedback.configuredLocale,
                     onSelect: { template in
-                        MeerkatFeedback.present(screen: screen, template: template)
+                        session.beginFeedbackForm(template: template)
                     }
                 )
+            }
+            .sheet(isPresented: $session.showFeedbackForm) {
+                if let template = session.pendingTemplate {
+                    MeerkatFeedbackFormSheet(
+                        template: template,
+                        locale: MeerkatFeedback.configuredLocale,
+                        onSubmit: session.submitForm
+                    )
+                }
             }
             .onAppear {
                 isDismissedThisVisit = false

@@ -71,16 +71,60 @@ final class MeerkatKitTests: XCTestCase {
 
     @MainActor
     func testPayloadIncludesScreenName() {
-        MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            collectUserInput: false
+        )
         MeerkatFeedback.setEnabled(true)
         let expectation = expectation(description: "custom delivery")
-        MeerkatFeedback.bootstrap(customDelivery: { payload in
-            XCTAssertEqual(payload.placement, "Checkout")
-            XCTAssertEqual(payload.metadata["placement"], "Checkout")
-            expectation.fulfill()
-        })
+        MeerkatFeedback.bootstrap(
+            customDelivery: { payload in
+                XCTAssertEqual(payload.placement, "Checkout")
+                XCTAssertEqual(payload.metadata["placement"], "Checkout")
+                expectation.fulfill()
+            },
+            collectUserInput: false
+        )
         MeerkatFeedback.present(screen: "Checkout", template: .bugReport)
         wait(for: [expectation], timeout: 1)
+    }
+
+    @MainActor
+    func testPayloadIncludesUserInput() {
+        MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
+        let configuration = MeerkatBootstrap.mail(recipients: ["test@example.com"]).configuration(placement: "Home")
+        let userInput = FeedbackUserInput(message: "App crashes on launch", rating: 2)
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "Home",
+            templateOverride: .bugReport,
+            userInput: userInput
+        )
+
+        XCTAssertEqual(payload.userInput, userInput)
+        XCTAssertTrue(payload.body.contains("App crashes on launch"))
+        XCTAssertTrue(payload.body.contains("Rating: 2/5"))
+        XCTAssertTrue(payload.body.contains("Describe the bug:"))
+    }
+
+    @MainActor
+    func testCollectUserInputDefaultsTrue() {
+        MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
+        XCTAssertTrue(MeerkatFeedback.shouldCollectUserInput)
+    }
+
+    @MainActor
+    func testBeginFeedbackFormShowsFormSheet() {
+        #if DEBUG
+        MeerkatFeedbackSessionRegistry.resetAll()
+        MeerkatFeedback.bootstrap(recipients: ["test@example.com"], collectUserInput: true)
+        let session = MeerkatFeedbackScreenSession(screen: "Settings")
+        MeerkatFeedbackSessionRegistry.register(session)
+        session.beginFeedbackForm(template: .general)
+        XCTAssertTrue(session.showFeedbackForm)
+        XCTAssertEqual(session.pendingTemplate, .general)
+        MeerkatFeedbackSessionRegistry.resetAll()
+        #endif
     }
 
     @MainActor
@@ -94,7 +138,8 @@ final class MeerkatKitTests: XCTestCase {
         let payload = FeedbackPayloadBuilder.build(
             configuration: configuration,
             placementOverride: "Settings",
-            templateOverride: .general
+            templateOverride: .general,
+            userInput: nil
         )
 
         XCTAssertEqual(payload.subject, "Feedback")

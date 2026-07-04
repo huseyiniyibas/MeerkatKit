@@ -17,6 +17,13 @@ enum MeerkatLocalizedKey {
     case labelAppStoreID
     case templatePickerTitle
     case templatePickerCancel
+    case formTitle
+    case formSubmit
+    case formCancel
+    case formRatingLabel
+    case formMessagePlaceholder
+    case labelRating
+    case labelRecipients
 }
 
 enum MeerkatLocalizer {
@@ -48,7 +55,14 @@ enum MeerkatLocalizer {
             .labelOS: "OS",
             .labelAppStoreID: "App Store ID",
             .templatePickerTitle: "What kind of feedback?",
-            .templatePickerCancel: "Cancel"
+            .templatePickerCancel: "Cancel",
+            .formTitle: "Send Feedback",
+            .formSubmit: "Send",
+            .formCancel: "Cancel",
+            .formRatingLabel: "How would you rate your experience?",
+            .formMessagePlaceholder: "Tell us more…",
+            .labelRating: "Rating",
+            .labelRecipients: "Send to"
         ],
         "tr": [
             .feedbackButton: "Geri Bildirim",
@@ -66,7 +80,14 @@ enum MeerkatLocalizer {
             .labelOS: "İşletim Sistemi",
             .labelAppStoreID: "App Store ID",
             .templatePickerTitle: "Ne tür geri bildirim?",
-            .templatePickerCancel: "İptal"
+            .templatePickerCancel: "İptal",
+            .formTitle: "Geri Bildirim Gönder",
+            .formSubmit: "Gönder",
+            .formCancel: "İptal",
+            .formRatingLabel: "Deneyiminizi nasıl değerlendirirsiniz?",
+            .formMessagePlaceholder: "Detayları yazın…",
+            .labelRating: "Puan",
+            .labelRecipients: "Alıcı"
         ],
         "es": [
             .feedbackButton: "Comentarios",

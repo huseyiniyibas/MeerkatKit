@@ -8,10 +8,29 @@ enum FeedbackMailDelivery {
         #if os(iOS)
         MailFeedbackPresenter.present(payload: payload, recipients: recipients)
         #elseif os(macOS)
-        MailtoFeedbackPresenter.present(payload: payload, recipients: recipients)
+        deliverViaMailtoOrFallback(payload: payload, recipients: recipients)
         #elseif os(tvOS)
-        MailtoFeedbackPresenter.present(payload: payload, recipients: recipients)
+        deliverViaMailtoOrFallback(payload: payload, recipients: recipients)
         #endif
+    }
+
+    @MainActor
+    private static func deliverViaMailtoOrFallback(
+        payload: FeedbackPayload,
+        recipients: [String]
+    ) {
+        let opened = MailtoFeedbackPresenter.presentIfPossible(
+            payload: payload,
+            recipients: recipients
+        )
+        if !opened {
+            switch MeerkatFeedback.mailUnavailableFallback {
+            case .shareSheet:
+                ShareFeedbackPresenter.present(payload: payload, recipients: recipients)
+            case .none:
+                print("MeerkatKit: Mail unavailable and no fallback configured.")
+            }
+        }
     }
 }
 
@@ -20,16 +39,17 @@ import AppKit
 
 enum MailtoFeedbackPresenter {
     @MainActor
-    static func present(payload: FeedbackPayload, recipients: [String]) {
+    @discardableResult
+    static func presentIfPossible(payload: FeedbackPayload, recipients: [String]) -> Bool {
         guard let url = MailtoURLBuilder.makeURL(
             recipients: recipients,
             subject: "[\(payload.placement)] \(payload.subject)",
             body: payload.body
         ) else {
             print("MeerkatKit: Could not build mailto URL.")
-            return
+            return false
         }
-        NSWorkspace.shared.open(url)
+        return NSWorkspace.shared.open(url)
     }
 }
 #elseif canImport(UIKit)
@@ -37,16 +57,18 @@ import UIKit
 
 enum MailtoFeedbackPresenter {
     @MainActor
-    static func present(payload: FeedbackPayload, recipients: [String]) {
+    @discardableResult
+    static func presentIfPossible(payload: FeedbackPayload, recipients: [String]) -> Bool {
         guard let url = MailtoURLBuilder.makeURL(
             recipients: recipients,
             subject: "[\(payload.placement)] \(payload.subject)",
             body: payload.body
         ) else {
             print("MeerkatKit: Could not build mailto URL.")
-            return
+            return false
         }
-        UIApplication.shared.open(url)
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        return true
     }
 }
 #endif

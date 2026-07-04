@@ -10,6 +10,8 @@ struct MeerkatBootstrap {
     var enableShake: Bool
     var isEnabled: Bool
     var dismissCooldown: Duration
+    var collectUserInput: Bool
+    var mailUnavailableFallback: MailUnavailableFallback
     var customDelivery: (@MainActor (FeedbackPayload) -> Void)?
 
     static func mail(
@@ -21,7 +23,9 @@ struct MeerkatBootstrap {
         buttonPosition: FeedbackPosition = .bottomTrailing,
         enableShake: Bool = false,
         isEnabled: Bool = true,
-        dismissCooldown: Duration = .seconds(86_400)
+        dismissCooldown: Duration = .seconds(86_400),
+        collectUserInput: Bool = true,
+        mailUnavailableFallback: MailUnavailableFallback = .shareSheet
     ) -> MeerkatBootstrap {
         MeerkatBootstrap(
             recipients: recipients,
@@ -33,6 +37,8 @@ struct MeerkatBootstrap {
             enableShake: enableShake,
             isEnabled: isEnabled,
             dismissCooldown: dismissCooldown,
+            collectUserInput: collectUserInput,
+            mailUnavailableFallback: mailUnavailableFallback,
             customDelivery: nil
         )
     }
@@ -44,7 +50,8 @@ struct MeerkatBootstrap {
         buttonPosition: FeedbackPosition = .bottomTrailing,
         enableShake: Bool = false,
         isEnabled: Bool = true,
-        dismissCooldown: Duration = .seconds(86_400)
+        dismissCooldown: Duration = .seconds(86_400),
+        collectUserInput: Bool = true
     ) -> MeerkatBootstrap {
         MeerkatBootstrap(
             recipients: [],
@@ -56,6 +63,8 @@ struct MeerkatBootstrap {
             enableShake: enableShake,
             isEnabled: isEnabled,
             dismissCooldown: dismissCooldown,
+            collectUserInput: collectUserInput,
+            mailUnavailableFallback: .none,
             customDelivery: handler
         )
     }

@@ -7,7 +7,7 @@ enum MailFeedbackPresenter {
     static func present(payload: FeedbackPayload, recipients: [String]) {
         if MFMailComposeViewController.canSendMail() {
             guard let presenter = TopViewControllerFinder.topViewController() else {
-                print("MeerkatKit: Could not find a view controller to present mail composer.")
+                attemptMailtoThenFallback(payload: payload, recipients: recipients)
                 return
             }
 
@@ -21,7 +21,34 @@ enum MailFeedbackPresenter {
             return
         }
 
-        MailtoFeedbackPresenter.present(payload: payload, recipients: recipients)
+        attemptMailtoThenFallback(payload: payload, recipients: recipients)
+    }
+
+    @MainActor
+    private static func attemptMailtoThenFallback(
+        payload: FeedbackPayload,
+        recipients: [String]
+    ) {
+        let opened = MailtoFeedbackPresenter.presentIfPossible(
+            payload: payload,
+            recipients: recipients
+        )
+        if !opened {
+            presentFallback(payload: payload, recipients: recipients)
+        }
+    }
+
+    @MainActor
+    private static func presentFallback(
+        payload: FeedbackPayload,
+        recipients: [String]
+    ) {
+        switch MeerkatFeedback.mailUnavailableFallback {
+        case .shareSheet:
+            ShareFeedbackPresenter.present(payload: payload, recipients: recipients)
+        case .none:
+            print("MeerkatKit: Mail unavailable and no fallback configured.")
+        }
     }
 }
 

@@ -25,7 +25,11 @@ SettingsView()
 
 When you pass **more than one** ``FeedbackTemplate`` at bootstrap, tapping the feedback button (or shaking on iOS) opens a picker sheet before Mail or your custom handler runs.
 
-A single template skips the picker and opens feedback immediately.
+A single template opens the in-app feedback form (message + optional rating) before delivery.
+
+Set `collectUserInput: false` at bootstrap to skip the form and open Mail immediately.
+
+When Mail is unavailable, MeerkatKit falls back to a share sheet (`mailUnavailableFallback: .shareSheet`, default).
 
 ## Custom UI
 
