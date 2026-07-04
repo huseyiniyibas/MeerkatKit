@@ -52,8 +52,7 @@ import UIKit
 private enum ShareFeedbackPresenterTV {
     @MainActor
     static func present(subject: String, body: String) {
-        UIPasteboard.general.string = "\(subject)\n\n\(body)"
-        print("MeerkatKit: Feedback copied to pasteboard (tvOS share fallback).")
+        print("MeerkatKit: Mail unavailable on tvOS. Feedback text:\n\(subject)\n\n\(body)")
     }
 }
 #endif
