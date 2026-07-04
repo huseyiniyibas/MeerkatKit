@@ -81,6 +81,19 @@ public enum MeerkatFeedback {
         bootstrap?.isEnabled = enabled
     }
 
+    public static var isEnabled: Bool {
+        bootstrap?.isEnabled ?? false
+    }
+
+    /// Opens the feedback flow for ``screen`` — template picker when multiple templates are configured.
+    ///
+    /// Prefer this from your own buttons. When the screen uses ``View/meerkatFeedback(screen:presentation:)``
+    /// with ``MeerkatFeedbackPresentation/integrated``, or ``EnvironmentValues/meerkatFeedbackRequest``.
+    public static func requestFeedback(screen: String) {
+        MeerkatFeedbackSessionRegistry.requestFeedback(screen: screen)
+    }
+
+    /// Delivers feedback immediately, skipping the template picker.
     public static func present(
         screen: String,
         template: FeedbackTemplate? = nil

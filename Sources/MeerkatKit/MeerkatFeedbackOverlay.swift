@@ -1,22 +1,88 @@
 import SwiftUI
 
-public struct MeerkatFeedbackModifier: ViewModifier {
+public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
     let screen: String
     let minimumDwell: Duration?
     let revealAfter: Duration?
     let enableShake: Bool
     let dismissCooldown: Duration?
+    let presentation: MeerkatFeedbackPresentation
+    let customFloatingButton: (
+        (@escaping MeerkatFeedbackRequestAction, @escaping MeerkatFeedbackDismissAction) -> CustomFloating
+    )?
 
+    @StateObject private var session: MeerkatFeedbackScreenSession
     @StateObject private var visibility = MeerkatFeedbackVisibilityController()
     @State private var isDismissedThisVisit = false
-    @State private var showTemplatePicker = false
 
-    private func requestFeedback() {
-        if MeerkatFeedback.shouldShowTemplatePicker {
-            showTemplatePicker = true
-        } else {
-            MeerkatFeedback.present(screen: screen)
-        }
+    init(
+        screen: String,
+        minimumDwell: Duration?,
+        revealAfter: Duration?,
+        enableShake: Bool,
+        dismissCooldown: Duration?,
+        presentation: MeerkatFeedbackPresentation,
+        customFloatingButton: (
+            (@escaping MeerkatFeedbackRequestAction, @escaping MeerkatFeedbackDismissAction) -> CustomFloating
+        )?
+    ) {
+        self.screen = screen
+        self.minimumDwell = minimumDwell
+        self.revealAfter = revealAfter
+        self.enableShake = enableShake
+        self.dismissCooldown = dismissCooldown
+        self.presentation = presentation
+        self.customFloatingButton = customFloatingButton
+        _session = StateObject(wrappedValue: MeerkatFeedbackScreenSession(screen: screen))
+    }
+
+    public func body(content: Content) -> some View {
+        content
+            .environment(
+                \.meerkatFeedbackRequest,
+                MeerkatFeedbackRequest(action: session.requestFeedback)
+            )
+            .overlay {
+                if presentation == .floating {
+                    MeerkatFeedbackFloatingOverlay(
+                        isVisible: isFloatingVisible,
+                        alignment: MeerkatFeedback.stickyButtonPosition().alignment,
+                        customFloatingButton: customFloatingButton,
+                        onRequest: session.requestFeedback,
+                        onDismiss: dismissFloatingButton
+                    )
+                }
+            }
+            .background {
+                #if os(iOS)
+                if usesShakeTrigger {
+                    ShakeResponderBridge(onShake: session.requestFeedback)
+                }
+                #endif
+            }
+            .sheet(isPresented: $session.showTemplatePicker) {
+                MeerkatTemplatePickerSheet(
+                    screen: screen,
+                    templates: MeerkatFeedback.configuredTemplates,
+                    locale: MeerkatFeedback.configuredLocale,
+                    onSelect: { template in
+                        MeerkatFeedback.present(screen: screen, template: template)
+                    }
+                )
+            }
+            .onAppear {
+                isDismissedThisVisit = false
+                MeerkatFeedbackSessionRegistry.register(session)
+                visibility.begin(
+                    screen: screen,
+                    minimumDwell: minimumDwell,
+                    revealAfter: revealAfter
+                )
+            }
+            .onDisappear {
+                MeerkatFeedbackSessionRegistry.unregister(screen: screen)
+                visibility.pauseDwell()
+            }
     }
 
     private var resolvedDismissCooldown: Duration {
@@ -32,54 +98,15 @@ public struct MeerkatFeedbackModifier: ViewModifier {
             || MeerkatDismissCooldown.isActive(screen: screen, cooldown: resolvedDismissCooldown)
     }
 
-    private var isVisible: Bool {
-        !usesShakeTrigger
+    private var isFloatingVisible: Bool {
+        presentation == .floating
+            && !usesShakeTrigger
             && MeerkatFeedback.canShowStickyButton
             && visibility.isReady
             && !isSuppressedByDismiss
     }
 
-    private var alignment: Alignment {
-        MeerkatFeedback.stickyButtonPosition().alignment
-    }
-
-    public func body(content: Content) -> some View {
-        content
-            .overlay(alignment: alignment) {
-                if isVisible {
-                    StickyFeedbackButton(
-                        onTap: requestFeedback,
-                        onDismiss: dismissStickyButton
-                    )
-                    .padding(16)
-                    .transition(.opacity.combined(with: .scale))
-                }
-            }
-            .animation(.easeOut(duration: 0.2), value: isVisible)
-            .background {
-                #if os(iOS)
-                if usesShakeTrigger {
-                    ShakeResponderBridge {
-                        requestFeedback()
-                    }
-                }
-                #endif
-            }
-            .modifier(MeerkatFeedbackSheets(screen: screen, showTemplatePicker: $showTemplatePicker))
-            .onAppear {
-                isDismissedThisVisit = false
-                visibility.begin(
-                    screen: screen,
-                    minimumDwell: minimumDwell,
-                    revealAfter: revealAfter
-                )
-            }
-            .onDisappear {
-                visibility.pauseDwell()
-            }
-    }
-
-    private func dismissStickyButton() {
+    private func dismissFloatingButton() {
         isDismissedThisVisit = true
         MeerkatDismissCooldown.recordDismiss(
             screen: screen,
@@ -88,35 +115,14 @@ public struct MeerkatFeedbackModifier: ViewModifier {
     }
 }
 
-public extension View {
-    /// Floating feedback button for this screen. Requires `MeerkatFeedback.bootstrap(...)` once at launch.
-    ///
-    /// - Parameters:
-    ///   - screen: Screen name included in feedback metadata.
-    ///   - minimumDwell: Show after the user **stays on this screen** for at least this long.
-    ///     Leaving cancels this timer until they return.
-    ///   - revealAfter: Show once this much time has passed since the screen was first shown
-    ///     in the app session, even if the user navigates away and comes back.
-    ///     When both are set, whichever completes first wins.
-    ///   - enableShake: On iOS, shake the device to open feedback on this screen (hides the sticky button here).
-    ///   - dismissCooldown: Override how long the sticky button stays hidden after the user taps ✕.
-    ///     `nil` uses the value from `bootstrap`. Pass `.zero` to hide for the current visit only.
-    func meerkatFeedback(
-        screen: String,
-        minimumDwell: Duration? = nil,
-        revealAfter: Duration? = nil,
-        enableShake: Bool = false,
-        dismissCooldown: Duration? = nil
-    ) -> some View {
-        modifier(
-            MeerkatFeedbackModifier(
-                screen: screen,
-                minimumDwell: minimumDwell,
-                revealAfter: revealAfter,
-                enableShake: enableShake,
-                dismissCooldown: dismissCooldown
-            )
-        )
+private extension FeedbackPosition {
+    var alignment: Alignment {
+        switch self {
+        case .topLeading: return .topLeading
+        case .topTrailing: return .topTrailing
+        case .bottomLeading: return .bottomLeading
+        case .bottomTrailing: return .bottomTrailing
+        }
     }
 }
 
@@ -131,16 +137,5 @@ private struct ShakeResponderBridge: View {
         #else
         EmptyView()
         #endif
-    }
-}
-
-private extension FeedbackPosition {
-    var alignment: Alignment {
-        switch self {
-        case .topLeading: return .topLeading
-        case .topTrailing: return .topTrailing
-        case .bottomLeading: return .bottomLeading
-        case .bottomTrailing: return .bottomTrailing
-        }
     }
 }

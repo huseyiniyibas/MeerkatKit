@@ -3,6 +3,14 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.0.8] — 2026-07-04
+
+### Added
+
+- **Custom floating button** — `meerkatFeedback` ViewBuilder overload (`request` / `dismiss` callbacks).
+- **Integrated presentation** — `presentation: .integrated` hides the sticky button; use your own UI.
+- ``MeerkatFeedback/requestFeedback(screen:)`` and ``EnvironmentValues/meerkatFeedbackRequest`` for in-screen buttons.
+
 ## [0.0.7] — 2026-07-04
 
 ### Added
@@ -66,6 +74,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.0.8]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.4...v0.0.5

@@ -27,6 +27,28 @@ When you pass **more than one** ``FeedbackTemplate`` at bootstrap, tapping the f
 
 A single template skips the picker and opens feedback immediately.
 
+## Custom UI
+
+### Custom floating button
+
+```swift
+ProfileView()
+    .meerkatFeedback(screen: "Profile") { request, dismiss in
+        MyChip(onTap: request, onClose: dismiss)
+    }
+```
+
+### Integrated — your own button
+
+```swift
+@Environment(\.meerkatFeedbackRequest) private var requestFeedback
+
+Button("Feedback") { requestFeedback?() }
+    .meerkatFeedback(screen: "Settings", presentation: .integrated)
+```
+
+Or call ``MeerkatFeedback/requestFeedback(screen:)`` from UIKit actions.
+
 ## Custom delivery
 
 ```swift

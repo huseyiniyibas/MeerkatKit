@@ -61,7 +61,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.7")
+    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.0.8")
 ]
 ```
 
@@ -148,6 +148,40 @@ MeerkatFeedback.bootstrap(
 ```
 
 With a single template, feedback opens immediately (no sheet).
+
+### Custom button UI
+
+**Your own floating control** — replace the built-in sticky button:
+
+```swift
+SettingsView()
+    .meerkatFeedback(screen: "Settings") { request, dismiss in
+        MyFeedbackChip(onTap: request, onClose: dismiss)
+    }
+```
+
+**Your own in-screen button** — no floating UI; wire an existing row or toolbar item:
+
+```swift
+struct SettingsView: View {
+    @Environment(\.meerkatFeedbackRequest) private var requestFeedback
+
+    var body: some View {
+        List {
+            Button("Send Feedback") { requestFeedback?() }
+        }
+        .meerkatFeedback(screen: "Settings", presentation: .integrated)
+    }
+}
+```
+
+From UIKit or anywhere else on the same screen:
+
+```swift
+MeerkatFeedback.requestFeedback(screen: "Settings")
+```
+
+`requestFeedback` runs the template picker (if configured) then opens Mail — same path as the default button.
 
 ### API documentation (DocC)
 

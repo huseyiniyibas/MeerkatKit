@@ -105,6 +105,23 @@ final class MeerkatKitTests: XCTestCase {
     }
 
     @MainActor
+    func testRequestFeedbackUsesRegisteredSession() {
+        #if DEBUG
+        MeerkatFeedbackSessionRegistry.resetAll()
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            templates: [.bugReport, .general]
+        )
+        let session = MeerkatFeedbackScreenSession(screen: "Settings")
+        MeerkatFeedbackSessionRegistry.register(session)
+        XCTAssertFalse(session.showTemplatePicker)
+        MeerkatFeedback.requestFeedback(screen: "Settings")
+        XCTAssertTrue(session.showTemplatePicker)
+        MeerkatFeedbackSessionRegistry.resetAll()
+        #endif
+    }
+
+    @MainActor
     func testRevealTrackerSessionDeadline() {
         #if DEBUG
         MeerkatFeedbackRevealTracker.resetAll()
