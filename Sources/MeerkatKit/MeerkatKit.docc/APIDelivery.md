@@ -23,6 +23,29 @@ Set `apiResultPresentation: .none` to suppress built-in UI and handle outcomes i
 
 Failed requests are persisted locally when `offlineRetryEnabled` is `true`. Call ``MeerkatFeedback/flushOfflineQueue()`` to retry manually; bootstrap also flushes automatically.
 
+## Per-screen endpoint
+
+Override the API endpoint on specific screens:
+
+```swift
+BillingView()
+    .meerkatFeedback(
+        screen: "Billing",
+        apiEndpoint: URL(string: "https://api.yourapp.com/feedback/billing")!
+    )
+```
+
+UIKit:
+
+```swift
+MeerkatFeedback.setAPIEndpoint(
+    URL(string: "https://api.yourapp.com/feedback/billing")!,
+    forScreen: "Billing"
+)
+```
+
+Headers and offline retry settings come from bootstrap; only the endpoint URL is overridden per screen.
+
 ## Payload
 
 JSON includes `placement`, `template`, `subject`, `body`, `metadata`, optional `userInput`, `userIdentity`, and base64 `attachments`.

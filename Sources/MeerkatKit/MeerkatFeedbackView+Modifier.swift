@@ -4,9 +4,11 @@ public extension View {
     /// Floating feedback button for this screen. Requires ``MeerkatFeedback/bootstrap(recipients:appStoreID:)`` once at launch.
     ///
     /// - Parameter mailRecipients: Optional per-screen mail override. When `nil`, bootstrap recipients are used.
+    /// - Parameter apiEndpoint: Optional per-screen API endpoint override for API bootstrap.
     func meerkatFeedback(
         screen: String,
         mailRecipients: [String]? = nil,
+        apiEndpoint: URL? = nil,
         minimumDwell: Duration? = nil,
         revealAfter: Duration? = nil,
         enableShake: Bool = false,
@@ -17,6 +19,7 @@ public extension View {
             MeerkatFeedbackModifier<EmptyView>(
                 screen: screen,
                 mailRecipients: mailRecipients,
+                apiEndpoint: apiEndpoint,
                 minimumDwell: minimumDwell,
                 revealAfter: revealAfter,
                 enableShake: enableShake,
@@ -31,6 +34,7 @@ public extension View {
     func meerkatFeedback<Floating: View>(
         screen: String,
         mailRecipients: [String]? = nil,
+        apiEndpoint: URL? = nil,
         minimumDwell: Duration? = nil,
         revealAfter: Duration? = nil,
         enableShake: Bool = false,
@@ -44,6 +48,7 @@ public extension View {
             MeerkatFeedbackModifier(
                 screen: screen,
                 mailRecipients: mailRecipients,
+                apiEndpoint: apiEndpoint,
                 minimumDwell: minimumDwell,
                 revealAfter: revealAfter,
                 enableShake: enableShake,

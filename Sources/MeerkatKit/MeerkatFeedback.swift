@@ -177,6 +177,11 @@ public enum MeerkatFeedback {
         MeerkatFeedbackRecipientRegistry.register(screen: screen, recipients: recipients)
     }
 
+    /// Override API endpoint for ``screen``. Pass `nil` to use the bootstrap default.
+    public static func setAPIEndpoint(_ endpoint: URL?, forScreen screen: String) {
+        MeerkatFeedbackAPIEndpointRegistry.register(screen: screen, endpoint: endpoint)
+    }
+
     public static func setEnabled(_ enabled: Bool) {
         bootstrap?.isEnabled = enabled
     }

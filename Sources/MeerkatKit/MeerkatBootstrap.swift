@@ -155,7 +155,11 @@ struct MeerkatBootstrap {
         if let customDelivery {
             delivery = .custom(customDelivery)
         } else if let apiConfiguration {
-            delivery = .api(apiConfiguration)
+            let resolvedConfiguration = MeerkatFeedbackAPIEndpointRegistry.resolvedConfiguration(
+                default: apiConfiguration,
+                screen: placement
+            )
+            delivery = .api(resolvedConfiguration)
         } else {
             let resolvedRecipients = MeerkatFeedbackRecipientRegistry.resolvedRecipients(
                 for: placement,

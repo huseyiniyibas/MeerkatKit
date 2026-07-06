@@ -22,6 +22,7 @@ Typical integration:
 - <doc:CustomTemplates>
 - <doc:EventHandlers>
 - <doc:UIKitIntegration>
+- <doc:AppKitIntegration>
 
 ### Core types
 

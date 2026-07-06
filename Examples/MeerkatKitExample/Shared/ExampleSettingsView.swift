@@ -18,6 +18,7 @@ struct ExampleSettingsView: View {
         .meerkatFeedback(
             screen: "Settings",
             mailRecipients: ["settings-feedback@example.com"],
+            apiEndpoint: URL(string: "https://httpbin.org/post/settings")!,
             presentation: .integrated
         )
     }

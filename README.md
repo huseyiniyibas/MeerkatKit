@@ -20,6 +20,7 @@ Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery —
 | **API UX** | Success / offline / failure alert or banner (`apiResultPresentation`) |
 | **Timing** | `minimumDwell`, `revealAfter`, dismiss cooldown (per screen) |
 | **Recipients** | Default at bootstrap; **per-screen mail override** (optional) |
+| **API routing** | Default endpoint at bootstrap; **per-screen API endpoint override** (optional) |
 | **Identity** | `userId`, `email`, anonymous mode in metadata & API JSON |
 | **Attachments** | Screenshot toggle in form, log provider, crash log path |
 | **UIKit** | Bar button item + `meerkatRequestFeedback(screen:)` |
@@ -106,7 +107,28 @@ MeerkatFeedback.requestFeedback(screen: "Paywall")
 
 Pass `nil` to `setMailRecipients` to clear an override. Overrides registered via `.meerkatFeedback(mailRecipients:)` are cleared when the view disappears.
 
-> Per-screen recipients apply to **mail delivery** only. API and custom handlers use their own routing.
+> Per-screen recipients apply to **mail delivery** only. Per-screen `apiEndpoint` applies to **API delivery** only. Custom handlers use their own routing.
+
+## Per-screen API endpoint
+
+```swift
+MeerkatFeedback.bootstrap(api: URL(string: "https://api.yourapp.com/feedback")!)
+
+BillingView()
+    .meerkatFeedback(
+        screen: "Billing",
+        apiEndpoint: URL(string: "https://api.yourapp.com/feedback/billing")!
+    )
+```
+
+**UIKit / AppKit:**
+
+```swift
+MeerkatFeedback.setAPIEndpoint(
+    URL(string: "https://api.yourapp.com/feedback/billing")!,
+    forScreen: "Billing"
+)
+```
 
 ## Timing & dismiss
 
@@ -217,6 +239,15 @@ meerkatRequestFeedback(screen: "Checkout")
 
 See `Sources/MeerkatKit/MeerkatKit.docc/UIKitIntegration.md`.
 
+## AppKit (macOS)
+
+```swift
+let item = MeerkatFeedbackAppKit.makeToolbarItem(screen: "Profile")
+meerkatRequestFeedback(screen: "Checkout") // NSViewController extension
+```
+
+See `Sources/MeerkatKit/MeerkatKit.docc/AppKitIntegration.md`.
+
 ## Custom delivery
 
 ```swift
@@ -258,6 +289,7 @@ MeerkatFeedback.present(screen: "Profile", template: .bugReport)
 | Parameter | Default |
 |---|---|
 | `mailRecipients` | `nil` (bootstrap default) |
+| `apiEndpoint` | `nil` (bootstrap default) |
 | `minimumDwell` | `nil` |
 | `revealAfter` | `nil` |
 | `enableShake` | `false` |

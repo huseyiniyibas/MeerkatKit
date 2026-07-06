@@ -335,6 +335,55 @@ final class MeerkatKitTests: XCTestCase {
     }
 
     @MainActor
+    func testPerScreenAPIEndpoint() {
+        #if DEBUG
+        MeerkatFeedbackAPIEndpointRegistry.resetAll()
+        #endif
+        let defaultEndpoint = URL(string: "https://api.example.com/feedback")!
+        let billingEndpoint = URL(string: "https://api.example.com/feedback/billing")!
+        let bootstrap = MeerkatBootstrap.api(endpoint: defaultEndpoint)
+        MeerkatFeedbackAPIEndpointRegistry.register(screen: "Billing", endpoint: billingEndpoint)
+
+        let billingConfig = bootstrap.configuration(placement: "Billing")
+        let homeConfig = bootstrap.configuration(placement: "Home")
+
+        guard case let .api(billingAPI) = billingConfig.delivery else {
+            XCTFail("Expected API delivery")
+            return
+        }
+        guard case let .api(homeAPI) = homeConfig.delivery else {
+            XCTFail("Expected API delivery")
+            return
+        }
+        XCTAssertEqual(billingAPI.endpoint, billingEndpoint)
+        XCTAssertEqual(homeAPI.endpoint, defaultEndpoint)
+        #if DEBUG
+        MeerkatFeedbackAPIEndpointRegistry.resetAll()
+        #endif
+    }
+
+    @MainActor
+    func testSetAPIEndpointPublicAPI() {
+        #if DEBUG
+        MeerkatFeedbackAPIEndpointRegistry.resetAll()
+        #endif
+        let defaultEndpoint = URL(string: "https://api.example.com/feedback")!
+        let resultsEndpoint = URL(string: "https://api.example.com/feedback/results")!
+        MeerkatFeedback.bootstrap(api: defaultEndpoint, collectUserInput: false)
+        MeerkatFeedback.setAPIEndpoint(resultsEndpoint, forScreen: "Result")
+        let bootstrap = MeerkatBootstrap.api(endpoint: defaultEndpoint)
+        let config = bootstrap.configuration(placement: "Result")
+        guard case let .api(apiConfig) = config.delivery else {
+            XCTFail("Expected API delivery")
+            return
+        }
+        XCTAssertEqual(apiConfig.endpoint, resultsEndpoint)
+        #if DEBUG
+        MeerkatFeedbackAPIEndpointRegistry.resetAll()
+        #endif
+    }
+
+    @MainActor
     func testZeroDismissCooldownDoesNotPersist() {
         #if DEBUG
         MeerkatDismissCooldown.resetAll()

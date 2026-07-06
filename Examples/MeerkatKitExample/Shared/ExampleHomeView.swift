@@ -36,6 +36,10 @@ private struct ExampleActionButtons: View {
                 ExampleUIKitView()
             }
             .buttonStyle(.bordered)
+            NavigationLink("AppKit toolbar demo") {
+                ExampleAppKitView()
+            }
+            .buttonStyle(.bordered)
         }
     }
 }

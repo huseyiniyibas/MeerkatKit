@@ -12,6 +12,7 @@
 		E10000010000000000000003 /* ExampleSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000110000000000000003 /* ExampleSettingsView.swift */; };
 		E10000010000000000000004 /* ExampleBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000110000000000000004 /* ExampleBootstrap.swift */; };
 		E10000010000000000000006 /* ExampleUIKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000110000000000000006 /* ExampleUIKitView.swift */; };
+		E10000010000000000000007 /* ExampleAppKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000110000000000000007 /* ExampleAppKitView.swift */; };
 		E10000010000000000000005 /* MeerkatKit in Frameworks */ = {isa = PBXBuildFile; productRef = E10000310000000000000001 /* MeerkatKit */; };
 /* End PBXBuildFile section */
 
@@ -21,6 +22,7 @@
 		E10000110000000000000003 /* ExampleSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleSettingsView.swift; sourceTree = "<group>"; };
 		E10000110000000000000004 /* ExampleBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleBootstrap.swift; sourceTree = "<group>"; };
 		E10000110000000000000006 /* ExampleUIKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleUIKitView.swift; sourceTree = "<group>"; };
+		E10000110000000000000007 /* ExampleAppKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppKitView.swift; sourceTree = "<group>"; };
 		E10000210000000000000001 /* MeerkatKitExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MeerkatKitExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -52,6 +54,7 @@
 				E10000110000000000000003 /* ExampleSettingsView.swift */,
 				E10000110000000000000004 /* ExampleBootstrap.swift */,
 				E10000110000000000000006 /* ExampleUIKitView.swift */,
+				E10000110000000000000007 /* ExampleAppKitView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -127,6 +130,7 @@
 				E10000010000000000000003 /* ExampleSettingsView.swift in Sources */,
 				E10000010000000000000004 /* ExampleBootstrap.swift in Sources */,
 				E10000010000000000000006 /* ExampleUIKitView.swift in Sources */,
+				E10000010000000000000007 /* ExampleAppKitView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

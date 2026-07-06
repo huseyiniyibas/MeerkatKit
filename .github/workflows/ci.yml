@@ -15,19 +15,19 @@ jobs:
         include:
           - destination: "generic/platform=iOS Simulator"
             name: "iOS (deploy ≥17.5)"
-            run_tests: true
+            platform: ios
           - destination: "platform=macOS"
             name: "macOS (deploy ≥14.5)"
-            run_tests: false
+            platform: macos
           - destination: "generic/platform=tvOS Simulator"
             name: "tvOS (deploy ≥17.5)"
-            run_tests: false
+            platform: tvos
     name: ${{ matrix.name }}
     steps:
       - uses: actions/checkout@v4
       - name: Build and Test
         run: |
-          if [ "${{ matrix.run_tests }}" = "true" ]; then
+          if [ "${{ matrix.platform }}" = "ios" ]; then
             IOS_UDID=$(xcrun simctl list devices available iOS | awk -F '[()]' '/iPhone/ { print $2; exit }')
             if [ -z "$IOS_UDID" ]; then
               echo "No available iOS Simulator device found on runner."
@@ -39,8 +39,12 @@ jobs:
             xcodebuild -scheme MeerkatKit \
               -destination "id=$IOS_UDID" \
               test
+          elif [ "${{ matrix.platform }}" = "macos" ]; then
+            xcodebuild -scheme MeerkatKit \
+              -destination 'platform=macOS' \
+              test
           else
             xcodebuild -scheme MeerkatKit \
-              -destination '${{ matrix.destination }}' \
-              build
+              -destination 'generic/platform=tvOS Simulator' \
+              test
           fi

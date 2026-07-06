@@ -3,6 +3,15 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.2.1] — 2026-07-06
+
+### Added
+
+- **Per-screen API endpoint** — optional `apiEndpoint` on ``View/meerkatFeedback(screen:apiEndpoint:)`` and ``MeerkatFeedback/setAPIEndpoint(_:forScreen:)``.
+- **macOS AppKit helper** — ``MeerkatFeedbackAppKit`` toolbar item + ``NSViewController/meerkatRequestFeedback(screen:)``.
+- **DocC** — AppKit integration article.
+- **CI** — macOS and tvOS test jobs (previously build-only).
+
 ## [0.2.0] — 2026-07-06
 
 ### Added
@@ -144,6 +153,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.2.1]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.4...v0.2.0
 [0.1.4]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.2...v0.1.3
