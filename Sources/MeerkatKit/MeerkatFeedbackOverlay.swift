@@ -55,6 +55,7 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
                         onDismiss: dismissFloatingButton
                     )
                 }
+                FeedbackResultBannerOverlay()
             }
             .background {
                 #if os(iOS)
@@ -70,6 +71,9 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
                     locale: MeerkatFeedback.configuredLocale,
                     onSelect: { template in
                         session.beginFeedbackForm(template: template)
+                    },
+                    onCancel: {
+                        FeedbackEventDispatcher.cancelled(screen: screen, stage: .templatePicker)
                     }
                 )
             }
@@ -78,8 +82,12 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
                     MeerkatFeedbackFormSheet(
                         template: template,
                         locale: MeerkatFeedback.configuredLocale,
+                        formConfiguration: MeerkatFeedback.formConfiguration,
                         offerScreenshot: MeerkatFeedback.shouldOfferScreenshotInForm,
-                        onSubmit: session.submitForm
+                        onSubmit: session.submitForm,
+                        onCancel: {
+                            FeedbackEventDispatcher.cancelled(screen: screen, stage: .form)
+                        }
                     )
                 }
             }

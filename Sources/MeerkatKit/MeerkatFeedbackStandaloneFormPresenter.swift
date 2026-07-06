@@ -8,8 +8,10 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         screen: String,
         template: FeedbackTemplate,
         locale: FeedbackLocale,
+        formConfiguration: FeedbackFormConfiguration,
         offerScreenshot: Bool,
-        onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void
+        onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void,
+        onCancel: @escaping @MainActor () -> Void
     ) {
         guard let presenter = TopViewControllerFinder.topViewController() else {
             MeerkatFeedback.submitFeedback(screen: screen, template: template, userInput: nil)
@@ -19,8 +21,10 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         let sheet = MeerkatFeedbackFormSheet(
             template: template,
             locale: locale,
+            formConfiguration: formConfiguration,
             offerScreenshot: offerScreenshot,
-            onSubmit: onSubmit
+            onSubmit: onSubmit,
+            onCancel: onCancel
         )
         let host = UIHostingController(rootView: sheet)
         host.modalPresentationStyle = .pageSheet
@@ -41,8 +45,10 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         screen: String,
         template: FeedbackTemplate,
         locale: FeedbackLocale,
+        formConfiguration: FeedbackFormConfiguration,
         offerScreenshot: Bool,
-        onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void
+        onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void,
+        onCancel: @escaping @MainActor () -> Void
     ) {
         guard let presenter = TopViewControllerFinder.topViewController() else {
             MeerkatFeedback.submitFeedback(screen: screen, template: template, userInput: nil)
@@ -52,8 +58,10 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         let sheet = MeerkatFeedbackFormSheet(
             template: template,
             locale: locale,
+            formConfiguration: formConfiguration,
             offerScreenshot: offerScreenshot,
-            onSubmit: onSubmit
+            onSubmit: onSubmit,
+            onCancel: onCancel
         )
         let host = UIHostingController(rootView: sheet)
         host.modalPresentationStyle = .fullScreen
@@ -70,14 +78,18 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         screen: String,
         template: FeedbackTemplate,
         locale: FeedbackLocale,
+        formConfiguration: FeedbackFormConfiguration,
         offerScreenshot: Bool,
-        onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void
+        onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void,
+        onCancel: @escaping @MainActor () -> Void
     ) {
         let sheet = MeerkatFeedbackFormSheet(
             template: template,
             locale: locale,
+            formConfiguration: formConfiguration,
             offerScreenshot: offerScreenshot,
-            onSubmit: onSubmit
+            onSubmit: onSubmit,
+            onCancel: onCancel
         )
         let host = NSHostingController(rootView: sheet)
         host.preferredContentSize = NSSize(width: 420, height: 420)

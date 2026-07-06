@@ -14,7 +14,10 @@ Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery —
 | **Presentation** | Built-in button, custom floating ViewBuilder, integrated (your own UI) |
 | **Delivery** | Mail composer + mailto + share sheet fallback, REST API + offline queue, custom handler |
 | **Form** | In-app message + star rating (default on); skip with `collectUserInput: false` |
-| **Templates** | Bug / feature / general picker when multiple templates configured |
+| **Templates** | Bug / feature / general picker when multiple templates configured; custom templates via ``FeedbackCustomTemplate`` |
+| **Form config** | Optional rating, email field, custom fields via ``FeedbackFormConfiguration`` |
+| **Callbacks** | ``FeedbackEventHandler`` — submitted / failed / cancelled |
+| **API UX** | Success / offline / failure alert or banner (`apiResultPresentation`) |
 | **Timing** | `minimumDwell`, `revealAfter`, dismiss cooldown (per screen) |
 | **Recipients** | Default at bootstrap; **per-screen mail override** (optional) |
 | **Identity** | `userId`, `email`, anonymous mode in metadata & API JSON |

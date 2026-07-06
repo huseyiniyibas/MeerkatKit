@@ -5,19 +5,20 @@ struct MeerkatTemplatePickerSheet: View {
     let templates: [FeedbackTemplate]
     let locale: FeedbackLocale
     let onSelect: (FeedbackTemplate) -> Void
+    let onCancel: () -> Void
 
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
-            List(templates, id: \.self) { template in
+            List(templates) { template in
                 Button {
                     onSelect(template)
                     dismiss()
                 } label: {
                     TemplatePickerRow(template: template, locale: locale)
                 }
-                .accessibilityIdentifier("meerkat_template_\(template.rawValue)")
+                .accessibilityIdentifier("meerkat_template_\(template.apiIdentifier)")
             }
             .navigationTitle(MeerkatLocalizer.text(.templatePickerTitle, locale: locale))
             #if os(iOS)
@@ -26,6 +27,7 @@ struct MeerkatTemplatePickerSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(MeerkatLocalizer.text(.templatePickerCancel, locale: locale)) {
+                        onCancel()
                         dismiss()
                     }
                 }
@@ -48,19 +50,9 @@ private struct TemplatePickerRow: View {
                 .font(.title3)
                 .foregroundStyle(.secondary)
                 .frame(width: 28)
-            Text(template.title(for: locale))
+            Text(template.rowTitle(for: locale))
                 .foregroundStyle(.primary)
         }
         .padding(.vertical, 4)
-    }
-}
-
-private extension FeedbackTemplate {
-    var systemImage: String {
-        switch self {
-        case .bugReport: return "ladybug.fill"
-        case .featureRequest: return "lightbulb.fill"
-        case .general: return "text.bubble.fill"
-        }
     }
 }

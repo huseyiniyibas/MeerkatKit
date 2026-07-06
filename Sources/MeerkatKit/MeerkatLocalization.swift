@@ -25,6 +25,15 @@ enum MeerkatLocalizedKey {
     case formIncludeScreenshot
     case labelRating
     case labelRecipients
+    case formEmailPlaceholder
+    case labelEmail
+    case apiSuccessTitle
+    case apiSuccessMessage
+    case apiOfflineTitle
+    case apiOfflineMessage
+    case apiFailureTitle
+    case apiFailureMessage
+    case apiResultDismiss
 }
 
 enum MeerkatLocalizer {
@@ -64,7 +73,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "Tell us more…",
             .formIncludeScreenshot: "Include screenshot",
             .labelRating: "Rating",
-            .labelRecipients: "Send to"
+            .labelRecipients: "Send to",
+            .formEmailPlaceholder: "your@email.com",
+            .labelEmail: "Email",
+            .apiSuccessTitle: "Feedback sent",
+            .apiSuccessMessage: "Thank you — your feedback was delivered.",
+            .apiOfflineTitle: "Saved offline",
+            .apiOfflineMessage: "We couldn't reach the server. Your feedback will retry automatically.",
+            .apiFailureTitle: "Couldn't send",
+            .apiFailureMessage: "Something went wrong. Please try again later.",
+            .apiResultDismiss: "OK"
         ],
         "tr": [
             .feedbackButton: "Geri Bildirim",
@@ -90,7 +108,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "Detayları yazın…",
             .formIncludeScreenshot: "Ekran görüntüsü ekle",
             .labelRating: "Puan",
-            .labelRecipients: "Alıcı"
+            .labelRecipients: "Alıcı",
+            .formEmailPlaceholder: "ornek@email.com",
+            .labelEmail: "E-posta",
+            .apiSuccessTitle: "Geri bildirim gönderildi",
+            .apiSuccessMessage: "Teşekkürler — geri bildiriminiz iletildi.",
+            .apiOfflineTitle: "Çevrimdışı kaydedildi",
+            .apiOfflineMessage: "Sunucuya ulaşılamadı. Geri bildiriminiz otomatik olarak yeniden denenecek.",
+            .apiFailureTitle: "Gönderilemedi",
+            .apiFailureMessage: "Bir sorun oluştu. Lütfen daha sonra tekrar deneyin.",
+            .apiResultDismiss: "Tamam"
         ],
         "es": [
             .feedbackButton: "Comentarios",

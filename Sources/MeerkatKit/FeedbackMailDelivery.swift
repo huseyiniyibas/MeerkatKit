@@ -1,16 +1,30 @@
 import Foundation
 
+enum MailPresentationResult: Equatable {
+    case composerPresented
+    case deliveredImmediately
+    case failed
+}
+
 enum FeedbackMailDelivery {
     @MainActor
-    static func present(payload: FeedbackPayload, configuration: MeerkatConfiguration) {
-        guard case let .mailComposer(recipients, _, _) = configuration.delivery else { return }
+    static func present(
+        payload: FeedbackPayload,
+        configuration: MeerkatConfiguration,
+        screen: String,
+        template: FeedbackTemplate
+    ) -> MailPresentationResult {
+        guard case let .mailComposer(recipients, _, _) = configuration.delivery else { return .failed }
 
         #if os(iOS)
-        MailFeedbackPresenter.present(payload: payload, recipients: recipients)
-        #elseif os(macOS)
-        deliverViaMailtoOrFallback(payload: payload, recipients: recipients)
-        #elseif os(tvOS)
-        deliverViaMailtoOrFallback(payload: payload, recipients: recipients)
+        return MailFeedbackPresenter.present(
+            payload: payload,
+            recipients: recipients,
+            screen: screen,
+            template: template
+        )
+        #else
+        return deliverViaMailtoOrFallback(payload: payload, recipients: recipients)
         #endif
     }
 
@@ -18,18 +32,22 @@ enum FeedbackMailDelivery {
     private static func deliverViaMailtoOrFallback(
         payload: FeedbackPayload,
         recipients: [String]
-    ) {
+    ) -> MailPresentationResult {
         let opened = MailtoFeedbackPresenter.presentIfPossible(
             payload: payload,
             recipients: recipients
         )
-        if !opened {
-            switch MeerkatFeedback.mailUnavailableFallback {
-            case .shareSheet:
-                ShareFeedbackPresenter.present(payload: payload, recipients: recipients)
-            case .none:
-                print("MeerkatKit: Mail unavailable and no fallback configured.")
-            }
+        if opened {
+            return .deliveredImmediately
+        }
+
+        switch MeerkatFeedback.mailUnavailableFallback {
+        case .shareSheet:
+            ShareFeedbackPresenter.present(payload: payload, recipients: recipients)
+            return .deliveredImmediately
+        case .none:
+            print("MeerkatKit: Mail unavailable and no fallback configured.")
+            return .failed
         }
     }
 }

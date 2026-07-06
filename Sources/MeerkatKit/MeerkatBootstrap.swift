@@ -18,6 +18,9 @@ struct MeerkatBootstrap {
     var logProvider: (() -> String?)?
     var userIdentity: FeedbackUserIdentity
     var customDelivery: (@MainActor (FeedbackPayload) -> Void)?
+    var formConfiguration: FeedbackFormConfiguration
+    var eventHandler: FeedbackEventHandler?
+    var apiResultPresentation: FeedbackAPIResultPresentation
 
     static func mail(
         recipients: [String],
@@ -33,7 +36,9 @@ struct MeerkatBootstrap {
         mailUnavailableFallback: MailUnavailableFallback = .shareSheet,
         offerScreenshotInForm: Bool = false,
         crashLogPath: String? = nil,
-        userIdentity: FeedbackUserIdentity = .anonymous
+        userIdentity: FeedbackUserIdentity = .anonymous,
+        formConfiguration: FeedbackFormConfiguration = .default,
+        eventHandler: FeedbackEventHandler? = nil
     ) -> MeerkatBootstrap {
         MeerkatBootstrap(
             recipients: recipients,
@@ -52,7 +57,10 @@ struct MeerkatBootstrap {
             crashLogPath: crashLogPath,
             logProvider: nil,
             userIdentity: userIdentity,
-            customDelivery: nil
+            customDelivery: nil,
+            formConfiguration: formConfiguration,
+            eventHandler: eventHandler,
+            apiResultPresentation: .none
         )
     }
 
@@ -69,7 +77,10 @@ struct MeerkatBootstrap {
         collectUserInput: Bool = true,
         offerScreenshotInForm: Bool = true,
         crashLogPath: String? = nil,
-        userIdentity: FeedbackUserIdentity = .anonymous
+        userIdentity: FeedbackUserIdentity = .anonymous,
+        formConfiguration: FeedbackFormConfiguration = .default,
+        eventHandler: FeedbackEventHandler? = nil,
+        apiResultPresentation: FeedbackAPIResultPresentation = .alert
     ) -> MeerkatBootstrap {
         MeerkatBootstrap(
             recipients: [],
@@ -92,7 +103,10 @@ struct MeerkatBootstrap {
             crashLogPath: crashLogPath,
             logProvider: nil,
             userIdentity: userIdentity,
-            customDelivery: nil
+            customDelivery: nil,
+            formConfiguration: formConfiguration,
+            eventHandler: eventHandler,
+            apiResultPresentation: apiResultPresentation
         )
     }
 
@@ -107,7 +121,9 @@ struct MeerkatBootstrap {
         collectUserInput: Bool = true,
         offerScreenshotInForm: Bool = false,
         crashLogPath: String? = nil,
-        userIdentity: FeedbackUserIdentity = .anonymous
+        userIdentity: FeedbackUserIdentity = .anonymous,
+        formConfiguration: FeedbackFormConfiguration = .default,
+        eventHandler: FeedbackEventHandler? = nil
     ) -> MeerkatBootstrap {
         MeerkatBootstrap(
             recipients: [],
@@ -126,7 +142,10 @@ struct MeerkatBootstrap {
             crashLogPath: crashLogPath,
             logProvider: nil,
             userIdentity: userIdentity,
-            customDelivery: handler
+            customDelivery: handler,
+            formConfiguration: formConfiguration,
+            eventHandler: eventHandler,
+            apiResultPresentation: .none
         )
     }
 

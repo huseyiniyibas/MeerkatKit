@@ -3,12 +3,16 @@ import SwiftUI
 struct MeerkatFeedbackFormSheet: View {
     let template: FeedbackTemplate
     let locale: FeedbackLocale
+    let formConfiguration: FeedbackFormConfiguration
     let offerScreenshot: Bool
     let onSubmit: (FeedbackUserInput) -> Void
+    let onCancel: () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var message = ""
     @State private var rating: Int?
+    @State private var email = ""
+    @State private var customFieldValues: [String: String] = [:]
     @State private var includeScreenshot = false
 
     var body: some View {
@@ -16,14 +20,29 @@ struct MeerkatFeedbackFormSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     FeedbackFormCategoryRow(template: template, locale: locale)
-                    FeedbackStarRatingRow(
-                        label: MeerkatLocalizer.text(.formRatingLabel, locale: locale),
-                        rating: $rating
-                    )
+                    if formConfiguration.collectRating {
+                        FeedbackStarRatingRow(
+                            label: MeerkatLocalizer.text(.formRatingLabel, locale: locale),
+                            rating: $rating
+                        )
+                    }
                     FeedbackFormMessageField(
                         placeholder: MeerkatLocalizer.text(.formMessagePlaceholder, locale: locale),
                         text: $message
                     )
+                    if formConfiguration.collectEmail {
+                        FeedbackFormEmailField(
+                            label: MeerkatLocalizer.text(.labelEmail, locale: locale),
+                            placeholder: MeerkatLocalizer.text(.formEmailPlaceholder, locale: locale),
+                            email: $email
+                        )
+                    }
+                    if !formConfiguration.customFields.isEmpty {
+                        FeedbackFormCustomFieldsSection(
+                            fields: formConfiguration.customFields,
+                            values: $customFieldValues
+                        )
+                    }
                     if offerScreenshot {
                         FeedbackScreenshotToggle(
                             label: MeerkatLocalizer.text(.formIncludeScreenshot, locale: locale),
@@ -40,6 +59,7 @@ struct MeerkatFeedbackFormSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(MeerkatLocalizer.text(.formCancel, locale: locale)) {
+                        onCancel()
                         dismiss()
                     }
                 }
@@ -58,91 +78,39 @@ struct MeerkatFeedbackFormSheet: View {
     }
 
     private var canSubmit: Bool {
-        !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedMessage.isEmpty else { return false }
+
+        if formConfiguration.collectEmail {
+            let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmedEmail.isEmpty else { return false }
+        }
+
+        for field in formConfiguration.customFields where field.isRequired {
+            let value = customFieldValues[field.id, default: ""]
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !value.isEmpty else { return false }
+        }
+
+        return true
     }
 
     private func submit() {
-        let trimmed = message.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedCustomFields = customFieldValues.mapValues {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
         onSubmit(
             FeedbackUserInput(
-                message: trimmed,
-                rating: rating,
+                message: trimmedMessage,
+                rating: formConfiguration.collectRating ? rating : nil,
+                email: formConfiguration.collectEmail ? trimmedEmail : nil,
+                customFields: normalizedCustomFields,
                 includeScreenshot: includeScreenshot
             )
         )
         dismiss()
-    }
-}
-
-private struct FeedbackFormCategoryRow: View {
-    let template: FeedbackTemplate
-    let locale: FeedbackLocale
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: template.systemImage)
-                .font(.title3)
-                .foregroundStyle(.secondary)
-            Text(template.title(for: locale))
-                .font(.headline)
-        }
-        .accessibilityElement(children: .combine)
-    }
-}
-
-private struct FeedbackScreenshotToggle: View {
-    let label: String
-    @Binding var isOn: Bool
-
-    var body: some View {
-        Toggle(isOn: $isOn) {
-            Label(label, systemImage: "camera.viewfinder")
-        }
-    }
-}
-
-private struct FeedbackFormMessageField: View {
-    let placeholder: String
-    @Binding var text: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            #if os(tvOS)
-            TextField(placeholder, text: $text, axis: .vertical)
-                .lineLimit(5 ... 10)
-                .padding(8)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(.quaternary, lineWidth: 1)
-                }
-            #else
-            TextEditor(text: $text)
-                .frame(minHeight: 120)
-                .padding(8)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(.quaternary, lineWidth: 1)
-                }
-                .overlay(alignment: .topLeading) {
-                    if text.isEmpty {
-                        Text(placeholder)
-                            .foregroundStyle(.tertiary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 16)
-                            .allowsHitTesting(false)
-                    }
-                }
-            #endif
-        }
-    }
-}
-
-private extension FeedbackTemplate {
-    var systemImage: String {
-        switch self {
-        case .bugReport: return "ladybug.fill"
-        case .featureRequest: return "lightbulb.fill"
-        case .general: return "text.bubble.fill"
-        }
     }
 }

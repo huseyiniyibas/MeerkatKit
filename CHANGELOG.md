@@ -3,6 +3,22 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.2.0] — 2026-07-06
+
+### Added
+
+- **API result UI** — `apiResultPresentation` on API bootstrap (`.alert`, `.banner`, or `.none`).
+- **Event handlers** — ``FeedbackEventHandler`` with `onSubmitted`, `onFailed`, and `onCancelled` callbacks.
+- **Form configuration** — ``FeedbackFormConfiguration`` for optional rating, email collection, and custom fields.
+- **Custom templates** — ``FeedbackCustomTemplate`` via ``FeedbackTemplate/custom(_:)``.
+- **DocC articles** — API delivery, form configuration, custom templates, and event handlers.
+- **Example app** — custom template, form config, event handlers, per-screen mail, and UIKit demo screen.
+
+### Changed
+
+- ``FeedbackTemplate`` is now a sum type (`bugReport`, `featureRequest`, `general`, `custom`) with ``FeedbackTemplate/apiIdentifier`` for API payloads.
+- ``FeedbackUserInput`` includes optional `email` and `customFields`.
+
 ## [0.1.4] — 2026-07-06
 
 ### Fixed
@@ -128,6 +144,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.2.0]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.4...v0.2.0
 [0.1.4]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.1...v0.1.2

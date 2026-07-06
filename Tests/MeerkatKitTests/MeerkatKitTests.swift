@@ -275,6 +275,66 @@ final class MeerkatKitTests: XCTestCase {
     }
 
     @MainActor
+    func testCustomTemplateAPIIdentifier() {
+        let custom = FeedbackTemplate.custom(
+            FeedbackCustomTemplate(
+                id: "billing",
+                title: "Billing",
+                subject: "Billing issue",
+                bodyPrefix: "Details:\n\n"
+            )
+        )
+        XCTAssertEqual(custom.apiIdentifier, "billing")
+        XCTAssertEqual(custom.rowTitle(for: .english), "Billing")
+    }
+
+    @MainActor
+    func testFormConfigurationRatingDisabled() {
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            formConfiguration: FeedbackFormConfiguration(collectRating: false)
+        )
+        XCTAssertFalse(MeerkatFeedback.formConfiguration.collectRating)
+    }
+
+    @MainActor
+    func testFeedbackEventHandlerSubmitted() {
+        MeerkatFeedback.bootstrap(
+            customDelivery: { _ in },
+            collectUserInput: false,
+            eventHandler: FeedbackEventHandler(
+                onSubmitted: { event in
+                    XCTAssertEqual(event.screen, "Checkout")
+                    XCTAssertEqual(event.channel, .custom)
+                }
+            )
+        )
+        MeerkatFeedback.present(screen: "Checkout", template: .bugReport)
+    }
+
+    @MainActor
+    func testPayloadIncludesCustomFieldValues() {
+        MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
+        let configuration = MeerkatBootstrap.mail(recipients: ["test@example.com"]).configuration(placement: "Home")
+        let userInput = FeedbackUserInput(
+            message: "Help",
+            rating: 4,
+            email: "user@test.com",
+            customFields: ["orderId": "A-1"]
+        )
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "Home",
+            templateOverride: .general,
+            userInput: userInput
+        )
+
+        XCTAssertEqual(payload.metadata["email"], "user@test.com")
+        XCTAssertEqual(payload.metadata["orderId"], "A-1")
+        XCTAssertTrue(payload.body.contains("user@test.com"))
+    }
+
+    @MainActor
     func testZeroDismissCooldownDoesNotPersist() {
         #if DEBUG
         MeerkatDismissCooldown.resetAll()

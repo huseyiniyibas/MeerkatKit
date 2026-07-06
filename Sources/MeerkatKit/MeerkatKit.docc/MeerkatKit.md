@@ -17,9 +17,17 @@ Typical integration:
 
 - <doc:GettingStarted>
 - <doc:TimingAndDismiss>
+- <doc:APIDelivery>
+- <doc:FormConfiguration>
+- <doc:CustomTemplates>
+- <doc:EventHandlers>
+- <doc:UIKitIntegration>
 
 ### Core types
 
 - ``MeerkatFeedback``
 - ``FeedbackTemplate``
+- ``FeedbackCustomTemplate``
+- ``FeedbackFormConfiguration``
+- ``FeedbackEventHandler``
 - ``FeedbackPayload``

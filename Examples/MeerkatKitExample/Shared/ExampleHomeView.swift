@@ -9,7 +9,7 @@ struct ExampleHomeView: View {
                 .foregroundStyle(.tint)
             Text("MeerkatKit Example")
                 .font(.title2.bold())
-            Text("Floating button, shake (iOS), integrated row, and API delivery.")
+            Text("Floating button, shake (iOS), custom templates, form config, and API callbacks.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -17,7 +17,11 @@ struct ExampleHomeView: View {
         }
         .padding()
         .navigationTitle("Home")
-        .meerkatFeedback(screen: "Home", enableShake: true)
+        .meerkatFeedback(
+            screen: "Home",
+            mailRecipients: ["home-feedback@example.com"],
+            enableShake: true
+        )
     }
 }
 
@@ -26,6 +30,10 @@ private struct ExampleActionButtons: View {
         VStack(spacing: 12) {
             NavigationLink("Integrated settings row") {
                 ExampleSettingsView()
+            }
+            .buttonStyle(.bordered)
+            NavigationLink("UIKit bar button demo") {
+                ExampleUIKitView()
             }
             .buttonStyle(.bordered)
         }

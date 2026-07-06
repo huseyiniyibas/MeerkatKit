@@ -4,6 +4,8 @@ struct FeedbackAPIModel: Codable, Equatable {
     struct UserInput: Codable, Equatable {
         let message: String
         let rating: Int?
+        let email: String?
+        let customFields: [String: String]?
     }
 
     struct UserIdentity: Codable, Equatable {
@@ -35,7 +37,12 @@ struct FeedbackAPIModel: Codable, Equatable {
         }
 
         let userInput = payload.userInput.map {
-            UserInput(message: $0.message, rating: $0.rating)
+            UserInput(
+                message: $0.message,
+                rating: $0.rating,
+                email: $0.email,
+                customFields: $0.customFields.isEmpty ? nil : $0.customFields
+            )
         }
 
         let attachments = payload.attachments.map {
@@ -48,7 +55,7 @@ struct FeedbackAPIModel: Codable, Equatable {
 
         return FeedbackAPIModel(
             placement: payload.placement,
-            template: payload.template.rawValue,
+            template: payload.template.apiIdentifier,
             subject: payload.subject,
             body: payload.body,
             metadata: payload.metadata,

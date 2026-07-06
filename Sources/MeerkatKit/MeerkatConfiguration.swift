@@ -19,10 +19,25 @@ public enum FeedbackLocale: Sendable {
     case current
 }
 
-public enum FeedbackTemplate: String, Sendable, CaseIterable {
+public enum FeedbackTemplate: Hashable, Sendable, Identifiable {
     case bugReport
     case featureRequest
     case general
+    case custom(FeedbackCustomTemplate)
+
+    public static let builtInCases: [FeedbackTemplate] = [.bugReport, .featureRequest, .general]
+
+    public var id: String { apiIdentifier }
+
+    /// Stable identifier used in API payloads and accessibility identifiers.
+    public var apiIdentifier: String {
+        switch self {
+        case .bugReport: return "bugReport"
+        case .featureRequest: return "featureRequest"
+        case .general: return "general"
+        case let .custom(template): return template.id
+        }
+    }
 
     /// Localized label for template picker rows and mail subjects.
     public func title(for locale: FeedbackLocale) -> String {
@@ -37,6 +52,8 @@ public enum FeedbackTemplate: String, Sendable, CaseIterable {
             return MeerkatLocalizer.text(.subjectFeatureRequest, locale: locale)
         case .general:
             return MeerkatLocalizer.text(.subjectFeedback, locale: locale)
+        case let .custom(template):
+            return template.subject
         }
     }
 
@@ -48,6 +65,36 @@ public enum FeedbackTemplate: String, Sendable, CaseIterable {
             return MeerkatLocalizer.text(.bodyPrefixFeatureRequest, locale: locale)
         case .general:
             return MeerkatLocalizer.text(.bodyPrefixFeedback, locale: locale)
+        case let .custom(template):
+            return template.bodyPrefix
+        }
+    }
+
+    var displayTitle: String {
+        switch self {
+        case .bugReport, .featureRequest, .general:
+            return apiIdentifier
+        case let .custom(template):
+            return template.title
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .bugReport: return "ladybug.fill"
+        case .featureRequest: return "lightbulb.fill"
+        case .general: return "text.bubble.fill"
+        case let .custom(template):
+            return template.systemImage
+        }
+    }
+
+    func rowTitle(for locale: FeedbackLocale) -> String {
+        switch self {
+        case .bugReport, .featureRequest, .general:
+            return title(for: locale)
+        case let .custom(template):
+            return template.title
         }
     }
 }

@@ -30,6 +30,18 @@ public enum MeerkatFeedback {
         bootstrap?.offerScreenshotInForm ?? false
     }
 
+    public static var formConfiguration: FeedbackFormConfiguration {
+        bootstrap?.formConfiguration ?? .default
+    }
+
+    static var eventHandler: FeedbackEventHandler? {
+        bootstrap?.eventHandler
+    }
+
+    static var apiResultPresentation: FeedbackAPIResultPresentation {
+        bootstrap?.apiResultPresentation ?? .none
+    }
+
     public static func bootstrap(
         recipients: [String],
         appStoreID: String? = nil,
@@ -45,7 +57,9 @@ public enum MeerkatFeedback {
         mailUnavailableFallback: MailUnavailableFallback = .shareSheet,
         offerScreenshotInForm: Bool = false,
         crashLogPath: String? = nil,
-        userIdentity: FeedbackUserIdentity = .anonymous
+        userIdentity: FeedbackUserIdentity = .anonymous,
+        formConfiguration: FeedbackFormConfiguration = .default,
+        eventHandler: FeedbackEventHandler? = nil
     ) {
         MetadataCollector.setAppStoreID(appStoreID)
         MetadataCollector.setUserIdentity(userIdentity)
@@ -65,7 +79,9 @@ public enum MeerkatFeedback {
             mailUnavailableFallback: mailUnavailableFallback,
             offerScreenshotInForm: offerScreenshotInForm,
             crashLogPath: crashLogPath,
-            userIdentity: userIdentity
+            userIdentity: userIdentity,
+            formConfiguration: formConfiguration,
+            eventHandler: eventHandler
         )
         startOfflineQueueFlushIfNeeded()
     }
@@ -84,7 +100,10 @@ public enum MeerkatFeedback {
         collectUserInput: Bool = true,
         offerScreenshotInForm: Bool = true,
         crashLogPath: String? = nil,
-        userIdentity: FeedbackUserIdentity = .anonymous
+        userIdentity: FeedbackUserIdentity = .anonymous,
+        formConfiguration: FeedbackFormConfiguration = .default,
+        eventHandler: FeedbackEventHandler? = nil,
+        apiResultPresentation: FeedbackAPIResultPresentation = .alert
     ) {
         MetadataCollector.setAppStoreID(appStoreID)
         MetadataCollector.setUserIdentity(userIdentity)
@@ -101,7 +120,10 @@ public enum MeerkatFeedback {
             collectUserInput: collectUserInput,
             offerScreenshotInForm: offerScreenshotInForm,
             crashLogPath: crashLogPath,
-            userIdentity: userIdentity
+            userIdentity: userIdentity,
+            formConfiguration: formConfiguration,
+            eventHandler: eventHandler,
+            apiResultPresentation: apiResultPresentation
         )
         startOfflineQueueFlushIfNeeded()
     }
@@ -118,7 +140,9 @@ public enum MeerkatFeedback {
         collectUserInput: Bool = true,
         offerScreenshotInForm: Bool = false,
         crashLogPath: String? = nil,
-        userIdentity: FeedbackUserIdentity = .anonymous
+        userIdentity: FeedbackUserIdentity = .anonymous,
+        formConfiguration: FeedbackFormConfiguration = .default,
+        eventHandler: FeedbackEventHandler? = nil
     ) {
         MetadataCollector.setAppStoreID(appStoreID)
         MetadataCollector.setUserIdentity(userIdentity)
@@ -133,7 +157,9 @@ public enum MeerkatFeedback {
             collectUserInput: collectUserInput,
             offerScreenshotInForm: offerScreenshotInForm,
             crashLogPath: crashLogPath,
-            userIdentity: userIdentity
+            userIdentity: userIdentity,
+            formConfiguration: formConfiguration,
+            eventHandler: eventHandler
         )
     }
 
@@ -186,9 +212,13 @@ public enum MeerkatFeedback {
                 screen: screen,
                 template: template,
                 locale: bootstrap.locale,
+                formConfiguration: bootstrap.formConfiguration,
                 offerScreenshot: bootstrap.offerScreenshotInForm,
                 onSubmit: { userInput in
                     submitFeedback(screen: screen, template: template, userInput: userInput)
+                },
+                onCancel: {
+                    FeedbackEventDispatcher.cancelled(screen: screen, stage: .form)
                 }
             )
         } else {
@@ -209,15 +239,48 @@ public enum MeerkatFeedback {
             logProvider: bootstrap.logProvider,
             crashLogPath: bootstrap.crashLogPath
         )
+        let resolvedIdentity = resolvedUserIdentity(
+            bootstrapIdentity: bootstrap.userIdentity,
+            userInput: userInput
+        )
         let payload = FeedbackPayloadBuilder.build(
             configuration: configuration,
             placementOverride: screen,
             templateOverride: template,
             userInput: userInput,
             attachments: attachments,
-            userIdentity: bootstrap.userIdentity
+            userIdentity: resolvedIdentity
         )
-        deliver(payload, configuration: configuration, identity: bootstrap.userIdentity)
+        deliver(
+            payload,
+            screen: screen,
+            template: template,
+            configuration: configuration,
+            identity: resolvedIdentity
+        )
+    }
+
+    private static func resolvedUserIdentity(
+        bootstrapIdentity: FeedbackUserIdentity,
+        userInput: FeedbackUserInput?
+    ) -> FeedbackUserIdentity {
+        guard let email = userInput?.email?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !email.isEmpty else {
+            return bootstrapIdentity
+        }
+
+        if bootstrapIdentity.isAnonymous {
+            return FeedbackUserIdentity(email: email)
+        }
+
+        if bootstrapIdentity.email == nil || bootstrapIdentity.email?.isEmpty == true {
+            return FeedbackUserIdentity(
+                userId: bootstrapIdentity.userId,
+                email: email
+            )
+        }
+
+        return bootstrapIdentity
     }
 
     public static func stickyButtonPosition() -> FeedbackPosition {
@@ -251,20 +314,53 @@ public enum MeerkatFeedback {
 
     private static func deliver(
         _ payload: FeedbackPayload,
+        screen: String,
+        template: FeedbackTemplate,
         configuration: MeerkatConfiguration,
         identity: FeedbackUserIdentity
     ) {
         switch configuration.delivery {
         case .mailComposer:
-            FeedbackMailDelivery.present(payload: payload, configuration: configuration)
+            let result = FeedbackMailDelivery.present(
+                payload: payload,
+                configuration: configuration,
+                screen: screen,
+                template: template
+            )
+            switch result {
+            case .composerPresented:
+                break
+            case .deliveredImmediately:
+                FeedbackEventDispatcher.submitted(
+                    screen: screen,
+                    template: template,
+                    payload: payload,
+                    channel: .mail
+                )
+            case .failed:
+                FeedbackEventDispatcher.failed(
+                    screen: screen,
+                    template: template,
+                    error: .mailUnavailable,
+                    queuedOffline: false
+                )
+            }
         case let .api(apiConfig):
             APIFeedbackDelivery.deliver(
                 payload: payload,
                 configuration: apiConfig,
-                identity: identity
+                identity: identity,
+                screen: screen,
+                template: template
             )
         case let .custom(handler):
             handler(payload)
+            FeedbackEventDispatcher.submitted(
+                screen: screen,
+                template: template,
+                payload: payload,
+                channel: .custom
+            )
         }
     }
 }
@@ -291,6 +387,7 @@ enum FeedbackPayloadBuilder {
             placement: placement
         )
         appendIdentityMetadata(&metadata, identity: userIdentity)
+        appendUserInputMetadata(&metadata, userInput: userInput)
 
         var orderedKeys = MetadataCollector.orderedKeys(
             headerKeys: headerKeys,
@@ -317,6 +414,19 @@ enum FeedbackPayloadBuilder {
             userInput: userInput,
             attachments: attachments
         )
+    }
+
+    private static func appendUserInputMetadata(
+        _ metadata: inout [String: String],
+        userInput: FeedbackUserInput?
+    ) {
+        guard let userInput else { return }
+        if let email = userInput.email, !email.isEmpty {
+            metadata["email"] = email
+        }
+        for (key, value) in userInput.customFields where !value.isEmpty {
+            metadata[key] = value
+        }
     }
 
     private static func appendIdentityMetadata(

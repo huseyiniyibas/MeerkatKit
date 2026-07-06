@@ -7,10 +7,23 @@ enum APIFeedbackDelivery {
     static func deliver(
         payload: FeedbackPayload,
         configuration: FeedbackAPIConfiguration,
-        identity: FeedbackUserIdentity?
+        identity: FeedbackUserIdentity?,
+        screen: String,
+        template: FeedbackTemplate
     ) {
         Task {
-            await submit(payload: payload, configuration: configuration, identity: identity)
+            let result = await submit(
+                payload: payload,
+                configuration: configuration,
+                identity: identity
+            )
+            FeedbackEventDispatcher.handleAPIOutcome(
+                screen: screen,
+                template: template,
+                payload: payload,
+                outcome: result.outcome,
+                error: result.error
+            )
         }
     }
 
@@ -19,11 +32,11 @@ enum APIFeedbackDelivery {
         payload: FeedbackPayload,
         configuration: FeedbackAPIConfiguration,
         identity: FeedbackUserIdentity?
-    ) async {
+    ) async -> APIFeedbackSubmitResult {
         let model = FeedbackAPIModel.make(from: payload, identity: identity)
         guard let body = try? model.encoded() else {
             print("MeerkatKit: Failed to encode API payload.")
-            return
+            return APIFeedbackSubmitResult(outcome: .failed, error: .encodingFailed)
         }
 
         do {
@@ -33,15 +46,30 @@ enum APIFeedbackDelivery {
                 body: body,
                 session: urlSession
             )
-        } catch {
-            print("MeerkatKit: API delivery failed — \(error.localizedDescription)")
+            return APIFeedbackSubmitResult(outcome: .success, error: nil)
+        } catch let error as APIFeedbackError {
+            let deliveryError = FeedbackDeliveryError.unsuccessfulStatus(error.statusCode)
             if configuration.offlineRetryEnabled {
                 FeedbackOfflineQueue.enqueue(
                     endpoint: configuration.endpoint,
                     headers: configuration.headers,
                     body: body
                 )
+                return APIFeedbackSubmitResult(outcome: .queuedOffline, error: deliveryError)
             }
+            return APIFeedbackSubmitResult(outcome: .failed, error: deliveryError)
+        } catch {
+            print("MeerkatKit: API delivery failed — \(error.localizedDescription)")
+            let deliveryError = FeedbackDeliveryError.networkFailure(error.localizedDescription)
+            if configuration.offlineRetryEnabled {
+                FeedbackOfflineQueue.enqueue(
+                    endpoint: configuration.endpoint,
+                    headers: configuration.headers,
+                    body: body
+                )
+                return APIFeedbackSubmitResult(outcome: .queuedOffline, error: deliveryError)
+            }
+            return APIFeedbackSubmitResult(outcome: .failed, error: deliveryError)
         }
     }
 
@@ -67,6 +95,18 @@ enum APIFeedbackDelivery {
     }
 }
 
+struct APIFeedbackSubmitResult {
+    let outcome: FeedbackAPIOutcome
+    let error: FeedbackDeliveryError?
+}
+
 enum APIFeedbackError: Error, Equatable {
     case unsuccessfulStatus(Int)
+
+    var statusCode: Int {
+        switch self {
+        case let .unsuccessfulStatus(code):
+            return code
+        }
+    }
 }

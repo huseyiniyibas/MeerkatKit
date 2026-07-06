@@ -56,6 +56,12 @@ enum FeedbackEmailComposer {
                     "\(MeerkatLocalizer.text(.labelRating, locale: locale)): \(rating)/5"
                 )
             }
+            if let email = userInput.email, !email.isEmpty {
+                sections.append("\(MeerkatLocalizer.text(.labelEmail, locale: locale)): \(email)")
+            }
+            for (key, value) in userInput.customFields.sorted(by: { $0.key < $1.key }) where !value.isEmpty {
+                sections.append("\(key): \(value)")
+            }
             let prefix = template.bodyPrefix(for: locale)
             sections.append("\(prefix)\(userInput.message)")
         } else {

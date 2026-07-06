@@ -11,8 +11,14 @@ struct ExampleSettingsView: View {
                 MeerkatFeedback.flushOfflineQueue()
             }
             LabeledContent("Queued items", value: "\(MeerkatFeedback.offlineQueueCount)")
+            LabeledContent("Collect email", value: MeerkatFeedback.formConfiguration.collectEmail ? "Yes" : "No")
+            LabeledContent("Custom fields", value: "\(MeerkatFeedback.formConfiguration.customFields.count)")
         }
         .navigationTitle("Settings")
-        .meerkatFeedback(screen: "Settings", presentation: .integrated)
+        .meerkatFeedback(
+            screen: "Settings",
+            mailRecipients: ["settings-feedback@example.com"],
+            presentation: .integrated
+        )
     }
 }

@@ -137,6 +137,96 @@ final class MeerkatKitAPITests: XCTestCase {
     }
 
     @MainActor
+    func testAPIModelIncludesEmailAndCustomFields() throws {
+        resetState()
+        let payload = FeedbackPayload(
+            placement: "Home",
+            template: .general,
+            subject: "Feedback",
+            body: "details",
+            metadata: [:],
+            userInput: FeedbackUserInput(
+                message: "Crash",
+                rating: 1,
+                email: "user@test.com",
+                customFields: ["orderId": "42"]
+            )
+        )
+        let model = FeedbackAPIModel.make(from: payload, identity: .anonymous)
+        let data = try model.encoded()
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let userInput = json?["userInput"] as? [String: Any]
+        XCTAssertEqual(userInput?["email"] as? String, "user@test.com")
+        let customFields = userInput?["customFields"] as? [String: String]
+        XCTAssertEqual(customFields?["orderId"], "42")
+    }
+
+    @MainActor
+    func testAPIDeliverySuccessDispatchesSubmitted() async {
+        resetState()
+        #if DEBUG
+        FeedbackOfflineQueue.resetAll()
+        #endif
+
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [MockURLProtocol.self]
+        let session = URLSession(configuration: config)
+        APIFeedbackDelivery.urlSession = session
+
+        MockURLProtocol.handler = { request in
+            let response = HTTPURLResponse(
+                url: request.url!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil
+            )!
+            return (response, Data())
+        }
+
+        let submitted = expectation(description: "submitted")
+        MeerkatFeedback.bootstrap(
+            api: URL(string: "https://api.example.com/feedback")!,
+            collectUserInput: false,
+            eventHandler: FeedbackEventHandler(
+                onSubmitted: { event in
+                    XCTAssertEqual(event.screen, "Home")
+                    submitted.fulfill()
+                }
+            ),
+            apiResultPresentation: .none
+        )
+
+        let payload = FeedbackPayload(
+            placement: "Home",
+            template: .general,
+            subject: "Feedback",
+            body: "body",
+            metadata: [:]
+        )
+
+        let result = await APIFeedbackDelivery.submit(
+            payload: payload,
+            configuration: FeedbackAPIConfiguration(
+                endpoint: URL(string: "https://api.example.com/feedback")!,
+                headers: [:],
+                offlineRetryEnabled: false
+            ),
+            identity: .anonymous
+        )
+        XCTAssertEqual(result.outcome, .success)
+
+        FeedbackEventDispatcher.handleAPIOutcome(
+            screen: "Home",
+            template: .general,
+            payload: payload,
+            outcome: result.outcome,
+            error: result.error
+        )
+
+        await fulfillment(of: [submitted], timeout: 1)
+    }
+
+    @MainActor
     func testLogAttachmentFromProvider() {
         resetState()
         let attachment = FeedbackLogAttachment.makeAttachment(
