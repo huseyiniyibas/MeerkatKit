@@ -21,7 +21,7 @@ struct MeerkatTemplatePickerSheet: View {
                 .accessibilityIdentifier("meerkat_template_\(template.apiIdentifier)")
             }
             .navigationTitle(MeerkatLocalizer.text(.templatePickerTitle, locale: locale))
-            #if os(iOS)
+            #if os(iOS) || os(visionOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
@@ -33,7 +33,7 @@ struct MeerkatTemplatePickerSheet: View {
                 }
             }
         }
-        #if os(iOS)
+        #if os(iOS) || os(visionOS)
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
         #endif

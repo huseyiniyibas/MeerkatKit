@@ -25,7 +25,7 @@ enum FeedbackResultPresenter {
         let title = MeerkatLocalizer.text(titleKey(for: outcome), locale: locale)
         let message = MeerkatLocalizer.text(messageKey(for: outcome), locale: locale)
 
-        #if os(iOS) || os(tvOS)
+        #if os(iOS) || os(visionOS) || os(tvOS)
         guard let presenter = TopViewControllerFinder.topViewController() else { return }
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(
@@ -140,7 +140,7 @@ private struct FeedbackResultBannerView: View {
 }
 #endif
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(visionOS) || os(tvOS)
 import UIKit
 #elseif os(macOS)
 import AppKit

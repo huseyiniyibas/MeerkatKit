@@ -384,6 +384,11 @@ final class MeerkatKitTests: XCTestCase {
     }
 
     @MainActor
+    func testVisionProDeviceIdentifier() {
+        XCTAssertEqual(DeviceModelCatalog.marketingName(for: "RealityDevice14,1"), "Apple Vision Pro")
+    }
+
+    @MainActor
     func testZeroDismissCooldownDoesNotPersist() {
         #if DEBUG
         MeerkatDismissCooldown.resetAll()

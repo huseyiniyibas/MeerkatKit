@@ -1,6 +1,6 @@
 # MeerkatKit
 
-Collect user feedback in SwiftUI apps on iOS, iPadOS, macOS, and tvOS.
+Collect user feedback in SwiftUI apps on iOS, iPadOS, macOS, tvOS, and visionOS.
 
 ## Overview
 
@@ -23,6 +23,7 @@ Typical integration:
 - <doc:EventHandlers>
 - <doc:UIKitIntegration>
 - <doc:AppKitIntegration>
+- <doc:VisionOSIntegration>
 
 ### Core types
 

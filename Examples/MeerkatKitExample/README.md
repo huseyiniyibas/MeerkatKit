@@ -1,6 +1,6 @@
 # MeerkatKit Example
 
-Multi-platform demo for MeerkatKit (iOS, macOS, tvOS).
+Multi-platform demo for MeerkatKit (iOS, macOS, tvOS, visionOS).
 
 ## Open in Xcode
 

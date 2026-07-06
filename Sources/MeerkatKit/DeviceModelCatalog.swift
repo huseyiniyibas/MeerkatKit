@@ -32,11 +32,16 @@ enum DeviceModelCatalog {
 
     private static func fallbackName(for identifier: String) -> String {
         if identifier == "arm64" || identifier == "x86_64" {
-            #if canImport(UIKit) && !os(watchOS)
+            #if os(visionOS)
+            return "visionOS Simulator"
+            #elseif canImport(UIKit) && !os(watchOS)
             return "iOS Simulator"
             #else
             return "Unknown Device"
             #endif
+        }
+        if identifier.hasPrefix("RealityDevice") || identifier.hasPrefix("AppleVisionPro") {
+            return "Apple Vision Pro"
         }
         if identifier.hasPrefix("iPhone") {
             return "iPhone"
@@ -92,7 +97,8 @@ enum DeviceModelCatalog {
         "iPad14,5": "iPad Pro 12.9-inch (6th generation)",
         "iPad16,3": "iPad Pro 11-inch (M4)",
         "iPad16,4": "iPad Pro 13-inch (M4)",
-        "AppleTV14,1": "Apple TV 4K (3rd generation)"
+        "AppleTV14,1": "Apple TV 4K (3rd generation)",
+        "RealityDevice14,1": "Apple Vision Pro"
     ]
 }
 

@@ -47,7 +47,7 @@ struct FeedbackFormEmailField: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             TextField(placeholder, text: $email)
-                #if os(iOS) || os(tvOS)
+                #if os(iOS) || os(visionOS) || os(tvOS)
                 .textInputAutocapitalization(.never)
                 .keyboardType(.emailAddress)
                 #endif

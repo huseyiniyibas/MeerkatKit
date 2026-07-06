@@ -3,6 +3,18 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.3.0] — 2026-07-06
+
+### Added
+
+- **visionOS support** — deployment target 1.5; floating button, form, API delivery, mailto + share fallback, UIKit helpers, and screenshot capture.
+- **DocC** — visionOS integration article.
+- **CI** — visionOS Simulator build/test job.
+
+### Changed
+
+- Platform policy and sync script now include visionOS alongside iOS, macOS, and tvOS.
+
 ## [0.2.1] — 2026-07-06
 
 ### Added
@@ -153,6 +165,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.3.0]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.4...v0.2.0
 [0.1.4]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.3...v0.1.4

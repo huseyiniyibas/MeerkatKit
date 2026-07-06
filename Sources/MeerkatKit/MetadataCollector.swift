@@ -136,6 +136,8 @@ enum MetadataCollector {
     private static var platformName: String {
         #if os(iOS)
         return "iOS"
+        #elseif os(visionOS)
+        return "visionOS"
         #elseif os(tvOS)
         return "tvOS"
         #elseif os(macOS)

@@ -22,6 +22,9 @@ jobs:
           - destination: "generic/platform=tvOS Simulator"
             name: "tvOS (deploy ≥17.5)"
             platform: tvos
+          - destination: "generic/platform=visionOS Simulator"
+            name: "visionOS (deploy ≥1.5)"
+            platform: visionos
     name: ${{ matrix.name }}
     steps:
       - uses: actions/checkout@v4
@@ -45,6 +48,6 @@ jobs:
               test
           else
             xcodebuild -scheme MeerkatKit \
-              -destination 'generic/platform=tvOS Simulator' \
+              -destination '${{ matrix.destination }}' \
               test
           fi

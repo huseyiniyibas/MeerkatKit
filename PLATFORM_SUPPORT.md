@@ -13,6 +13,7 @@ We support the **three most recent major OS releases** per platform (stable only
 | iOS / iPadOS | 17, 18, 26 | When iOS 27 ships stable → drop 17 → support 18, 26, 27 |
 | macOS | 14, 15, 26 | When macOS 27 ships stable → drop 14 → support 15, 26, 27 |
 | tvOS | 17, 18, 26 | Same pattern as iOS |
+| visionOS | 1, 2, 26 | When visionOS 27 ships stable → drop 1 → support 2, 26, 27 |
 
 iPadOS uses the iOS deployment target and build.
 
@@ -25,10 +26,10 @@ The **minimum** deployment version uses:
 
 **Formula:** `min = {oldestMajor}.{latestStableMinor}`
 
-| Latest stable | Minimum iOS | Minimum macOS | Minimum tvOS |
-|---------------|-------------|---------------|--------------|
-| 26.5.x | 17.5 | 14.5 | 17.5 |
-| 26.6.x | 17.6 | 14.6 | 17.6 |
+| Latest stable | Minimum iOS | Minimum macOS | Minimum tvOS | Minimum visionOS |
+|---------------|-------------|---------------|--------------|------------------|
+| 26.5.x | 17.5 | 14.5 | 17.5 | 1.5 |
+| 26.6.x | 17.6 | 14.6 | 17.6 | 1.6 |
 
 When Apple ships a new **0.1** stable (e.g. 26.5 → 26.6), bump all minimum minors in `Package.swift` and run CI.
 

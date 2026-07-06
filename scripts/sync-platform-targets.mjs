@@ -21,23 +21,25 @@ function minorFromStable(version) {
   return Number.parseInt(parts[1], 10);
 }
 
-function minimumTarget(platformKey, majors, latestStable) {
+function minimumTarget(majors, latestStable) {
   const oldestMajor = Math.min(...majors);
   const minor = minorFromStable(latestStable);
   return `${oldestMajor}.${minor}`;
 }
 
 const targets = {
-  iOS: minimumTarget("iOS", config.supportedMajors.iOS, config.latestStable.iOS),
-  macOS: minimumTarget("macOS", config.supportedMajors.macOS, config.latestStable.macOS),
-  tvOS: minimumTarget("tvOS", config.supportedMajors.tvOS, config.latestStable.tvOS)
+  iOS: minimumTarget(config.supportedMajors.iOS, config.latestStable.iOS),
+  macOS: minimumTarget(config.supportedMajors.macOS, config.latestStable.macOS),
+  tvOS: minimumTarget(config.supportedMajors.tvOS, config.latestStable.tvOS),
+  visionOS: minimumTarget(config.supportedMajors.visionOS, config.latestStable.visionOS)
 };
 
 const packageSwift = readFileSync(packagePath, "utf8");
 const platformsBlock = `    platforms: [
         .iOS("${targets.iOS}"),
         .macOS("${targets.macOS}"),
-        .tvOS("${targets.tvOS}")
+        .tvOS("${targets.tvOS}"),
+        .visionOS("${targets.visionOS}")
     ],`;
 
 const updated = packageSwift.replace(
@@ -56,4 +58,5 @@ console.log("Platform minimums synced:");
 console.log(`  iOS / iPadOS : ${targets.iOS}`);
 console.log(`  macOS        : ${targets.macOS}`);
 console.log(`  tvOS         : ${targets.tvOS}`);
+console.log(`  visionOS     : ${targets.visionOS}`);
 console.log(`  (from latest stable iOS ${config.latestStable.iOS})`);

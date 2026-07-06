@@ -9,7 +9,7 @@ enum ShareFeedbackPresenter {
             shareText += "\n\n\(MeerkatLocalizer.text(.labelRecipients, locale: MeerkatFeedback.configuredLocale)): \(recipients.joined(separator: ", "))"
         }
 
-        #if os(iOS)
+        #if os(iOS) || os(visionOS)
         ShareFeedbackPresenterIOS.present(subject: subject, body: shareText)
         #elseif os(tvOS)
         ShareFeedbackPresenterTV.present(subject: subject, body: shareText)
@@ -19,7 +19,7 @@ enum ShareFeedbackPresenter {
     }
 }
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 import UIKit
 
 private enum ShareFeedbackPresenterIOS {

@@ -2,11 +2,13 @@
   "latestStable": {
     "iOS": "26.5.2",
     "macOS": "26.5.2",
-    "tvOS": "26.5.2"
+    "tvOS": "26.5.2",
+    "visionOS": "26.5.2"
   },
   "supportedMajors": {
     "iOS": [17, 18, 26],
     "macOS": [14, 15, 26],
-    "tvOS": [17, 18, 26]
+    "tvOS": [17, 18, 26],
+    "visionOS": [1, 2, 26]
   }
 }

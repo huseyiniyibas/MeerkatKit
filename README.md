@@ -1,6 +1,6 @@
 # MeerkatKit
 
-Swift package for collecting in-app feedback on iOS, iPadOS, macOS, and tvOS.
+Swift package for collecting in-app feedback on iOS, iPadOS, macOS, tvOS, and visionOS.
 
 Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery — with automatic metadata, optional attachments, and per-screen configuration.
 
@@ -33,6 +33,7 @@ Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery —
 | **iOS / iPadOS** | 17.5 | 17, 18, 26 |
 | **macOS** | 14.5 | 14, 15, 26 |
 | **tvOS** | 17.5 | 17, 18, 26 |
+| **visionOS** | 1.5 | 1, 2, 26 |
 | **Swift** | 6.0 | 6.0+ |
 | **Xcode** | 16.0 | 16 – 26 |
 
@@ -45,6 +46,9 @@ See [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for deployment target policy.
 | iOS / iPadOS | Yes | Yes | Composer + mailto | Share sheet |
 | macOS | Yes | No | mailto | Sharing picker |
 | tvOS | Yes | No | mailto | Console log |
+| visionOS | Yes | No | mailto | Share sheet |
+
+See [Sources/MeerkatKit/MeerkatKit.docc/VisionOSIntegration.md](Sources/MeerkatKit/MeerkatKit.docc/VisionOSIntegration.md) for visionOS details.
 
 ## Installation
 
