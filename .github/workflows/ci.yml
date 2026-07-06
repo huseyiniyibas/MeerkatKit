@@ -30,6 +30,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build and Test
         run: |
+          run_xcodebuild() {
+            xcodebuild -scheme MeerkatKit "$@"
+          }
+
           if [ "${{ matrix.platform }}" = "ios" ]; then
             IOS_UDID=$(xcrun simctl list devices available iOS | awk -F '[()]' '/iPhone/ { print $2; exit }')
             if [ -z "$IOS_UDID" ]; then
@@ -39,15 +43,25 @@ jobs:
             fi
             echo "Package minimum deployment: iOS 17.5 (Package.swift)"
             xcrun simctl list devices available | grep "$IOS_UDID" || true
-            xcodebuild -scheme MeerkatKit \
-              -destination "id=$IOS_UDID" \
-              test
+            run_xcodebuild -destination "id=$IOS_UDID" test
           elif [ "${{ matrix.platform }}" = "macos" ]; then
-            xcodebuild -scheme MeerkatKit \
-              -destination 'platform=macOS' \
-              test
+            run_xcodebuild -destination 'platform=macOS' test
+          elif [ "${{ matrix.platform }}" = "tvos" ]; then
+            TVOS_UDID=$(xcrun simctl list devices available tvOS | awk -F '[()]' '/Apple TV/ { print $2; exit }')
+            if [ -z "$TVOS_UDID" ]; then
+              echo "No available tvOS Simulator device found on runner; falling back to build."
+              run_xcodebuild -destination 'generic/platform=tvOS Simulator' build
+              exit 0
+            fi
+            echo "Using tvOS Simulator: $TVOS_UDID"
+            run_xcodebuild -destination "id=$TVOS_UDID" test
           else
-            xcodebuild -scheme MeerkatKit \
-              -destination '${{ matrix.destination }}' \
-              test
+            VISIONOS_UDID=$(xcrun simctl list devices available visionOS | awk -F '[()]' '/Apple Vision Pro/ { print $2; exit }')
+            if [ -z "$VISIONOS_UDID" ]; then
+              echo "No available visionOS Simulator device found on runner; falling back to build."
+              run_xcodebuild -destination 'generic/platform=visionOS Simulator' build
+              exit 0
+            fi
+            echo "Using visionOS Simulator: $VISIONOS_UDID"
+            run_xcodebuild -destination "id=$VISIONOS_UDID" test
           fi

@@ -3,6 +3,10 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+### Fixed
+
+- **CI** — tvOS and visionOS jobs now target a concrete simulator UDID (or fall back to build-only when unavailable).
+
 ## [0.3.0] — 2026-07-06
 
 ### Added
