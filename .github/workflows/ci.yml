@@ -34,20 +34,30 @@ jobs:
             xcodebuild -scheme MeerkatKit "$@"
           }
 
+          simulator_udid() {
+            local runtime="$1"
+            local pattern="$2"
+            xcrun simctl list devices available "$runtime" \
+              | grep -E "$pattern" \
+              | head -1 \
+              | grep -Eo '[0-9A-F-]{36}' \
+              | head -1
+          }
+
           if [ "${{ matrix.platform }}" = "ios" ]; then
-            IOS_UDID=$(xcrun simctl list devices available iOS | awk -F '[()]' '/iPhone/ { print $2; exit }')
+            IOS_UDID=$(simulator_udid "iOS" 'iPhone')
             if [ -z "$IOS_UDID" ]; then
               echo "No available iOS Simulator device found on runner."
               xcrun simctl list devices available
               exit 1
             fi
             echo "Package minimum deployment: iOS 17.5 (Package.swift)"
-            xcrun simctl list devices available | grep "$IOS_UDID" || true
+            echo "Using iOS Simulator: $IOS_UDID"
             run_xcodebuild -destination "id=$IOS_UDID" test
           elif [ "${{ matrix.platform }}" = "macos" ]; then
             run_xcodebuild -destination 'platform=macOS' test
           elif [ "${{ matrix.platform }}" = "tvos" ]; then
-            TVOS_UDID=$(xcrun simctl list devices available tvOS | awk -F '[()]' '/Apple TV/ { print $2; exit }')
+            TVOS_UDID=$(simulator_udid "tvOS" 'Apple TV')
             if [ -z "$TVOS_UDID" ]; then
               echo "No available tvOS Simulator device found on runner; falling back to build."
               run_xcodebuild -destination 'generic/platform=tvOS Simulator' build
@@ -56,7 +66,7 @@ jobs:
             echo "Using tvOS Simulator: $TVOS_UDID"
             run_xcodebuild -destination "id=$TVOS_UDID" test
           else
-            VISIONOS_UDID=$(xcrun simctl list devices available visionOS | awk -F '[()]' '/Apple Vision Pro/ { print $2; exit }')
+            VISIONOS_UDID=$(simulator_udid "visionOS" 'Apple Vision Pro')
             if [ -z "$VISIONOS_UDID" ]; then
               echo "No available visionOS Simulator device found on runner; falling back to build."
               run_xcodebuild -destination 'generic/platform=visionOS Simulator' build

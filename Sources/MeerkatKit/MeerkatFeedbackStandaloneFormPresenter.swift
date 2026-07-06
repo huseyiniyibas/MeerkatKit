@@ -28,10 +28,12 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         )
         let host = UIHostingController(rootView: sheet)
         host.modalPresentationStyle = .pageSheet
+        #if os(iOS)
         if let sheetController = host.sheetPresentationController {
             sheetController.detents = [.medium(), .large()]
             sheetController.prefersGrabberVisible = true
         }
+        #endif
         presenter.present(host, animated: true)
     }
 }

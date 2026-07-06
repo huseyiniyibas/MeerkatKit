@@ -5,7 +5,8 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
 ### Fixed
 
-- **CI** — tvOS and visionOS jobs now target a concrete simulator UDID (or fall back to build-only when unavailable).
+- **visionOS** — `sheetPresentationController` detents and SwiftUI `presentationDetents` are iOS-only (unavailable on visionOS).
+- **CI** — tvOS and visionOS jobs use reliable simulator UUID extraction; concrete UDID targeting (build-only fallback when unavailable).
 
 ## [0.3.0] — 2026-07-06
 

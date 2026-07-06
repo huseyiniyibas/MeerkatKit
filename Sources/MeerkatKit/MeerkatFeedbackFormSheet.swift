@@ -53,7 +53,7 @@ struct MeerkatFeedbackFormSheet: View {
                 .padding()
             }
             .navigationTitle(MeerkatLocalizer.text(.formTitle, locale: locale))
-            #if os(iOS) || os(visionOS)
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
@@ -71,7 +71,7 @@ struct MeerkatFeedbackFormSheet: View {
                 }
             }
         }
-        #if os(iOS) || os(visionOS)
+        #if os(iOS)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         #endif
