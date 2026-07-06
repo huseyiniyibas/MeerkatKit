@@ -130,6 +130,7 @@ struct MeerkatBootstrap {
         )
     }
 
+    @MainActor
     func configuration(placement: String) -> MeerkatConfiguration {
         let delivery: FeedbackDelivery
         if let customDelivery {
@@ -137,8 +138,12 @@ struct MeerkatBootstrap {
         } else if let apiConfiguration {
             delivery = .api(apiConfiguration)
         } else {
+            let resolvedRecipients = MeerkatFeedbackRecipientRegistry.resolvedRecipients(
+                for: placement,
+                default: recipients
+            )
             delivery = .mailComposer(
-                recipients: recipients,
+                recipients: resolvedRecipients,
                 headerMetadata: headerMetadata,
                 footerMetadata: footerMetadata
             )

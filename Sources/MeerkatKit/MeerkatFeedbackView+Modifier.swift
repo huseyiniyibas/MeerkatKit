@@ -2,8 +2,11 @@ import SwiftUI
 
 public extension View {
     /// Floating feedback button for this screen. Requires ``MeerkatFeedback/bootstrap(recipients:appStoreID:)`` once at launch.
+    ///
+    /// - Parameter mailRecipients: Optional per-screen mail override. When `nil`, bootstrap recipients are used.
     func meerkatFeedback(
         screen: String,
+        mailRecipients: [String]? = nil,
         minimumDwell: Duration? = nil,
         revealAfter: Duration? = nil,
         enableShake: Bool = false,
@@ -13,6 +16,7 @@ public extension View {
         modifier(
             MeerkatFeedbackModifier<EmptyView>(
                 screen: screen,
+                mailRecipients: mailRecipients,
                 minimumDwell: minimumDwell,
                 revealAfter: revealAfter,
                 enableShake: enableShake,
@@ -26,6 +30,7 @@ public extension View {
     /// Replace the built-in floating button with your own SwiftUI view.
     func meerkatFeedback<Floating: View>(
         screen: String,
+        mailRecipients: [String]? = nil,
         minimumDwell: Duration? = nil,
         revealAfter: Duration? = nil,
         enableShake: Bool = false,
@@ -38,6 +43,7 @@ public extension View {
         modifier(
             MeerkatFeedbackModifier(
                 screen: screen,
+                mailRecipients: mailRecipients,
                 minimumDwell: minimumDwell,
                 revealAfter: revealAfter,
                 enableShake: enableShake,

@@ -1,10 +1,26 @@
 # MeerkatKit
 
-Swift package for collecting in-app feedback on Apple platforms.
+Swift package for collecting in-app feedback on iOS, iPadOS, macOS, and tvOS.
 
-Drop in a floating feedback button per screen, or use shake-to-trigger on iOS. Feedback is delivered through Mail (with mailto fallback) or a custom handler. Device and app metadata are included automatically.
+Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery — with automatic metadata, optional attachments, and per-screen configuration.
 
 **Links:** [Repository](https://github.com/huseyiniyibas/MeerkatKit) · [Releases](https://github.com/huseyiniyibas/MeerkatKit/releases) · [Changelog](CHANGELOG.md) · [Platform policy](PLATFORM_SUPPORT.md) · [License](LICENSE)
+
+## Features
+
+| Area | What you get |
+|------|----------------|
+| **Triggers** | Sticky floating button, iOS shake, manual `requestFeedback` / `present` |
+| **Presentation** | Built-in button, custom floating ViewBuilder, integrated (your own UI) |
+| **Delivery** | Mail composer + mailto + share sheet fallback, REST API + offline queue, custom handler |
+| **Form** | In-app message + star rating (default on); skip with `collectUserInput: false` |
+| **Templates** | Bug / feature / general picker when multiple templates configured |
+| **Timing** | `minimumDwell`, `revealAfter`, dismiss cooldown (per screen) |
+| **Recipients** | Default at bootstrap; **per-screen mail override** (optional) |
+| **Identity** | `userId`, `email`, anonymous mode in metadata & API JSON |
+| **Attachments** | Screenshot toggle in form, log provider, crash log path |
+| **UIKit** | Bar button item + `meerkatRequestFeedback(screen:)` |
+| **i18n** | 14 languages for UI labels |
 
 ## Requirements
 
@@ -16,207 +32,147 @@ Drop in a floating feedback button per screen, or use shake-to-trigger on iOS. F
 | **Swift** | 6.0 | 6.0+ |
 | **Xcode** | 16.0 | 16 – 26 |
 
-See [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for the full deployment target policy.
-
-## Deployment policy
-
-- We support the latest **3 stable major** OS versions (betas excluded).
-- Minimum deployment follows: `oldestSupportedMajor.latestStableMinor`
-- Example: latest stable iOS `26.5.x` → minimum iOS `17.5`
-- When Apple ships `26.6` stable → minimum iOS becomes `17.6`
-- Package semver (`0.0.x`) is unrelated to deployment targets
-
-### Updating minimum OS versions (the sync script)
-
-When Apple releases a new **stable** iOS/macOS/tvOS version, you only update one file:
-[`scripts/platform-targets.json`](scripts/platform-targets.json) (set `latestStable` and adjust `supportedMajors` if a major is dropped).
-
-Then run:
-
-```bash
-node scripts/sync-platform-targets.mjs
-```
-
-**What it does in plain terms:** reads that JSON and rewrites the `platforms:` block in `Package.swift` automatically — so you don't hand-edit three version strings. It applies the rule *“oldest supported major + latest stable minor”* (e.g. iOS 26.5 stable → min iOS **17.5**).
-
-You still commit the changed `Package.swift` + JSON yourself; the script does not tag releases or touch the README table.
+See [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for deployment target policy.
 
 ## Platform notes
 
-| Platform | Sticky button | Shake | Delivery |
-|---|---|---|---|
-| iOS / iPadOS | Yes | Yes | Mail composer + mailto fallback |
-| macOS | Yes | No | mailto |
-| tvOS | Yes | No | mailto |
-
-iPadOS uses the same iOS build — no separate package.
+| Platform | Sticky button | Shake | Mail | Share fallback |
+|---|---|---|---|---|
+| iOS / iPadOS | Yes | Yes | Composer + mailto | Share sheet |
+| macOS | Yes | No | mailto | Sharing picker |
+| tvOS | Yes | No | mailto | Console log |
 
 ## Installation
 
-In Xcode: **File → Add Package Dependencies**, then paste:
-
-**[https://github.com/huseyiniyibas/MeerkatKit.git](https://github.com/huseyiniyibas/MeerkatKit.git)**
-
-Or in `Package.swift`:
-
 ```swift
 dependencies: [
-    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.1.2")
+    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.1.3")
 ]
 ```
 
-## Usage
+## Quick start
 
-**1. Once at app launch** — recipients and metadata (`AppDelegate` or `App` init):
+**1. Bootstrap once** (launch):
 
 ```swift
 import MeerkatKit
 
 MeerkatFeedback.bootstrap(
     recipients: ["feedback@yourapp.com"],
-    appStoreID: "1234567890"
-)
-```
-
-**2. Per screen** — add the modifier with a screen name:
-
-```swift
-SettingsView()
-    .meerkatFeedback(screen: "Settings")
-```
-
-Show the button only after the user stays on the screen for a while (optional):
-
-```swift
-HomeView()
-    .meerkatFeedback(screen: "Home", minimumDwell: .seconds(8))
-```
-
-Or reveal on a fixed schedule after the screen appears:
-
-```swift
-ProfileView()
-    .meerkatFeedback(screen: "Profile", revealAfter: .seconds(12))
-```
-
-Both can be combined — whichever completes first shows the button:
-
-```swift
-CheckoutView()
-    .meerkatFeedback(screen: "Checkout", minimumDwell: .seconds(20), revealAfter: .seconds(8))
-```
-
-| Parameter | Meaning |
-|---|---|
-| `minimumDwell` | User must **stay on this screen continuously** for this long. Leave → timer resets. |
-| `revealAfter` | Button may appear after this much time since the screen was **first opened in the session**, even if the user navigates away in between. |
-| `dismissCooldown` | After the user taps **✕**, the sticky button stays hidden on that screen for this long. `nil` = bootstrap default (24h). `.zero` = current visit only. |
-
-Hide the sticky button for 24 hours after dismiss (default):
-
-```swift
-MeerkatFeedback.bootstrap(
-    recipients: ["feedback@yourapp.com"],
-    dismissCooldown: .seconds(86_400)  // 24 hours — this is the default
-)
-
-SettingsView()
-    .meerkatFeedback(screen: "Settings")
-```
-
-Per-screen override, or hide only until the user leaves:
-
-```swift
-SettingsView()
-    .meerkatFeedback(screen: "Settings", dismissCooldown: .seconds(604_800))  // 7 days
-
-DebugView()
-    .meerkatFeedback(screen: "Debug", dismissCooldown: .zero)  // ✕ hides until next appear only
-```
-
-Dismiss cooldown applies to the **sticky button only** — shake-to-feedback is unaffected.
-
-### Template picker
-
-Pass multiple templates at bootstrap — users pick before Mail opens:
-
-```swift
-MeerkatFeedback.bootstrap(
-    recipients: ["feedback@yourapp.com"],
+    appStoreID: "1234567890",
     templates: [.bugReport, .featureRequest, .general]
 )
 ```
 
-With a single template, feedback opens the in-app form (or Mail directly when `collectUserInput: false`).
-
-### In-app feedback form
-
-By default users fill a short form (message + optional star rating) before Mail or custom delivery:
-
-```swift
-MeerkatFeedback.bootstrap(
-    recipients: ["feedback@yourapp.com"],
-    collectUserInput: true  // default
-)
-```
-
-Disable for legacy immediate-mail behaviour:
-
-```swift
-MeerkatFeedback.bootstrap(
-    recipients: ["feedback@yourapp.com"],
-    collectUserInput: false
-)
-```
-
-### Mail unavailable fallback
-
-When Mail is not configured or mailto cannot open, MeerkatKit shows a **share sheet** with the formatted feedback text (default). Override at bootstrap:
-
-```swift
-MeerkatFeedback.bootstrap(
-    recipients: ["feedback@yourapp.com"],
-    mailUnavailableFallback: .shareSheet  // or .none
-)
-```
-
-### Custom button UI
-
-**Your own floating control** — replace the built-in sticky button:
+**2. Attach per screen:**
 
 ```swift
 SettingsView()
-    .meerkatFeedback(screen: "Settings") { request, dismiss in
-        MyFeedbackChip(onTap: request, onClose: dismiss)
-    }
+    .meerkatFeedback(screen: "Settings")
 ```
 
-**Your own in-screen button** — no floating UI; wire an existing row or toolbar item:
+## Per-screen mail recipients
+
+Default recipients come from bootstrap. Override on specific screens — e.g. billing on Paywall, support on Results:
 
 ```swift
-struct SettingsView: View {
-    @Environment(\.meerkatFeedbackRequest) private var requestFeedback
+MeerkatFeedback.bootstrap(recipients: ["feedback@yourapp.com"])
 
-    var body: some View {
-        List {
-            Button("Send Feedback") { requestFeedback?() }
-        }
-        .meerkatFeedback(screen: "Settings", presentation: .integrated)
-    }
+PaywallView()
+    .meerkatFeedback(
+        screen: "Paywall",
+        mailRecipients: ["billing@yourapp.com", "finance@yourapp.com"]
+    )
+
+ResultView()
+    .meerkatFeedback(
+        screen: "Result",
+        mailRecipients: ["results@yourapp.com"]
+    )
+
+HomeView()
+    .meerkatFeedback(screen: "Home")  // uses bootstrap default
+```
+
+**UIKit** (no SwiftUI modifier on that screen):
+
+```swift
+MeerkatFeedback.setMailRecipients(["billing@yourapp.com"], forScreen: "Paywall")
+MeerkatFeedback.requestFeedback(screen: "Paywall")
+```
+
+Pass `nil` to `setMailRecipients` to clear an override. Overrides registered via `.meerkatFeedback(mailRecipients:)` are cleared when the view disappears.
+
+> Per-screen recipients apply to **mail delivery** only. API and custom handlers use their own routing.
+
+## Timing & dismiss
+
+```swift
+HomeView()
+    .meerkatFeedback(screen: "Home", minimumDwell: .seconds(8))
+
+ProfileView()
+    .meerkatFeedback(screen: "Profile", revealAfter: .seconds(12))
+
+SettingsView()
+    .meerkatFeedback(screen: "Settings", dismissCooldown: .seconds(604_800))  // 7 days after ✕
+```
+
+| Parameter | Meaning |
+|---|---|
+| `minimumDwell` | User must stay on screen continuously |
+| `revealAfter` | Button may appear after elapsed time since first visit (session) |
+| `dismissCooldown` | Hide sticky button after ✕ (`nil` = bootstrap default 24h) |
+
+Shake (`enableShake: true`) hides the sticky button on that screen; dismiss cooldown does not affect shake.
+
+## Template picker & in-app form
+
+Multiple templates → picker sheet → form (default) → delivery.
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    templates: [.bugReport, .featureRequest, .general],
+    collectUserInput: true  // default — message + optional 1–5 stars
+)
+```
+
+Skip the form (legacy immediate mail):
+
+```swift
+collectUserInput: false
+```
+
+## Mail unavailable fallback
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    mailUnavailableFallback: .shareSheet  // default; or .none
+)
+```
+
+## Custom button UI
+
+**Custom floating:**
+
+```swift
+.meerkatFeedback(screen: "Settings") { request, dismiss in
+    MyChip(onTap: request, onClose: dismiss)
 }
 ```
 
-From UIKit or anywhere else on the same screen:
+**Integrated** (your own row / toolbar):
 
 ```swift
-MeerkatFeedback.requestFeedback(screen: "Settings")
+@Environment(\.meerkatFeedbackRequest) private var requestFeedback
+
+Button("Feedback") { requestFeedback?() }
+    .meerkatFeedback(screen: "Settings", presentation: .integrated)
 ```
 
-`requestFeedback` runs the template picker (if configured), in-app form, then delivery.
-
-### REST API delivery
-
-Post JSON to your backend instead of Mail:
+## REST API delivery
 
 ```swift
 MeerkatFeedback.bootstrap(
@@ -224,23 +180,21 @@ MeerkatFeedback.bootstrap(
     headers: ["Authorization": "Bearer token"],
     offlineRetryEnabled: true
 )
+
+MeerkatFeedback.flushOfflineQueue()  // also runs on bootstrap
 ```
 
-Failed submissions are queued locally and retried via ``MeerkatFeedback/flushOfflineQueue()``.
-
-### User identity
+## User identity
 
 ```swift
 MeerkatFeedback.bootstrap(
     recipients: ["feedback@yourapp.com"],
     userIdentity: FeedbackUserIdentity(userId: "u_123", email: "user@example.com")
 )
-
-// or anonymous
 MeerkatFeedback.setUserIdentity(.anonymous)
 ```
 
-### Screenshots & logs
+## Screenshots & logs
 
 ```swift
 MeerkatFeedback.bootstrap(
@@ -251,117 +205,65 @@ MeerkatFeedback.bootstrap(
 MeerkatFeedback.setLogProvider { MyLogger.recentLines() }
 ```
 
-Attachments are included in Mail, share sheet text context, and API JSON (`attachments[].dataBase64`).
-
-### UIKit integration
+## UIKit
 
 ```swift
 navigationItem.rightBarButtonItem = MeerkatFeedbackUIKit.makeBarButtonItem(screen: "Profile")
-// or
 meerkatRequestFeedback(screen: "Checkout")
 ```
 
-See `MeerkatKit.docc/UIKitIntegration.md`.
+See `Sources/MeerkatKit/MeerkatKit.docc/UIKitIntegration.md`.
 
-### Example app
-
-Open `Examples/MeerkatKitExample/MeerkatKitExample.xcodeproj` — demonstrates floating, shake, integrated mode, and API bootstrap (Debug).
-
-### API documentation (DocC)
-
-Open the package in Xcode → **Product → Build Documentation**, or browse `Sources/MeerkatKit/MeerkatKit.docc/` (Getting Started, timing & dismiss).
-
-### AppDelegate example
-
-```swift
-import MeerkatKit
-
-func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-) -> Bool {
-    MeerkatFeedback.bootstrap(
-        recipients: ["feedback@yourapp.com"],
-        appStoreID: "1234567890"
-    )
-    return true
-}
-```
-
-### Mail body format
-
-The default mail body includes localized labels and a typing area:
-
-```
-App: YourApp
-Version: 1.2.0 (42)
-Screen: Settings
-Device: iPhone 17 Pro
-OS: iOS 26.5.2
-App Store ID: 1234567890
-
-Please type your feedback below:
-========================================
-
-
-
-```
-
-### Supported UI languages
-
-- English (`en`)
-- Turkish (`tr`)
-- Spanish (`es`)
-- French (`fr`)
-- German (`de`)
-- Japanese (`ja`)
-- Italian (`it`)
-- Portuguese (`pt`) — covers `pt-BR`
-- Russian (`ru`)
-- Korean (`ko`)
-- Chinese Simplified (`zh-Hans`)
-- Chinese Traditional (`zh-Hant`)
-- Dutch (`nl`)
-- Arabic (`ar`)
-
-Fallback: region-specific locales map to base language (e.g. `pt-BR` → `pt`); unknown locales fall back to English.
-
-| Parameter | Default |
-|---|---|
-| `minimumDwell` | `nil` (show immediately) |
-| `revealAfter` | `nil` (show immediately) |
-| `enableShake` | `false` (iOS shake on this screen; hides sticky button here) |
-| `dismissCooldown` | `nil` (uses bootstrap default) |
-
-See the table under **Usage** for what each timing parameter means.
-
-### Optional bootstrap settings
-
-| Parameter | Default |
-|---|---|
-| `appStoreID` | `nil` |
-| `headerMetadata` | app name, version, device, OS |
-| `footerMetadata` | `[]` |
-| `templates` | `.general` |
-| `locale` | `.current` (follows device language) |
-| `buttonPosition` | `.bottomTrailing` |
-| `enableShake` | `false` |
-| `isEnabled` | `true` |
-| `dismissCooldown` | 24 hours (`.seconds(86_400)`) — sticky button hidden after ✕ until this elapses (per screen). Pass `.zero` to hide for the current visit only. |
-
-### Custom delivery
+## Custom delivery
 
 ```swift
 MeerkatFeedback.bootstrap(customDelivery: { payload in
-    // send payload to your backend
+    // POST payload to your backend
 })
 ```
 
-### Manual trigger
+## Manual trigger
 
 ```swift
+MeerkatFeedback.requestFeedback(screen: "Settings")
 MeerkatFeedback.present(screen: "Profile", template: .bugReport)
 ```
+
+## Example app
+
+`Examples/MeerkatKitExample/MeerkatKitExample.xcodeproj` — floating, shake, integrated mode, API bootstrap (Debug).
+
+## Bootstrap reference
+
+| Parameter | Default |
+|---|---|
+| `recipients` | required for mail bootstrap |
+| `appStoreID` | `nil` |
+| `templates` | `[.general]` |
+| `locale` | `.current` |
+| `buttonPosition` | `.bottomTrailing` |
+| `enableShake` | `false` (global; per-screen via modifier) |
+| `isEnabled` | `true` |
+| `dismissCooldown` | 24 hours |
+| `collectUserInput` | `true` |
+| `mailUnavailableFallback` | `.shareSheet` |
+| `offerScreenshotInForm` | `false` (mail) / `true` (API bootstrap) |
+| `userIdentity` | `.anonymous` |
+
+## Modifier reference
+
+| Parameter | Default |
+|---|---|
+| `mailRecipients` | `nil` (bootstrap default) |
+| `minimumDwell` | `nil` |
+| `revealAfter` | `nil` |
+| `enableShake` | `false` |
+| `dismissCooldown` | `nil` |
+| `presentation` | `.floating` |
+
+## Supported UI languages
+
+English, Turkish, Spanish, French, German, Japanese, Italian, Portuguese, Russian, Korean, Chinese (Simplified & Traditional), Dutch, Arabic. Unknown locales fall back to English.
 
 ## License
 

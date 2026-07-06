@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
     let screen: String
+    let mailRecipients: [String]?
     let minimumDwell: Duration?
     let revealAfter: Duration?
     let enableShake: Bool
@@ -17,6 +18,7 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
 
     init(
         screen: String,
+        mailRecipients: [String]?,
         minimumDwell: Duration?,
         revealAfter: Duration?,
         enableShake: Bool,
@@ -27,6 +29,7 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
         )?
     ) {
         self.screen = screen
+        self.mailRecipients = mailRecipients
         self.minimumDwell = minimumDwell
         self.revealAfter = revealAfter
         self.enableShake = enableShake
@@ -82,6 +85,7 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
             }
             .onAppear {
                 isDismissedThisVisit = false
+                MeerkatFeedbackRecipientRegistry.register(screen: screen, recipients: mailRecipients)
                 MeerkatFeedbackSessionRegistry.register(session)
                 visibility.begin(
                     screen: screen,
@@ -91,6 +95,7 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
             }
             .onDisappear {
                 MeerkatFeedbackSessionRegistry.unregister(screen: screen)
+                MeerkatFeedbackRecipientRegistry.unregister(screen: screen)
                 visibility.pauseDwell()
             }
     }

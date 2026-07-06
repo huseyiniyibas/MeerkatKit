@@ -3,6 +3,16 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.1.3] — 2026-07-06
+
+### Added
+
+- **Per-screen mail recipients** — optional `mailRecipients` on ``View/meerkatFeedback(screen:mailRecipients:)`` and ``MeerkatFeedback/setMailRecipients(_:forScreen:)`` for UIKit.
+
+### Changed
+
+- README rewritten with full feature overview and current API reference.
+
 ## [0.1.2] — 2026-07-04
 
 ### Fixed
@@ -112,6 +122,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.1.3]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.0.9...v0.1.0

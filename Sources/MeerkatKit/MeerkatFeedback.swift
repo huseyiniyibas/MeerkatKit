@@ -146,6 +146,11 @@ public enum MeerkatFeedback {
         bootstrap?.logProvider = provider
     }
 
+    /// Override mail recipients for ``screen``. Pass `nil` to use the bootstrap default.
+    public static func setMailRecipients(_ recipients: [String]?, forScreen screen: String) {
+        MeerkatFeedbackRecipientRegistry.register(screen: screen, recipients: recipients)
+    }
+
     public static func setEnabled(_ enabled: Bool) {
         bootstrap?.isEnabled = enabled
     }

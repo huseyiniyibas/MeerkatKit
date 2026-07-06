@@ -128,6 +128,53 @@ final class MeerkatKitTests: XCTestCase {
     }
 
     @MainActor
+    func testPerScreenMailRecipients() {
+        #if DEBUG
+        MeerkatFeedbackRecipientRegistry.resetAll()
+        #endif
+        let bootstrap = MeerkatBootstrap.mail(recipients: ["default@example.com"])
+        MeerkatFeedbackRecipientRegistry.register(
+            screen: "Paywall",
+            recipients: ["billing@example.com"]
+        )
+        let paywallConfig = bootstrap.configuration(placement: "Paywall")
+        let homeConfig = bootstrap.configuration(placement: "Home")
+
+        guard case let .mailComposer(paywallRecipients, _, _) = paywallConfig.delivery else {
+            XCTFail("Expected mail composer delivery")
+            return
+        }
+        guard case let .mailComposer(homeRecipients, _, _) = homeConfig.delivery else {
+            XCTFail("Expected mail composer delivery")
+            return
+        }
+        XCTAssertEqual(paywallRecipients, ["billing@example.com"])
+        XCTAssertEqual(homeRecipients, ["default@example.com"])
+        #if DEBUG
+        MeerkatFeedbackRecipientRegistry.resetAll()
+        #endif
+    }
+
+    @MainActor
+    func testSetMailRecipientsPublicAPI() {
+        #if DEBUG
+        MeerkatFeedbackRecipientRegistry.resetAll()
+        #endif
+        MeerkatFeedback.bootstrap(recipients: ["default@example.com"], collectUserInput: false)
+        MeerkatFeedback.setMailRecipients(["results@example.com"], forScreen: "Result")
+        let bootstrap = MeerkatBootstrap.mail(recipients: ["default@example.com"])
+        let config = bootstrap.configuration(placement: "Result")
+        guard case let .mailComposer(recipients, _, _) = config.delivery else {
+            XCTFail("Expected mail composer")
+            return
+        }
+        XCTAssertEqual(recipients, ["results@example.com"])
+        #if DEBUG
+        MeerkatFeedbackRecipientRegistry.resetAll()
+        #endif
+    }
+
+    @MainActor
     func testEmailBodyFormat() {
         MetadataCollector.setAppStoreID("1234567890")
         MeerkatFeedback.bootstrap(
