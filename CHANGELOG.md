@@ -3,6 +3,12 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.1.4] — 2026-07-06
+
+### Fixed
+
+- **Form & picker localization** — completed translations for all 14 supported UI languages (previously only EN/TR had full form and template picker strings).
+
 ## [0.1.3] — 2026-07-06
 
 ### Added
@@ -122,6 +128,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.1.4]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.0...v0.1.1

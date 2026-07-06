@@ -70,6 +70,37 @@ final class MeerkatKitTests: XCTestCase {
     }
 
     @MainActor
+    func testFormAndPickerLocalizationCoverage() {
+        let languageCodes = [
+            "en", "tr", "es", "fr", "de", "ja", "it", "pt", "ru", "ko", "zh-hans", "zh-hant", "nl", "ar"
+        ]
+        let formKeys: [MeerkatLocalizedKey] = [
+            .templatePickerTitle,
+            .templatePickerCancel,
+            .formTitle,
+            .formSubmit,
+            .formCancel,
+            .formRatingLabel,
+            .formMessagePlaceholder,
+            .formIncludeScreenshot,
+            .labelRating,
+            .labelRecipients
+        ]
+
+        for languageCode in languageCodes where languageCode != "en" {
+            for key in formKeys {
+                let localized = MeerkatLocalizer.text(key, languageCode: languageCode)
+                let english = MeerkatLocalizer.text(key, languageCode: "en")
+                XCTAssertNotEqual(
+                    localized,
+                    english,
+                    "Expected \(languageCode) translation for \(key), got English fallback"
+                )
+            }
+        }
+    }
+
+    @MainActor
     func testPayloadIncludesScreenName() {
         MeerkatFeedback.bootstrap(
             recipients: ["test@example.com"],

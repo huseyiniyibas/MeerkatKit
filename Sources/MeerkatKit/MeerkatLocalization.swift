@@ -106,7 +106,17 @@ enum MeerkatLocalizer {
             .labelScreen: "Pantalla",
             .labelDevice: "Dispositivo",
             .labelOS: "Sistema",
-            .labelAppStoreID: "ID de App Store"
+            .labelAppStoreID: "ID de App Store",
+            .templatePickerTitle: "¿Qué tipo de comentario?",
+            .templatePickerCancel: "Cancelar",
+            .formTitle: "Enviar comentarios",
+            .formSubmit: "Enviar",
+            .formCancel: "Cancelar",
+            .formRatingLabel: "¿Cómo calificarías tu experiencia?",
+            .formMessagePlaceholder: "Cuéntanos más…",
+            .formIncludeScreenshot: "Incluir captura de pantalla",
+            .labelRating: "Calificación",
+            .labelRecipients: "Enviar a"
         ],
         "fr": [
             .feedbackButton: "Retour",
@@ -122,7 +132,17 @@ enum MeerkatLocalizer {
             .labelScreen: "Écran",
             .labelDevice: "Appareil",
             .labelOS: "Système",
-            .labelAppStoreID: "ID App Store"
+            .labelAppStoreID: "ID App Store",
+            .templatePickerTitle: "Quel type de retour ?",
+            .templatePickerCancel: "Annuler",
+            .formTitle: "Envoyer un retour",
+            .formSubmit: "Envoyer",
+            .formCancel: "Annuler",
+            .formRatingLabel: "Comment évaluez-vous votre expérience ?",
+            .formMessagePlaceholder: "Dites-nous en plus…",
+            .formIncludeScreenshot: "Inclure une capture d'écran",
+            .labelRating: "Note",
+            .labelRecipients: "Envoyer à"
         ],
         "de": [
             .feedbackButton: "Rückmeldung",
@@ -138,7 +158,17 @@ enum MeerkatLocalizer {
             .labelScreen: "Bildschirm",
             .labelDevice: "Gerät",
             .labelOS: "Betriebssystem",
-            .labelAppStoreID: "App Store-ID"
+            .labelAppStoreID: "App Store-ID",
+            .templatePickerTitle: "Welche Art von Feedback?",
+            .templatePickerCancel: "Abbrechen",
+            .formTitle: "Feedback senden",
+            .formSubmit: "Senden",
+            .formCancel: "Abbrechen",
+            .formRatingLabel: "Wie würdest du deine Erfahrung bewerten?",
+            .formMessagePlaceholder: "Erzähl uns mehr…",
+            .formIncludeScreenshot: "Screenshot einschließen",
+            .labelRating: "Bewertung",
+            .labelRecipients: "Senden an"
         ],
         "ja": [
             .feedbackButton: "フィードバック",
@@ -154,7 +184,17 @@ enum MeerkatLocalizer {
             .labelScreen: "画面",
             .labelDevice: "デバイス",
             .labelOS: "OS",
-            .labelAppStoreID: "App Store ID"
+            .labelAppStoreID: "App Store ID",
+            .templatePickerTitle: "どのようなフィードバックですか？",
+            .templatePickerCancel: "キャンセル",
+            .formTitle: "フィードバックを送信",
+            .formSubmit: "送信",
+            .formCancel: "キャンセル",
+            .formRatingLabel: "体験をどのように評価しますか？",
+            .formMessagePlaceholder: "詳細を入力してください…",
+            .formIncludeScreenshot: "スクリーンショットを含める",
+            .labelRating: "評価",
+            .labelRecipients: "送信先"
         ],
         "it": [
             .feedbackButton: "Feedback",
@@ -170,7 +210,17 @@ enum MeerkatLocalizer {
             .labelScreen: "Schermata",
             .labelDevice: "Dispositivo",
             .labelOS: "Sistema operativo",
-            .labelAppStoreID: "ID App Store"
+            .labelAppStoreID: "ID App Store",
+            .templatePickerTitle: "Che tipo di feedback?",
+            .templatePickerCancel: "Annulla",
+            .formTitle: "Invia feedback",
+            .formSubmit: "Invia",
+            .formCancel: "Annulla",
+            .formRatingLabel: "Come valuteresti la tua esperienza?",
+            .formMessagePlaceholder: "Raccontaci di più…",
+            .formIncludeScreenshot: "Includi screenshot",
+            .labelRating: "Valutazione",
+            .labelRecipients: "Invia a"
         ],
         "pt": [
             .feedbackButton: "Feedback",
@@ -186,7 +236,17 @@ enum MeerkatLocalizer {
             .labelScreen: "Tela",
             .labelDevice: "Dispositivo",
             .labelOS: "Sistema",
-            .labelAppStoreID: "ID da App Store"
+            .labelAppStoreID: "ID da App Store",
+            .templatePickerTitle: "Que tipo de feedback?",
+            .templatePickerCancel: "Cancelar",
+            .formTitle: "Enviar feedback",
+            .formSubmit: "Enviar",
+            .formCancel: "Cancelar",
+            .formRatingLabel: "Como você avaliaria sua experiência?",
+            .formMessagePlaceholder: "Conte-nos mais…",
+            .formIncludeScreenshot: "Incluir captura de tela",
+            .labelRating: "Avaliação",
+            .labelRecipients: "Enviar para"
         ],
         "ru": [
             .feedbackButton: "Обратная связь",
@@ -202,7 +262,17 @@ enum MeerkatLocalizer {
             .labelScreen: "Экран",
             .labelDevice: "Устройство",
             .labelOS: "ОС",
-            .labelAppStoreID: "ID App Store"
+            .labelAppStoreID: "ID App Store",
+            .templatePickerTitle: "Какой тип отзыва?",
+            .templatePickerCancel: "Отмена",
+            .formTitle: "Отправить отзыв",
+            .formSubmit: "Отправить",
+            .formCancel: "Отмена",
+            .formRatingLabel: "Как бы вы оценили свой опыт?",
+            .formMessagePlaceholder: "Расскажите подробнее…",
+            .formIncludeScreenshot: "Включить снимок экрана",
+            .labelRating: "Оценка",
+            .labelRecipients: "Отправить"
         ],
         "ko": [
             .feedbackButton: "피드백",
@@ -218,7 +288,17 @@ enum MeerkatLocalizer {
             .labelScreen: "화면",
             .labelDevice: "기기",
             .labelOS: "OS",
-            .labelAppStoreID: "App Store ID"
+            .labelAppStoreID: "App Store ID",
+            .templatePickerTitle: "어떤 종류의 피드백인가요?",
+            .templatePickerCancel: "취소",
+            .formTitle: "피드백 보내기",
+            .formSubmit: "보내기",
+            .formCancel: "취소",
+            .formRatingLabel: "경험을 어떻게 평가하시겠습니까?",
+            .formMessagePlaceholder: "자세히 알려주세요…",
+            .formIncludeScreenshot: "스크린샷 포함",
+            .labelRating: "평점",
+            .labelRecipients: "받는 사람"
         ],
         "zh-hans": [
             .feedbackButton: "反馈",
@@ -234,7 +314,17 @@ enum MeerkatLocalizer {
             .labelScreen: "页面",
             .labelDevice: "设备",
             .labelOS: "系统",
-            .labelAppStoreID: "App Store ID"
+            .labelAppStoreID: "App Store ID",
+            .templatePickerTitle: "哪种反馈？",
+            .templatePickerCancel: "取消",
+            .formTitle: "发送反馈",
+            .formSubmit: "发送",
+            .formCancel: "取消",
+            .formRatingLabel: "您如何评价您的体验？",
+            .formMessagePlaceholder: "请告诉我们更多…",
+            .formIncludeScreenshot: "包含截图",
+            .labelRating: "评分",
+            .labelRecipients: "发送至"
         ],
         "zh-hant": [
             .feedbackButton: "回饋",
@@ -250,7 +340,17 @@ enum MeerkatLocalizer {
             .labelScreen: "頁面",
             .labelDevice: "裝置",
             .labelOS: "系統",
-            .labelAppStoreID: "App Store ID"
+            .labelAppStoreID: "App Store ID",
+            .templatePickerTitle: "哪種回饋？",
+            .templatePickerCancel: "取消",
+            .formTitle: "傳送回饋",
+            .formSubmit: "傳送",
+            .formCancel: "取消",
+            .formRatingLabel: "您如何評價您的體驗？",
+            .formMessagePlaceholder: "請告訴我們更多…",
+            .formIncludeScreenshot: "包含截圖",
+            .labelRating: "評分",
+            .labelRecipients: "傳送至"
         ],
         "nl": [
             .feedbackButton: "Feedback",
@@ -266,7 +366,17 @@ enum MeerkatLocalizer {
             .labelScreen: "Scherm",
             .labelDevice: "Apparaat",
             .labelOS: "Besturingssysteem",
-            .labelAppStoreID: "App Store-ID"
+            .labelAppStoreID: "App Store-ID",
+            .templatePickerTitle: "Wat voor feedback?",
+            .templatePickerCancel: "Annuleren",
+            .formTitle: "Feedback versturen",
+            .formSubmit: "Versturen",
+            .formCancel: "Annuleren",
+            .formRatingLabel: "Hoe beoordeel je je ervaring?",
+            .formMessagePlaceholder: "Vertel ons meer…",
+            .formIncludeScreenshot: "Schermafbeelding toevoegen",
+            .labelRating: "Beoordeling",
+            .labelRecipients: "Versturen naar"
         ],
         "ar": [
             .feedbackButton: "ملاحظات",
@@ -282,7 +392,17 @@ enum MeerkatLocalizer {
             .labelScreen: "الشاشة",
             .labelDevice: "الجهاز",
             .labelOS: "نظام التشغيل",
-            .labelAppStoreID: "معرّف App Store"
+            .labelAppStoreID: "معرّف App Store",
+            .templatePickerTitle: "ما نوع الملاحظات؟",
+            .templatePickerCancel: "إلغاء",
+            .formTitle: "إرسال ملاحظات",
+            .formSubmit: "إرسال",
+            .formCancel: "إلغاء",
+            .formRatingLabel: "كيف تقيّم تجربتك؟",
+            .formMessagePlaceholder: "أخبرنا المزيد…",
+            .formIncludeScreenshot: "تضمين لقطة الشاشة",
+            .labelRating: "التقييم",
+            .labelRecipients: "إرسال إلى"
         ]
     ]
 }
