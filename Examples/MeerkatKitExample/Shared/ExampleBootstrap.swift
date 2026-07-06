@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 enum ExampleBootstrap {
     static func configure() {
+        let crashLogPath = makeDemoCrashLogPath()
         let billingTemplate = FeedbackCustomTemplate(
             id: "billing",
             title: "Billing issue",
@@ -41,6 +42,7 @@ enum ExampleBootstrap {
             api: URL(string: "https://httpbin.org/post")!,
             templates: [.bugReport, .featureRequest, .custom(billingTemplate), .general],
             offerScreenshotInForm: true,
+            crashLogPath: crashLogPath,
             userIdentity: FeedbackUserIdentity(userId: "demo-user"),
             formConfiguration: formConfiguration,
             eventHandler: eventHandler,
@@ -52,9 +54,23 @@ enum ExampleBootstrap {
             recipients: ["feedback@example.com"],
             templates: [.bugReport, .general],
             offerScreenshotInForm: true,
+            crashLogPath: crashLogPath,
             formConfiguration: formConfiguration,
             eventHandler: eventHandler
         )
         #endif
+    }
+
+    private static func makeDemoCrashLogPath() -> String? {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("meerkat-example-crash.log")
+        let content = "Example crash log\nThread: main\n"
+        do {
+            try content.write(to: url, atomically: true, encoding: .utf8)
+            return url.path
+        } catch {
+            print("Example: could not write demo crash log — \(error.localizedDescription)")
+            return nil
+        }
     }
 }

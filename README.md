@@ -48,7 +48,7 @@ See [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for deployment target policy.
 | tvOS | Yes | No | mailto | Console log |
 | visionOS | Yes | No | mailto | Share sheet |
 
-See [Sources/MeerkatKit/MeerkatKit.docc/VisionOSIntegration.md](Sources/MeerkatKit/MeerkatKit.docc/VisionOSIntegration.md) for visionOS details.
+See [Platform limits](Sources/MeerkatKit/MeerkatKit.docc/PlatformLimits.md) for the full capability matrix. Platform guides: [visionOS](Sources/MeerkatKit/MeerkatKit.docc/VisionOSIntegration.md), [tvOS](Sources/MeerkatKit/MeerkatKit.docc/TVOSIntegration.md).
 
 ## Installation
 

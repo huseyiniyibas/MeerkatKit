@@ -3,6 +3,21 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.3.2] — 2026-07-06
+
+### Added
+
+- **DocC — Platform limits** — full capability matrix for iOS, macOS, tvOS, and visionOS (shake, mail, share fallback, form differences).
+- **DocC** — mail delivery, attachments & identity, per-screen configuration, tvOS integration, and localization articles.
+- **Example app** — timing & dismiss, custom floating button, mail delivery, custom delivery pattern, AppKit toolbar item, and crash log path demo.
+
+### Changed
+
+- DocC catalog and README link to platform limits and tvOS guide.
+- Example home screen links to all major integration demos.
+
+## [0.3.1] — 2026-07-06
+
 ### Fixed
 
 - **visionOS** — `sheetPresentationController` detents and SwiftUI `presentationDetents` are iOS-only (unavailable on visionOS).

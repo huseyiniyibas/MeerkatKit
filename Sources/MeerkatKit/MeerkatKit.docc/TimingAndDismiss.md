@@ -46,3 +46,4 @@ Hides the sticky button on that screen; shake opens the template picker or feedb
 
 - ``MeerkatFeedback``
 - <doc:GettingStarted>
+- <doc:PlatformLimits>

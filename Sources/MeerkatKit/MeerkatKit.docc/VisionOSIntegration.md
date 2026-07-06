@@ -41,6 +41,7 @@ navigationItem.rightBarButtonItem = MeerkatFeedbackUIKit.makeBarButtonItem(scree
 
 ## See also
 
+- <doc:PlatformLimits>
 - <doc:APIDelivery>
 - <doc:UIKitIntegration>
 - <doc:FormConfiguration>

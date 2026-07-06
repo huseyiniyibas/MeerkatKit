@@ -16,13 +16,19 @@ Typical integration:
 ### Essentials
 
 - <doc:GettingStarted>
+- <doc:PlatformLimits>
 - <doc:TimingAndDismiss>
+- <doc:PerScreenConfiguration>
+- <doc:MailDelivery>
 - <doc:APIDelivery>
+- <doc:AttachmentsAndIdentity>
 - <doc:FormConfiguration>
 - <doc:CustomTemplates>
 - <doc:EventHandlers>
+- <doc:Localization>
 - <doc:UIKitIntegration>
 - <doc:AppKitIntegration>
+- <doc:TVOSIntegration>
 - <doc:VisionOSIntegration>
 
 ### Core types

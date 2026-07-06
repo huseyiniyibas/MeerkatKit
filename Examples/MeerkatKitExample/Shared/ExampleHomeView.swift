@@ -9,7 +9,7 @@ struct ExampleHomeView: View {
                 .foregroundStyle(.tint)
             Text("MeerkatKit Example")
                 .font(.title2.bold())
-            Text("Floating button, shake (iOS), custom templates, form config, and API callbacks.")
+            Text("Floating button, shake (iOS), timing, custom UI, mail, and API demos.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -28,6 +28,22 @@ struct ExampleHomeView: View {
 private struct ExampleActionButtons: View {
     var body: some View {
         VStack(spacing: 12) {
+            NavigationLink("Timing & dismiss") {
+                ExampleTimingView()
+            }
+            .buttonStyle(.bordered)
+            NavigationLink("Custom floating button") {
+                ExampleCustomButtonView()
+            }
+            .buttonStyle(.bordered)
+            NavigationLink("Mail delivery") {
+                ExampleMailDeliveryView()
+            }
+            .buttonStyle(.bordered)
+            NavigationLink("Custom delivery pattern") {
+                ExampleCustomDeliveryView()
+            }
+            .buttonStyle(.bordered)
             NavigationLink("Integrated settings row") {
                 ExampleSettingsView()
             }
