@@ -3,6 +3,29 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.3.3] — 2026-07-07
+
+### Added
+
+- **UIKit-only flow** — template picker and API banner overlay work without `.meerkatFeedback` modifier.
+- **`FeedbackTrigger.manual`** — assigned for screens using `presentation: .integrated`.
+- **`effectiveOfferScreenshotInForm`** — hides screenshot toggle on platforms without capture support (tvOS).
+- **Per-screen shake registry** — `enableShake` on modifier updates ``MeerkatConfiguration/trigger`` per screen.
+- **Full i18n** — email field and API result strings for all 14 UI languages.
+- **DocC / README** — `headerMetadata`, `footerMetadata`, sync script, mail attachment limits, timing OR semantics.
+- **CI** — DocC build job; tvOS/visionOS simulators fail loudly instead of silent build-only fallback.
+
+### Fixed
+
+- **Sticky button locale** — uses bootstrap `locale` instead of device locale.
+- **macOS standalone windows** — delegate/window retained in registry; close fires `onCancelled`.
+- **UIKit presenter missing** — cancels flow instead of silent form skip.
+- **API banner overlay** — reinstalls when key window changes.
+
+### Changed
+
+- ``shouldShowStickyButton`` deprecated in favor of ``canShowStickyButton``.
+
 ## [0.3.2] — 2026-07-06
 
 ### Added
@@ -185,6 +208,9 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.3.3]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.3.2...v0.3.3
+[0.3.2]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.1.4...v0.2.0

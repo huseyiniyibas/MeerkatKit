@@ -15,7 +15,7 @@ MeerkatKit runs on iOS, iPadOS, macOS, tvOS, and visionOS. Some triggers and del
 | Share fallback | Share sheet | Sharing picker | Console log | Share sheet |
 | REST API delivery | Yes | Yes | Yes | Yes |
 | Offline queue | Yes | Yes | Yes | Yes |
-| Screenshot toggle | Yes | Yes | Yes | Yes |
+| Screenshot toggle | Yes | Yes | No | Yes |
 | UIKit bar button | Yes | No | Yes | Yes |
 | AppKit toolbar item | No | Yes | No | No |
 
@@ -61,6 +61,8 @@ See <doc:MailDelivery>.
 ## Form input
 
 On tvOS, the message field uses `TextField` instead of `TextEditor` because `TextEditor` is unavailable on Apple TV.
+
+Screenshot capture is not available on tvOS. When `offerScreenshotInForm` is enabled at bootstrap, the toggle is hidden on tvOS automatically.
 
 Sheet detents (`.medium` / `.large`) and the grabber apply on **iOS only**. visionOS presents the form as a standard sheet without detents.
 

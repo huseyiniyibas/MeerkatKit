@@ -39,5 +39,5 @@ struct ExampleCustomDeliveryView: View {
 }
 
 enum ExampleCustomDeliveryStore {
-    static var note = "Custom delivery runs at bootstrap — see ExampleBootstrap for the active mode."
+    static let note = "Custom delivery runs at bootstrap — see ExampleBootstrap for the active mode."
 }

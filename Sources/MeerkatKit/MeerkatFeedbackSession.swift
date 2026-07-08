@@ -63,10 +63,7 @@ enum MeerkatFeedbackSessionRegistry {
         if let session = sessions[screen] {
             session.requestFeedback()
         } else {
-            MeerkatFeedback.beginFeedbackWithoutSession(
-                screen: screen,
-                template: MeerkatFeedback.configuredTemplates.first ?? .general
-            )
+            MeerkatFeedbackStandaloneFlowPresenter.requestFeedback(screen: screen)
         }
     }
 

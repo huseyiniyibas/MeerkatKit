@@ -24,7 +24,7 @@ import SwiftUI
 
 struct ExampleUIKitView: View {
     var body: some View {
-        Text("UIKit demo is available on iOS and tvOS.")
+        Text("UIKit demo is available on macOS only. Use iOS, tvOS, or visionOS to run the bar button example.")
             .foregroundStyle(.secondary)
             .navigationTitle("UIKit")
     }

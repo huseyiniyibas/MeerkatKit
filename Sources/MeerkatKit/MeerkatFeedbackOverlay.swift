@@ -96,6 +96,8 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
             }
             .onAppear {
                 isDismissedThisVisit = false
+                MeerkatFeedbackPresentationRegistry.register(screen: screen, presentation: presentation)
+                MeerkatFeedbackShakeRegistry.register(screen: screen, enableShake: enableShake)
                 MeerkatFeedbackRecipientRegistry.register(screen: screen, recipients: mailRecipients)
                 MeerkatFeedbackAPIEndpointRegistry.register(screen: screen, endpoint: apiEndpoint)
                 MeerkatFeedbackSessionRegistry.register(session)
@@ -107,6 +109,8 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
             }
             .onDisappear {
                 MeerkatFeedbackSessionRegistry.unregister(screen: screen)
+                MeerkatFeedbackPresentationRegistry.unregister(screen: screen)
+                MeerkatFeedbackShakeRegistry.unregister(screen: screen)
                 MeerkatFeedbackRecipientRegistry.unregister(screen: screen)
                 MeerkatFeedbackAPIEndpointRegistry.unregister(screen: screen)
                 visibility.pauseDwell()
@@ -118,7 +122,10 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
     }
 
     private var usesShakeTrigger: Bool {
-        enableShake || MeerkatFeedback.isShakeEnabled
+        MeerkatFeedbackShakeRegistry.isShakeEnabled(
+            for: screen,
+            bootstrapDefault: MeerkatFeedback.isShakeEnabled
+        )
     }
 
     private var isSuppressedByDismiss: Bool {

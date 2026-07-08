@@ -64,12 +64,14 @@ HomeView()
 
 See <doc:TimingAndDismiss> for parameter details.
 
+When both `minimumDwell` and `revealAfter` are set, **either** timer completing will show the floating button (logical OR).
+
 ## Presentation modes
 
 | Mode | Use when |
 |---|---|
 | `.floating` (default) | Sticky button or custom floating ViewBuilder |
-| `.integrated` | Your own button via `@Environment(\.meerkatFeedbackRequest)` |
+| `.integrated` | Your own button via `@Environment(\.meerkatFeedbackRequest)` — sets ``FeedbackTrigger/manual`` in configuration |
 
 ```swift
 @Environment(\.meerkatFeedbackRequest) private var requestFeedback

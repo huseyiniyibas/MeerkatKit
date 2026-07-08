@@ -8,10 +8,21 @@ Send feedback through the system Mail composer on iOS, or via `mailto:` and shar
 MeerkatFeedback.bootstrap(
     recipients: ["feedback@yourapp.com"],
     appStoreID: "1234567890",
+    headerMetadata: ["appName", "appVersion", "deviceModel", "osVersion", "placement"],
+    footerMetadata: ["appStoreID"],
     templates: [.bugReport, .featureRequest, .general],
     mailUnavailableFallback: .shareSheet  // default
 )
 ```
+
+### Metadata keys
+
+| Parameter | Default | Purpose |
+|---|---|---|
+| `headerMetadata` | Built-in keys (`appName`, `appVersion`, `deviceModel`, `osVersion`, `placement`) | Keys rendered at the top of the mail body |
+| `footerMetadata` | `[]` | Additional keys appended after the user message |
+
+Pass an empty `headerMetadata` array to omit the metadata block entirely. Footer keys are optional — include `appStoreID` when you set `appStoreID` at bootstrap.
 
 ## Delivery flow
 
@@ -56,6 +67,14 @@ MeerkatFeedback.requestFeedback(screen: "Paywall")
 ```
 
 Pass `nil` to clear an override. Overrides from `.meerkatFeedback(mailRecipients:)` are cleared when the view disappears.
+
+## Attachments
+
+Screenshots, logs, and crash files are attached when using the **iOS Mail composer** or **REST API** delivery.
+
+`mailto:` URLs and share-sheet fallback carry **text only** — attachments are not included on those paths.
+
+See <doc:AttachmentsAndIdentity>.
 
 ## Skip the form
 

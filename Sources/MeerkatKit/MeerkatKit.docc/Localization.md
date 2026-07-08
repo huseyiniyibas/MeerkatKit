@@ -28,6 +28,8 @@ Use `.current` (default) to match the device language when a translation exists.
 - API result alerts and banners
 - Share fallback recipient label
 
+All 14 supported languages include form, picker, email field, and API result strings. Unknown locales fall back to English.
+
 Template titles and email subjects come from your ``FeedbackTemplate`` or ``FeedbackCustomTemplate`` configuration — those are **not** auto-translated.
 
 ## Custom templates

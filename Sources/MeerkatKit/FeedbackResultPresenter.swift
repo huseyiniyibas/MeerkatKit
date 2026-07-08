@@ -45,6 +45,7 @@ enum FeedbackResultPresenter {
 
     private static func presentBanner(outcome: FeedbackAPIOutcome, locale: FeedbackLocale) {
         #if canImport(SwiftUI)
+        FeedbackResultBannerWindowPresenter.ensureOverlayInstalledIfNeeded()
         FeedbackResultBannerController.shared.show(
             title: MeerkatLocalizer.text(titleKey(for: outcome), locale: locale),
             message: MeerkatLocalizer.text(messageKey(for: outcome), locale: locale),

@@ -7,9 +7,10 @@ public enum FeedbackPosition: Sendable {
     case bottomTrailing
 }
 
-public enum FeedbackTrigger: Sendable {
+public enum FeedbackTrigger: Sendable, Equatable {
     case stickyButton(position: FeedbackPosition)
     case shake
+    /// Manual-only trigger — no floating button or shake. Use with ``MeerkatFeedbackPresentation/integrated``.
     case manual
 }
 
@@ -67,15 +68,6 @@ public enum FeedbackTemplate: Hashable, Sendable, Identifiable {
             return MeerkatLocalizer.text(.bodyPrefixFeedback, locale: locale)
         case let .custom(template):
             return template.bodyPrefix
-        }
-    }
-
-    var displayTitle: String {
-        switch self {
-        case .bugReport, .featureRequest, .general:
-            return apiIdentifier
-        case let .custom(template):
-            return template.title
         }
     }
 

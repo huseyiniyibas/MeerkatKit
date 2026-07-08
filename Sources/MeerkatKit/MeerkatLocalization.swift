@@ -143,7 +143,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "Cuéntanos más…",
             .formIncludeScreenshot: "Incluir captura de pantalla",
             .labelRating: "Calificación",
-            .labelRecipients: "Enviar a"
+            .labelRecipients: "Enviar a",
+            .formEmailPlaceholder: "tu@email.com",
+            .labelEmail: "Correo electrónico",
+            .apiSuccessTitle: "Comentarios enviados",
+            .apiSuccessMessage: "Gracias — tus comentarios fueron entregados.",
+            .apiOfflineTitle: "Guardado sin conexión",
+            .apiOfflineMessage: "No pudimos conectar con el servidor. Se reintentará automáticamente.",
+            .apiFailureTitle: "No se pudo enviar",
+            .apiFailureMessage: "Algo salió mal. Inténtalo de nuevo más tarde.",
+            .apiResultDismiss: "Aceptar"
         ],
         "fr": [
             .feedbackButton: "Retour",
@@ -169,7 +178,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "Dites-nous en plus…",
             .formIncludeScreenshot: "Inclure une capture d'écran",
             .labelRating: "Note",
-            .labelRecipients: "Envoyer à"
+            .labelRecipients: "Envoyer à",
+            .formEmailPlaceholder: "vous@email.com",
+            .labelEmail: "E-mail",
+            .apiSuccessTitle: "Retour envoyé",
+            .apiSuccessMessage: "Merci — votre retour a été transmis.",
+            .apiOfflineTitle: "Enregistré hors ligne",
+            .apiOfflineMessage: "Serveur inaccessible. Nouvel essai automatique.",
+            .apiFailureTitle: "Échec de l'envoi",
+            .apiFailureMessage: "Un problème est survenu. Réessayez plus tard.",
+            .apiResultDismiss: "D'accord"
         ],
         "de": [
             .feedbackButton: "Rückmeldung",
@@ -195,7 +213,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "Erzähl uns mehr…",
             .formIncludeScreenshot: "Screenshot einschließen",
             .labelRating: "Bewertung",
-            .labelRecipients: "Senden an"
+            .labelRecipients: "Senden an",
+            .formEmailPlaceholder: "deine@email.com",
+            .labelEmail: "E-Mail",
+            .apiSuccessTitle: "Feedback gesendet",
+            .apiSuccessMessage: "Danke — dein Feedback wurde übermittelt.",
+            .apiOfflineTitle: "Offline gespeichert",
+            .apiOfflineMessage: "Server nicht erreichbar. Automatischer Neuversuch.",
+            .apiFailureTitle: "Senden fehlgeschlagen",
+            .apiFailureMessage: "Etwas ist schiefgelaufen. Bitte später erneut versuchen.",
+            .apiResultDismiss: "Schließen"
         ],
         "ja": [
             .feedbackButton: "フィードバック",
@@ -221,7 +248,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "詳細を入力してください…",
             .formIncludeScreenshot: "スクリーンショットを含める",
             .labelRating: "評価",
-            .labelRecipients: "送信先"
+            .labelRecipients: "送信先",
+            .formEmailPlaceholder: "example@email.com",
+            .labelEmail: "メール",
+            .apiSuccessTitle: "フィードバックを送信しました",
+            .apiSuccessMessage: "ありがとうございます。フィードバックが送信されました。",
+            .apiOfflineTitle: "オフラインで保存",
+            .apiOfflineMessage: "サーバーに接続できません。自動的に再試行します。",
+            .apiFailureTitle: "送信できませんでした",
+            .apiFailureMessage: "問題が発生しました。後でもう一度お試しください。",
+            .apiResultDismiss: "閉じる"
         ],
         "it": [
             .feedbackButton: "Feedback",
@@ -247,7 +283,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "Raccontaci di più…",
             .formIncludeScreenshot: "Includi screenshot",
             .labelRating: "Valutazione",
-            .labelRecipients: "Invia a"
+            .labelRecipients: "Invia a",
+            .formEmailPlaceholder: "tua@email.com",
+            .labelEmail: "Posta elettronica",
+            .apiSuccessTitle: "Feedback inviato",
+            .apiSuccessMessage: "Grazie — il tuo feedback è stato consegnato.",
+            .apiOfflineTitle: "Salvato offline",
+            .apiOfflineMessage: "Server non raggiungibile. Nuovo tentativo automatico.",
+            .apiFailureTitle: "Invio non riuscito",
+            .apiFailureMessage: "Qualcosa è andato storto. Riprova più tardi.",
+            .apiResultDismiss: "Chiudi"
         ],
         "pt": [
             .feedbackButton: "Feedback",
@@ -273,7 +318,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "Conte-nos mais…",
             .formIncludeScreenshot: "Incluir captura de tela",
             .labelRating: "Avaliação",
-            .labelRecipients: "Enviar para"
+            .labelRecipients: "Enviar para",
+            .formEmailPlaceholder: "seu@email.com",
+            .labelEmail: "E-mail",
+            .apiSuccessTitle: "Feedback enviado",
+            .apiSuccessMessage: "Obrigado — seu feedback foi entregue.",
+            .apiOfflineTitle: "Salvo offline",
+            .apiOfflineMessage: "Não foi possível conectar ao servidor. Nova tentativa automática.",
+            .apiFailureTitle: "Falha no envio",
+            .apiFailureMessage: "Algo deu errado. Tente novamente mais tarde.",
+            .apiResultDismiss: "Fechar"
         ],
         "ru": [
             .feedbackButton: "Обратная связь",
@@ -299,7 +353,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "Расскажите подробнее…",
             .formIncludeScreenshot: "Включить снимок экрана",
             .labelRating: "Оценка",
-            .labelRecipients: "Отправить"
+            .labelRecipients: "Отправить",
+            .formEmailPlaceholder: "ваш@email.com",
+            .labelEmail: "Эл. почта",
+            .apiSuccessTitle: "Отзыв отправлен",
+            .apiSuccessMessage: "Спасибо — ваш отзыв доставлен.",
+            .apiOfflineTitle: "Сохранено офлайн",
+            .apiOfflineMessage: "Сервер недоступен. Повторная попытка автоматически.",
+            .apiFailureTitle: "Не удалось отправить",
+            .apiFailureMessage: "Что-то пошло не так. Попробуйте позже.",
+            .apiResultDismiss: "Закрыть"
         ],
         "ko": [
             .feedbackButton: "피드백",
@@ -325,7 +388,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "자세히 알려주세요…",
             .formIncludeScreenshot: "스크린샷 포함",
             .labelRating: "평점",
-            .labelRecipients: "받는 사람"
+            .labelRecipients: "받는 사람",
+            .formEmailPlaceholder: "example@email.com",
+            .labelEmail: "이메일",
+            .apiSuccessTitle: "피드백 전송됨",
+            .apiSuccessMessage: "감사합니다 — 피드백이 전달되었습니다.",
+            .apiOfflineTitle: "오프라인 저장됨",
+            .apiOfflineMessage: "서버에 연결할 수 없습니다. 자동으로 재시도합니다.",
+            .apiFailureTitle: "전송 실패",
+            .apiFailureMessage: "문제가 발생했습니다. 나중에 다시 시도해 주세요.",
+            .apiResultDismiss: "확인"
         ],
         "zh-hans": [
             .feedbackButton: "反馈",
@@ -351,7 +423,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "请告诉我们更多…",
             .formIncludeScreenshot: "包含截图",
             .labelRating: "评分",
-            .labelRecipients: "发送至"
+            .labelRecipients: "发送至",
+            .formEmailPlaceholder: "example@email.com",
+            .labelEmail: "电子邮件",
+            .apiSuccessTitle: "反馈已发送",
+            .apiSuccessMessage: "谢谢 — 您的反馈已送达。",
+            .apiOfflineTitle: "已离线保存",
+            .apiOfflineMessage: "无法连接服务器，将自动重试。",
+            .apiFailureTitle: "发送失败",
+            .apiFailureMessage: "出现问题，请稍后重试。",
+            .apiResultDismiss: "好"
         ],
         "zh-hant": [
             .feedbackButton: "回饋",
@@ -377,7 +458,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "請告訴我們更多…",
             .formIncludeScreenshot: "包含截圖",
             .labelRating: "評分",
-            .labelRecipients: "傳送至"
+            .labelRecipients: "傳送至",
+            .formEmailPlaceholder: "example@email.com",
+            .labelEmail: "電子郵件",
+            .apiSuccessTitle: "回饋已傳送",
+            .apiSuccessMessage: "謝謝 — 您的回饋已送達。",
+            .apiOfflineTitle: "已離線儲存",
+            .apiOfflineMessage: "無法連線伺服器，將自動重試。",
+            .apiFailureTitle: "傳送失敗",
+            .apiFailureMessage: "發生問題，請稍後再試。",
+            .apiResultDismiss: "好"
         ],
         "nl": [
             .feedbackButton: "Feedback",
@@ -403,7 +493,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "Vertel ons meer…",
             .formIncludeScreenshot: "Schermafbeelding toevoegen",
             .labelRating: "Beoordeling",
-            .labelRecipients: "Versturen naar"
+            .labelRecipients: "Versturen naar",
+            .formEmailPlaceholder: "jouw@email.com",
+            .labelEmail: "E-mail",
+            .apiSuccessTitle: "Feedback verzonden",
+            .apiSuccessMessage: "Bedankt — je feedback is afgeleverd.",
+            .apiOfflineTitle: "Offline opgeslagen",
+            .apiOfflineMessage: "Server niet bereikbaar. Automatisch opnieuw proberen.",
+            .apiFailureTitle: "Verzenden mislukt",
+            .apiFailureMessage: "Er ging iets mis. Probeer het later opnieuw.",
+            .apiResultDismiss: "Sluiten"
         ],
         "ar": [
             .feedbackButton: "ملاحظات",
@@ -429,7 +528,16 @@ enum MeerkatLocalizer {
             .formMessagePlaceholder: "أخبرنا المزيد…",
             .formIncludeScreenshot: "تضمين لقطة الشاشة",
             .labelRating: "التقييم",
-            .labelRecipients: "إرسال إلى"
+            .labelRecipients: "إرسال إلى",
+            .formEmailPlaceholder: "example@email.com",
+            .labelEmail: "البريد الإلكتروني",
+            .apiSuccessTitle: "تم إرسال الملاحظات",
+            .apiSuccessMessage: "شكرًا — تم تسليم ملاحظاتك.",
+            .apiOfflineTitle: "حُفظت دون اتصال",
+            .apiOfflineMessage: "تعذّر الاتصال بالخادم. ستتم إعادة المحاولة تلقائيًا.",
+            .apiFailureTitle: "تعذّر الإرسال",
+            .apiFailureMessage: "حدث خطأ. حاول مرة أخرى لاحقًا.",
+            .apiResultDismiss: "موافق"
         ]
     ]
 }

@@ -9,6 +9,16 @@ import AppKit
 #endif
 
 enum FeedbackScreenshotCapture {
+    static var isSupported: Bool {
+        #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
+        return true
+        #elseif os(macOS)
+        return true
+        #else
+        return false
+        #endif
+    }
+
     @MainActor
     static func capturePNG() -> Data? {
         #if canImport(UIKit) && !os(watchOS)

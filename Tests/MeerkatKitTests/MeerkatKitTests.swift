@@ -84,7 +84,16 @@ final class MeerkatKitTests: XCTestCase {
             .formMessagePlaceholder,
             .formIncludeScreenshot,
             .labelRating,
-            .labelRecipients
+            .labelRecipients,
+            .formEmailPlaceholder,
+            .labelEmail,
+            .apiSuccessTitle,
+            .apiSuccessMessage,
+            .apiOfflineTitle,
+            .apiOfflineMessage,
+            .apiFailureTitle,
+            .apiFailureMessage,
+            .apiResultDismiss
         ]
 
         for languageCode in languageCodes where languageCode != "en" {
@@ -395,5 +404,132 @@ final class MeerkatKitTests: XCTestCase {
         MeerkatDismissCooldown.recordDismiss(screen: "Home", cooldown: .zero)
         XCTAssertFalse(MeerkatDismissCooldown.isActive(screen: "Home", cooldown: .zero))
         #endif
+    }
+
+    @MainActor
+    func testIntegratedPresentationUsesManualTrigger() {
+        #if DEBUG
+        MeerkatFeedbackPresentationRegistry.resetAll()
+        MeerkatFeedbackPresentationRegistry.register(screen: "Settings", presentation: .integrated)
+        let bootstrap = MeerkatBootstrap.mail(recipients: ["test@example.com"])
+        let configuration = bootstrap.configuration(placement: "Settings")
+        XCTAssertEqual(configuration.trigger, .manual)
+        MeerkatFeedbackPresentationRegistry.resetAll()
+        #endif
+    }
+
+    @MainActor
+    func testFloatingPresentationUsesStickyButtonTrigger() {
+        #if DEBUG
+        MeerkatFeedbackPresentationRegistry.resetAll()
+        MeerkatFeedbackPresentationRegistry.register(screen: "Home", presentation: .floating)
+        let bootstrap = MeerkatBootstrap.mail(
+            recipients: ["test@example.com"],
+            buttonPosition: .topLeading
+        )
+        let configuration = bootstrap.configuration(placement: "Home")
+        XCTAssertEqual(configuration.trigger, .stickyButton(position: .topLeading))
+        MeerkatFeedbackPresentationRegistry.resetAll()
+        #endif
+    }
+
+    @MainActor
+    func testScreenshotSupportAvailability() {
+        #if os(tvOS)
+        XCTAssertFalse(FeedbackScreenshotCapture.isSupported)
+        #else
+        XCTAssertTrue(FeedbackScreenshotCapture.isSupported)
+        #endif
+    }
+
+    @MainActor
+    func testEffectiveOfferScreenshotRespectsPlatformSupport() {
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            offerScreenshotInForm: true
+        )
+        #if os(tvOS)
+        XCTAssertFalse(MeerkatFeedback.effectiveOfferScreenshotInForm)
+        #else
+        XCTAssertTrue(MeerkatFeedback.effectiveOfferScreenshotInForm)
+        #endif
+    }
+
+    @MainActor
+    func testCustomHeaderAndFooterMetadata() {
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            appStoreID: "1234567890",
+            headerMetadata: ["placement"],
+            footerMetadata: ["appStoreID"]
+        )
+        let configuration = MeerkatBootstrap.mail(
+            recipients: ["test@example.com"],
+            headerMetadata: ["placement"],
+            footerMetadata: ["appStoreID"]
+        ).configuration(placement: "Checkout")
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "Checkout",
+            templateOverride: .general,
+            userInput: nil
+        )
+
+        XCTAssertTrue(payload.body.contains("Screen: Checkout"))
+        XCTAssertFalse(payload.body.contains("App Name:"))
+        XCTAssertTrue(payload.body.contains("App Store ID:"))
+    }
+
+    @MainActor
+    func testConfiguredLocaleUsedForStickyButtonLabel() {
+        MeerkatFeedback.bootstrap(recipients: ["test@example.com"], locale: .turkish)
+        XCTAssertEqual(MeerkatFeedback.configuredLocale, .turkish)
+        XCTAssertEqual(MeerkatLocalizer.text(.feedbackButton, locale: MeerkatFeedback.configuredLocale), "Geri Bildirim")
+    }
+
+    @MainActor
+    func testPerScreenShakeUpdatesConfigurationTrigger() {
+        #if DEBUG
+        MeerkatFeedbackShakeRegistry.resetAll()
+        MeerkatFeedbackShakeRegistry.register(screen: "Home", enableShake: true)
+        let bootstrap = MeerkatBootstrap.mail(recipients: ["test@example.com"], enableShake: false)
+        let configuration = bootstrap.configuration(placement: "Home")
+        XCTAssertEqual(configuration.trigger, .shake)
+        MeerkatFeedbackShakeRegistry.resetAll()
+        #endif
+    }
+
+    @MainActor
+    func testMinimumDwellMakesVisibilityReady() async {
+        let controller = MeerkatFeedbackVisibilityController()
+        controller.begin(screen: "Timed", minimumDwell: .milliseconds(50), revealAfter: nil)
+        XCTAssertFalse(controller.isReady)
+        try? await Task.sleep(for: .milliseconds(80))
+        XCTAssertTrue(controller.isReady)
+    }
+
+    @MainActor
+    func testCombinedTimingUsesOrSemantics() async {
+        #if DEBUG
+        MeerkatFeedbackRevealTracker.resetAll()
+        let controller = MeerkatFeedbackVisibilityController()
+        controller.begin(
+            screen: "Combined",
+            minimumDwell: .milliseconds(200),
+            revealAfter: .milliseconds(50)
+        )
+        try? await Task.sleep(for: .milliseconds(80))
+        XCTAssertTrue(controller.isReady)
+        MeerkatFeedbackRevealTracker.resetAll()
+        #endif
+    }
+
+    @MainActor
+    func testMailUnavailableFallbackConfiguration() {
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            mailUnavailableFallback: .none
+        )
+        XCTAssertEqual(MeerkatFeedback.mailUnavailableFallback, .none)
     }
 }

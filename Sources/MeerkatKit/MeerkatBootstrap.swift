@@ -172,9 +172,18 @@ struct MeerkatBootstrap {
             )
         }
 
-        let trigger: FeedbackTrigger = enableShake
-            ? .shake
-            : .stickyButton(position: buttonPosition)
+        let shakeEnabled = MeerkatFeedbackShakeRegistry.isShakeEnabled(
+            for: placement,
+            bootstrapDefault: enableShake
+        )
+        let trigger: FeedbackTrigger
+        if shakeEnabled {
+            trigger = .shake
+        } else if MeerkatFeedbackPresentationRegistry.presentation(for: placement) == .integrated {
+            trigger = .manual
+        } else {
+            trigger = .stickyButton(position: buttonPosition)
+        }
 
         return MeerkatConfiguration(
             trigger: trigger,

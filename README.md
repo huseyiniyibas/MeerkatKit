@@ -39,6 +39,17 @@ Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery —
 
 See [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for deployment target policy.
 
+## Updating minimum OS versions (sync script)
+
+When Apple ships a new stable OS, bump deployment targets from [`scripts/platform-targets.json`](scripts/platform-targets.json):
+
+```bash
+node scripts/sync-platform-targets.mjs
+xcodebuild -scheme MeerkatKit -destination 'platform=macOS' test
+```
+
+Commit `Package.swift` and `platform-targets.json` together.
+
 ## Platform notes
 
 | Platform | Sticky button | Shake | Mail | Share fallback |
@@ -54,7 +65,7 @@ See [Platform limits](Sources/MeerkatKit/MeerkatKit.docc/PlatformLimits.md) for 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.1.3")
+    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.3.3")
 ]
 ```
 
@@ -71,6 +82,8 @@ MeerkatFeedback.bootstrap(
     templates: [.bugReport, .featureRequest, .general]
 )
 ```
+
+Mail bootstrap also accepts `headerMetadata` and `footerMetadata` to control which keys appear in the email body. See [Mail delivery](Sources/MeerkatKit/MeerkatKit.docc/MailDelivery.md).
 
 **2. Attach per screen:**
 
@@ -277,6 +290,8 @@ MeerkatFeedback.present(screen: "Profile", template: .bugReport)
 |---|---|
 | `recipients` | required for mail bootstrap |
 | `appStoreID` | `nil` |
+| `headerMetadata` | built-in keys (`appName`, `appVersion`, `deviceModel`, `osVersion`, `placement`) |
+| `footerMetadata` | `[]` |
 | `templates` | `[.general]` |
 | `locale` | `.current` |
 | `buttonPosition` | `.bottomTrailing` |

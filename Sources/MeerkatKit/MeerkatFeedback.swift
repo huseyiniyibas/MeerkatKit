@@ -13,6 +13,8 @@ public enum MeerkatFeedback {
         return !bootstrap.enableShake
     }
 
+    /// Deprecated alias for ``canShowStickyButton``.
+    @available(*, deprecated, renamed: "canShowStickyButton")
     public static var shouldShowStickyButton: Bool {
         canShowStickyButton
     }
@@ -27,7 +29,12 @@ public enum MeerkatFeedback {
     }
 
     public static var shouldOfferScreenshotInForm: Bool {
-        bootstrap?.offerScreenshotInForm ?? false
+        effectiveOfferScreenshotInForm
+    }
+
+    public static var effectiveOfferScreenshotInForm: Bool {
+        let configured = bootstrap?.offerScreenshotInForm ?? false
+        return configured && FeedbackScreenshotCapture.isSupported
     }
 
     public static var formConfiguration: FeedbackFormConfiguration {
@@ -218,7 +225,7 @@ public enum MeerkatFeedback {
                 template: template,
                 locale: bootstrap.locale,
                 formConfiguration: bootstrap.formConfiguration,
-                offerScreenshot: bootstrap.offerScreenshotInForm,
+                offerScreenshot: effectiveOfferScreenshotInForm,
                 onSubmit: { userInput in
                     submitFeedback(screen: screen, template: template, userInput: userInput)
                 },
@@ -240,7 +247,7 @@ public enum MeerkatFeedback {
         let configuration = bootstrap.configuration(placement: screen)
         let attachments = FeedbackAttachmentCollector.collect(
             userInput: userInput,
-            offerScreenshot: bootstrap.offerScreenshotInForm,
+            offerScreenshot: effectiveOfferScreenshotInForm,
             logProvider: bootstrap.logProvider,
             crashLogPath: bootstrap.crashLogPath
         )

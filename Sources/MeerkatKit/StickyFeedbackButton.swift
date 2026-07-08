@@ -1,13 +1,14 @@
 import SwiftUI
 
 struct StickyFeedbackButton: View {
+    let locale: FeedbackLocale
     let onTap: () -> Void
     let onDismiss: () -> Void
 
     var body: some View {
         HStack(spacing: 0) {
             Button(action: onTap) {
-                Label(MeerkatLocalizer.text(.feedbackButton, locale: .current), systemImage: "binoculars.fill")
+                Label(MeerkatLocalizer.text(.feedbackButton, locale: locale), systemImage: "binoculars.fill")
                     .font(.subheadline.weight(.semibold))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 10)

@@ -33,6 +33,8 @@ Or without a view controller extension:
 MeerkatFeedbackUIKit.requestFeedback(screen: "Checkout")
 ```
 
+When multiple templates are configured at bootstrap, `requestFeedback` presents the template picker even without a SwiftUI modifier. API banner results (`.banner` presentation) are shown via a window-level overlay when no SwiftUI modifier is attached.
+
 ## SwiftUI screens in a UIKit app
 
 Attach the modifier on hosting roots:

@@ -14,7 +14,11 @@ struct MeerkatFeedbackFloatingOverlay<CustomFloating: View>: View {
                     customFloatingButton(onRequest, onDismiss)
                         .padding(16)
                 } else {
-                    StickyFeedbackButton(onTap: onRequest, onDismiss: onDismiss)
+                    StickyFeedbackButton(
+                        locale: MeerkatFeedback.configuredLocale,
+                        onTap: onRequest,
+                        onDismiss: onDismiss
+                    )
                         .padding(16)
                 }
             }
