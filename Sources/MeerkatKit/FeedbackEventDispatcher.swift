@@ -33,6 +33,7 @@ enum FeedbackEventDispatcher {
     }
 
     static func cancelled(screen: String, stage: FeedbackCancellationStage) {
+        MeerkatSurveyAnalytics.clearContinuation()
         let event = FeedbackCancellationEvent(screen: screen, stage: stage)
         MeerkatFeedback.eventHandler?.onCancelled?(event)
     }

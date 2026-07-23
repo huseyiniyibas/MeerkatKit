@@ -32,6 +32,10 @@ private struct ExampleActionButtons: View {
                 ExampleTimingView()
             }
             .buttonStyle(.bordered)
+            NavigationLink("Satisfaction survey") {
+                ExampleSurveyView()
+            }
+            .buttonStyle(.bordered)
             NavigationLink("Custom floating button") {
                 ExampleCustomButtonView()
             }

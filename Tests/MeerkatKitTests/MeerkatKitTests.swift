@@ -515,10 +515,11 @@ final class MeerkatKitTests: XCTestCase {
         let controller = MeerkatFeedbackVisibilityController()
         controller.begin(
             screen: "Combined",
-            minimumDwell: .milliseconds(200),
+            minimumDwell: .milliseconds(400),
             revealAfter: .milliseconds(50)
         )
-        try? await Task.sleep(for: .milliseconds(80))
+        // revealAfter sleeps with 50 ms tolerance — wait comfortably past the worst case.
+        try? await Task.sleep(for: .milliseconds(200))
         XCTAssertTrue(controller.isReady)
         MeerkatFeedbackRevealTracker.resetAll()
         #endif

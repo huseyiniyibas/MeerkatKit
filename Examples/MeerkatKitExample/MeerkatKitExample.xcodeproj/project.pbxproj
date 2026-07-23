@@ -17,6 +17,7 @@
 		E10000010000000000000009 /* ExampleCustomButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000110000000000000009 /* ExampleCustomButtonView.swift */; };
 		E1000001000000000000000A /* ExampleMailDeliveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000011000000000000000A /* ExampleMailDeliveryView.swift */; };
 		E1000001000000000000000B /* ExampleCustomDeliveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000011000000000000000B /* ExampleCustomDeliveryView.swift */; };
+		E1000001000000000000000C /* ExampleSurveyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000011000000000000000C /* ExampleSurveyView.swift */; };
 		E10000010000000000000005 /* MeerkatKit in Frameworks */ = {isa = PBXBuildFile; productRef = E10000310000000000000001 /* MeerkatKit */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +32,7 @@
 		E10000110000000000000009 /* ExampleCustomButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleCustomButtonView.swift; sourceTree = "<group>"; };
 		E1000011000000000000000A /* ExampleMailDeliveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleMailDeliveryView.swift; sourceTree = "<group>"; };
 		E1000011000000000000000B /* ExampleCustomDeliveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleCustomDeliveryView.swift; sourceTree = "<group>"; };
+		E1000011000000000000000C /* ExampleSurveyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleSurveyView.swift; sourceTree = "<group>"; };
 		E10000210000000000000001 /* MeerkatKitExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MeerkatKitExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -67,6 +69,7 @@
 				E10000110000000000000009 /* ExampleCustomButtonView.swift */,
 				E1000011000000000000000A /* ExampleMailDeliveryView.swift */,
 				E1000011000000000000000B /* ExampleCustomDeliveryView.swift */,
+				E1000011000000000000000C /* ExampleSurveyView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -147,6 +150,7 @@
 				E10000010000000000000009 /* ExampleCustomButtonView.swift in Sources */,
 				E1000001000000000000000A /* ExampleMailDeliveryView.swift in Sources */,
 				E1000001000000000000000B /* ExampleCustomDeliveryView.swift in Sources */,
+				E1000001000000000000000C /* ExampleSurveyView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,6 +10,7 @@ MeerkatKit runs on iOS, iPadOS, macOS, tvOS, and visionOS. Some triggers and del
 | Shake trigger | Yes | No | No | No |
 | In-app form | Yes | Yes | Yes | Yes |
 | Template picker | Yes | Yes | Yes | Yes |
+| Satisfaction survey modal | Yes | Yes | Yes | Yes |
 | Mail composer (`MFMailComposeViewController`) | Yes | No | No | No |
 | `mailto:` fallback | Yes | Yes | Yes | Yes |
 | Share fallback | Share sheet | Sharing picker | Console log | Share sheet |

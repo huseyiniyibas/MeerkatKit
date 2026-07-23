@@ -207,6 +207,13 @@ public enum MeerkatFeedback {
         MeerkatFeedbackSessionRegistry.beginFeedbackForm(screen: screen, template: resolvedTemplate)
     }
 
+    /// Clears stored satisfaction survey state (view count, shown flag, response) for `screen`.
+    ///
+    /// Useful after major content changes when you want to ask the user again.
+    public static func resetSatisfactionSurvey(forScreen screen: String) {
+        MeerkatSurveyStore.reset(screen: screen)
+    }
+
     /// Retries queued API submissions. Called automatically on API bootstrap.
     public static func flushOfflineQueue() {
         Task { await FeedbackOfflineQueue.flush() }
@@ -218,6 +225,8 @@ public enum MeerkatFeedback {
 
     static func beginFeedbackWithoutSession(screen: String, template: FeedbackTemplate) {
         guard let bootstrap, bootstrap.isEnabled else { return }
+
+        MeerkatSurveyAnalytics.templateCommitted(screen: screen, template: template)
 
         if bootstrap.collectUserInput {
             MeerkatFeedbackStandaloneFormPresenter.present(

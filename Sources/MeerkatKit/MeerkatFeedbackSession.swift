@@ -24,6 +24,7 @@ final class MeerkatFeedbackScreenSession: ObservableObject {
     }
 
     func beginFeedbackForm(template: FeedbackTemplate) {
+        MeerkatSurveyAnalytics.templateCommitted(screen: screen, template: template)
         pendingTemplate = template
         guard MeerkatFeedback.shouldCollectUserInput else {
             MeerkatFeedback.submitFeedback(

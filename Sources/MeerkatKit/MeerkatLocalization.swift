@@ -34,6 +34,12 @@ enum MeerkatLocalizedKey {
     case apiFailureTitle
     case apiFailureMessage
     case apiResultDismiss
+    case surveyTitle
+    case surveyLike
+    case surveyDislike
+    case surveyThanks
+    case surveySendFeedback
+    case surveyNotNow
 }
 
 enum MeerkatLocalizer {
@@ -82,7 +88,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "We couldn't reach the server. Your feedback will retry automatically.",
             .apiFailureTitle: "Couldn't send",
             .apiFailureMessage: "Something went wrong. Please try again later.",
-            .apiResultDismiss: "OK"
+            .apiResultDismiss: "OK",
+            .surveyTitle: "How was your experience?",
+            .surveyLike: "Like",
+            .surveyDislike: "Dislike",
+            .surveyThanks: "Thanks for your response!",
+            .surveySendFeedback: "Send feedback",
+            .surveyNotNow: "Not now"
         ],
         "tr": [
             .feedbackButton: "Geri Bildirim",
@@ -117,7 +129,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "Sunucuya ulaşılamadı. Geri bildiriminiz otomatik olarak yeniden denenecek.",
             .apiFailureTitle: "Gönderilemedi",
             .apiFailureMessage: "Bir sorun oluştu. Lütfen daha sonra tekrar deneyin.",
-            .apiResultDismiss: "Tamam"
+            .apiResultDismiss: "Tamam",
+            .surveyTitle: "Deneyiminiz nasıldı?",
+            .surveyLike: "Beğendim",
+            .surveyDislike: "Beğenmedim",
+            .surveyThanks: "Yanıtınız için teşekkürler!",
+            .surveySendFeedback: "Geri bildirim gönder",
+            .surveyNotNow: "Şimdi değil"
         ],
         "es": [
             .feedbackButton: "Comentarios",
@@ -152,7 +170,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "No pudimos conectar con el servidor. Se reintentará automáticamente.",
             .apiFailureTitle: "No se pudo enviar",
             .apiFailureMessage: "Algo salió mal. Inténtalo de nuevo más tarde.",
-            .apiResultDismiss: "Aceptar"
+            .apiResultDismiss: "Aceptar",
+            .surveyTitle: "¿Cómo fue tu experiencia?",
+            .surveyLike: "Me gusta",
+            .surveyDislike: "No me gusta",
+            .surveyThanks: "¡Gracias por tu respuesta!",
+            .surveySendFeedback: "Enviar comentarios",
+            .surveyNotNow: "Ahora no"
         ],
         "fr": [
             .feedbackButton: "Retour",
@@ -187,7 +211,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "Serveur inaccessible. Nouvel essai automatique.",
             .apiFailureTitle: "Échec de l'envoi",
             .apiFailureMessage: "Un problème est survenu. Réessayez plus tard.",
-            .apiResultDismiss: "D'accord"
+            .apiResultDismiss: "D'accord",
+            .surveyTitle: "Comment était votre expérience ?",
+            .surveyLike: "J'aime",
+            .surveyDislike: "Je n'aime pas",
+            .surveyThanks: "Merci pour votre réponse !",
+            .surveySendFeedback: "Envoyer un retour",
+            .surveyNotNow: "Pas maintenant"
         ],
         "de": [
             .feedbackButton: "Rückmeldung",
@@ -222,7 +252,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "Server nicht erreichbar. Automatischer Neuversuch.",
             .apiFailureTitle: "Senden fehlgeschlagen",
             .apiFailureMessage: "Etwas ist schiefgelaufen. Bitte später erneut versuchen.",
-            .apiResultDismiss: "Schließen"
+            .apiResultDismiss: "Schließen",
+            .surveyTitle: "Wie war deine Erfahrung?",
+            .surveyLike: "Gefällt mir",
+            .surveyDislike: "Gefällt mir nicht",
+            .surveyThanks: "Danke für deine Antwort!",
+            .surveySendFeedback: "Feedback senden",
+            .surveyNotNow: "Jetzt nicht"
         ],
         "ja": [
             .feedbackButton: "フィードバック",
@@ -257,7 +293,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "サーバーに接続できません。自動的に再試行します。",
             .apiFailureTitle: "送信できませんでした",
             .apiFailureMessage: "問題が発生しました。後でもう一度お試しください。",
-            .apiResultDismiss: "閉じる"
+            .apiResultDismiss: "閉じる",
+            .surveyTitle: "この画面の体験はいかがでしたか？",
+            .surveyLike: "良い",
+            .surveyDislike: "悪い",
+            .surveyThanks: "ご回答ありがとうございます！",
+            .surveySendFeedback: "フィードバックを送信",
+            .surveyNotNow: "後で"
         ],
         "it": [
             .feedbackButton: "Feedback",
@@ -292,7 +334,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "Server non raggiungibile. Nuovo tentativo automatico.",
             .apiFailureTitle: "Invio non riuscito",
             .apiFailureMessage: "Qualcosa è andato storto. Riprova più tardi.",
-            .apiResultDismiss: "Chiudi"
+            .apiResultDismiss: "Chiudi",
+            .surveyTitle: "Com'è stata la tua esperienza?",
+            .surveyLike: "Mi piace",
+            .surveyDislike: "Non mi piace",
+            .surveyThanks: "Grazie per la tua risposta!",
+            .surveySendFeedback: "Invia feedback",
+            .surveyNotNow: "Non ora"
         ],
         "pt": [
             .feedbackButton: "Feedback",
@@ -327,7 +375,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "Não foi possível conectar ao servidor. Nova tentativa automática.",
             .apiFailureTitle: "Falha no envio",
             .apiFailureMessage: "Algo deu errado. Tente novamente mais tarde.",
-            .apiResultDismiss: "Fechar"
+            .apiResultDismiss: "Fechar",
+            .surveyTitle: "Como foi sua experiência?",
+            .surveyLike: "Gostei",
+            .surveyDislike: "Não gostei",
+            .surveyThanks: "Obrigado pela sua resposta!",
+            .surveySendFeedback: "Enviar feedback",
+            .surveyNotNow: "Agora não"
         ],
         "ru": [
             .feedbackButton: "Обратная связь",
@@ -362,7 +416,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "Сервер недоступен. Повторная попытка автоматически.",
             .apiFailureTitle: "Не удалось отправить",
             .apiFailureMessage: "Что-то пошло не так. Попробуйте позже.",
-            .apiResultDismiss: "Закрыть"
+            .apiResultDismiss: "Закрыть",
+            .surveyTitle: "Как вам ваш опыт?",
+            .surveyLike: "Нравится",
+            .surveyDislike: "Не нравится",
+            .surveyThanks: "Спасибо за ваш ответ!",
+            .surveySendFeedback: "Отправить отзыв",
+            .surveyNotNow: "Не сейчас"
         ],
         "ko": [
             .feedbackButton: "피드백",
@@ -397,7 +457,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "서버에 연결할 수 없습니다. 자동으로 재시도합니다.",
             .apiFailureTitle: "전송 실패",
             .apiFailureMessage: "문제가 발생했습니다. 나중에 다시 시도해 주세요.",
-            .apiResultDismiss: "확인"
+            .apiResultDismiss: "확인",
+            .surveyTitle: "경험이 어떠셨나요?",
+            .surveyLike: "좋아요",
+            .surveyDislike: "별로예요",
+            .surveyThanks: "응답해 주셔서 감사합니다!",
+            .surveySendFeedback: "피드백 보내기",
+            .surveyNotNow: "나중에"
         ],
         "zh-hans": [
             .feedbackButton: "反馈",
@@ -432,7 +498,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "无法连接服务器，将自动重试。",
             .apiFailureTitle: "发送失败",
             .apiFailureMessage: "出现问题，请稍后重试。",
-            .apiResultDismiss: "好"
+            .apiResultDismiss: "好",
+            .surveyTitle: "您的体验如何？",
+            .surveyLike: "喜欢",
+            .surveyDislike: "不喜欢",
+            .surveyThanks: "感谢您的回复！",
+            .surveySendFeedback: "发送反馈",
+            .surveyNotNow: "暂不"
         ],
         "zh-hant": [
             .feedbackButton: "回饋",
@@ -467,7 +539,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "無法連線伺服器，將自動重試。",
             .apiFailureTitle: "傳送失敗",
             .apiFailureMessage: "發生問題，請稍後再試。",
-            .apiResultDismiss: "好"
+            .apiResultDismiss: "好",
+            .surveyTitle: "您的體驗如何？",
+            .surveyLike: "喜歡",
+            .surveyDislike: "不喜歡",
+            .surveyThanks: "感謝您的回覆！",
+            .surveySendFeedback: "傳送回饋",
+            .surveyNotNow: "暫不"
         ],
         "nl": [
             .feedbackButton: "Feedback",
@@ -502,7 +580,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "Server niet bereikbaar. Automatisch opnieuw proberen.",
             .apiFailureTitle: "Verzenden mislukt",
             .apiFailureMessage: "Er ging iets mis. Probeer het later opnieuw.",
-            .apiResultDismiss: "Sluiten"
+            .apiResultDismiss: "Sluiten",
+            .surveyTitle: "Hoe was je ervaring?",
+            .surveyLike: "Vind ik leuk",
+            .surveyDislike: "Vind ik niet leuk",
+            .surveyThanks: "Bedankt voor je antwoord!",
+            .surveySendFeedback: "Feedback versturen",
+            .surveyNotNow: "Niet nu"
         ],
         "ar": [
             .feedbackButton: "ملاحظات",
@@ -537,7 +621,13 @@ enum MeerkatLocalizer {
             .apiOfflineMessage: "تعذّر الاتصال بالخادم. ستتم إعادة المحاولة تلقائيًا.",
             .apiFailureTitle: "تعذّر الإرسال",
             .apiFailureMessage: "حدث خطأ. حاول مرة أخرى لاحقًا.",
-            .apiResultDismiss: "موافق"
+            .apiResultDismiss: "موافق",
+            .surveyTitle: "كيف كانت تجربتك؟",
+            .surveyLike: "أعجبني",
+            .surveyDislike: "لم يعجبني",
+            .surveyThanks: "شكرًا على إجابتك!",
+            .surveySendFeedback: "إرسال ملاحظات",
+            .surveyNotNow: "ليس الآن"
         ]
     ]
 }

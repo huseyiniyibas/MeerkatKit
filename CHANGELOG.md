@@ -3,6 +3,18 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.0] — 2026-07-22
+
+### Added
+
+- **Satisfaction surveys** — `.meerkatSatisfactionSurvey(screen:trigger:offersFeedback:onResponse:)` shows a like/dislike modal per screen with triggers: `.firstView`, `.everyView`, `.afterViews(n)`, `.afterDwell(duration)`.
+- **Response callback** — `onResponse` runs developer code when the user taps like or dislike; state persists per screen and never re-asks after a response.
+- **Feedback continuation** — after a response the buttons animate out and an optional **Send feedback** button opens the regular flow (template picker → form → delivery); disable with `offersFeedback: false`.
+- **`MeerkatFeedback.resetSatisfactionSurvey(forScreen:)`** — clears stored survey state to ask again.
+- **Firebase Analytics bridge** — logs `meerkatkit_like` / `meerkatkit_dislike` and `meerkatkit_bugreport` / `meerkatkit_featurerequest` / `meerkatkit_feedback` (survey-originated flows) when Firebase is installed and configured. Resolved at runtime — no dependency added, silent no-op (never a crash) when Firebase or `GoogleService-Info.plist` is missing.
+- **i18n** — six survey strings localized in all 14 UI languages.
+- **DocC / README / Example** — Satisfaction surveys article, README section, and `ExampleSurveyView` demo.
+
 ## [0.3.3] — 2026-07-07
 
 ### Added

@@ -17,6 +17,8 @@ Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery —
 | **Templates** | Bug / feature / general picker when multiple templates configured; custom templates via ``FeedbackCustomTemplate`` |
 | **Form config** | Optional rating, email field, custom fields via ``FeedbackFormConfiguration`` |
 | **Callbacks** | ``FeedbackEventHandler`` — submitted / failed / cancelled |
+| **Satisfaction survey** | Per-screen like/dislike modal — first view / every view / after N views / after dwell; response callback; optional feedback continuation |
+| **Analytics** | `meerkatkit_like` / `meerkatkit_dislike` / `meerkatkit_bugreport` / … via Firebase — optional, crash-safe when Firebase is absent |
 | **API UX** | Success / offline / failure alert or banner (`apiResultPresentation`) |
 | **Timing** | `minimumDwell`, `revealAfter`, dismiss cooldown (per screen) |
 | **Recipients** | Default at bootstrap; **per-screen mail override** (optional) |
@@ -65,7 +67,7 @@ See [Platform limits](Sources/MeerkatKit/MeerkatKit.docc/PlatformLimits.md) for 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.3.3")
+    .package(url: "https://github.com/huseyiniyibas/MeerkatKit.git", from: "0.4.0")
 ]
 ```
 
@@ -167,6 +169,39 @@ SettingsView()
 | `dismissCooldown` | Hide sticky button after ✕ (`nil` = bootstrap default 24h) |
 
 Shake (`enableShake: true`) hides the sticky button on that screen; dismiss cooldown does not affect shake.
+
+## Satisfaction survey (like / dislike)
+
+Collect a quick like/dislike rating on any screen — an image generation result, a chat, a paywall:
+
+```swift
+ChatView()
+    .meerkatFeedback(screen: "Chat")
+    .meerkatSatisfactionSurvey(
+        screen: "Chat",
+        trigger: .afterDwell(.seconds(30)),   // or .firstView / .everyView / .afterViews(3)
+        onResponse: { event in
+            print("User tapped \(event.response) on \(event.screen)")
+        }
+    )
+```
+
+| Trigger | Shows the modal |
+|---|---|
+| `.firstView` | First appearance (default) |
+| `.everyView` | Every appearance until the user responds |
+| `.afterViews(n)` | Once the screen has appeared at least `n` times |
+| `.afterDwell(duration)` | After staying on the screen for `duration` in one visit |
+
+After a response the like/dislike buttons animate out and a **Send feedback** button appears, continuing into the regular flow (template picker → form → mail/API). Disable that continuation with `offersFeedback: false`. Once answered, the survey never auto-presents again on that screen:
+
+```swift
+MeerkatFeedback.resetSatisfactionSurvey(forScreen: "Chat")  // ask again after big changes
+```
+
+**Firebase Analytics (optional):** when the host app has Firebase installed *and* configured, MeerkatKit logs `meerkatkit_like` / `meerkatkit_dislike` on response, and `meerkatkit_bugreport` / `meerkatkit_featurerequest` / `meerkatkit_feedback` when a template is picked from the survey continuation. No Firebase dependency is added — Firebase is detected at runtime, and without it (or without `GoogleService-Info.plist`) events are skipped safely instead of crashing.
+
+See [Satisfaction surveys](Sources/MeerkatKit/MeerkatKit.docc/SatisfactionSurveys.md).
 
 ## Template picker & in-app form
 
@@ -314,6 +349,14 @@ MeerkatFeedback.present(screen: "Profile", template: .bugReport)
 | `enableShake` | `false` |
 | `dismissCooldown` | `nil` |
 | `presentation` | `.floating` |
+
+## Survey modifier reference
+
+| Parameter | Default |
+|---|---|
+| `trigger` | `.firstView` |
+| `offersFeedback` | `true` |
+| `onResponse` | `nil` |
 
 ## Supported UI languages
 

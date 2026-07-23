@@ -18,6 +18,7 @@ Typical integration:
 - <doc:GettingStarted>
 - <doc:PlatformLimits>
 - <doc:TimingAndDismiss>
+- <doc:SatisfactionSurveys>
 - <doc:PerScreenConfiguration>
 - <doc:MailDelivery>
 - <doc:APIDelivery>
@@ -39,3 +40,6 @@ Typical integration:
 - ``FeedbackFormConfiguration``
 - ``FeedbackEventHandler``
 - ``FeedbackPayload``
+- ``SatisfactionSurveyTrigger``
+- ``SatisfactionResponse``
+- ``SatisfactionSurveyEvent``
