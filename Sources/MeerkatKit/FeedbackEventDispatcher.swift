@@ -2,6 +2,14 @@ import Foundation
 
 @MainActor
 enum FeedbackEventDispatcher {
+    /// Notifies when the floating feedback control becomes visible, and logs
+    /// `meerkatkit_shown` to Firebase Analytics when available.
+    static func appeared(screen: String) {
+        let event = FeedbackAppearanceEvent(screen: screen)
+        MeerkatFeedback.eventHandler?.onAppeared?(event)
+        MeerkatAnalytics.logEvent("meerkatkit_shown", parameters: ["screen": screen])
+    }
+
     static func submitted(
         screen: String,
         template: FeedbackTemplate,

@@ -26,6 +26,9 @@ enum ExampleBootstrap {
         )
 
         let eventHandler = FeedbackEventHandler(
+            onAppeared: { event in
+                print("Example: feedback appeared on \(event.screen)")
+            },
             onSubmitted: { event in
                 print("Example: feedback submitted on \(event.screen)")
             },

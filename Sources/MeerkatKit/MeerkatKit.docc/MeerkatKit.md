@@ -39,6 +39,7 @@ Typical integration:
 - ``FeedbackCustomTemplate``
 - ``FeedbackFormConfiguration``
 - ``FeedbackEventHandler``
+- ``FeedbackAppearanceEvent``
 - ``FeedbackPayload``
 - ``SatisfactionSurveyTrigger``
 - ``SatisfactionResponse``

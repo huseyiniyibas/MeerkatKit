@@ -48,6 +48,7 @@ When the host app links Firebase **and** has called `FirebaseApp.configure()`, M
 
 | Event | When |
 |---|---|
+| `meerkatkit_shown` | Sticky / custom floating feedback control becomes visible |
 | `meerkatkit_like` | Like tapped |
 | `meerkatkit_dislike` | Dislike tapped |
 | `meerkatkit_bugreport` / `meerkatkit_featurerequest` / `meerkatkit_feedback` | Template chosen in a feedback flow started from the survey modal (custom templates log `meerkatkit_<id>`) |

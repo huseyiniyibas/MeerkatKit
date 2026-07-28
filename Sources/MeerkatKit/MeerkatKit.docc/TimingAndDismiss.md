@@ -33,6 +33,8 @@ SettingsView()
 
 Shake-to-feedback is not affected by dismiss cooldown.
 
+When the sticky (or custom floating) control becomes visible, ``FeedbackEventHandler/onAppeared`` runs and MeerkatKit logs `meerkatkit_shown` to Firebase Analytics when available. See <doc:EventHandlers>.
+
 ## Per-screen shake
 
 ```swift

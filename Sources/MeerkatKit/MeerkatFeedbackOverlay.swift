@@ -1,21 +1,12 @@
 import SwiftUI
 
 public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
-    let screen: String
-    let mailRecipients: [String]?
-    let apiEndpoint: URL?
-    let minimumDwell: Duration?
-    let revealAfter: Duration?
-    let enableShake: Bool
-    let dismissCooldown: Duration?
-    let presentation: MeerkatFeedbackPresentation
-    let customFloatingButton: (
-        (@escaping MeerkatFeedbackRequestAction, @escaping MeerkatFeedbackDismissAction) -> CustomFloating
-    )?
+    private let context: MeerkatFeedbackModifierContext<CustomFloating>
 
     @StateObject private var session: MeerkatFeedbackScreenSession
     @StateObject private var visibility = MeerkatFeedbackVisibilityController()
     @State private var isDismissedThisVisit = false
+    @State private var appearanceTracker = MeerkatFeedbackAppearanceTracker()
 
     init(
         screen: String,
@@ -30,15 +21,17 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
             (@escaping MeerkatFeedbackRequestAction, @escaping MeerkatFeedbackDismissAction) -> CustomFloating
         )?
     ) {
-        self.screen = screen
-        self.mailRecipients = mailRecipients
-        self.apiEndpoint = apiEndpoint
-        self.minimumDwell = minimumDwell
-        self.revealAfter = revealAfter
-        self.enableShake = enableShake
-        self.dismissCooldown = dismissCooldown
-        self.presentation = presentation
-        self.customFloatingButton = customFloatingButton
+        context = MeerkatFeedbackModifierContext(
+            screen: screen,
+            mailRecipients: mailRecipients,
+            apiEndpoint: apiEndpoint,
+            minimumDwell: minimumDwell,
+            revealAfter: revealAfter,
+            enableShake: enableShake,
+            dismissCooldown: dismissCooldown,
+            presentation: presentation,
+            customFloatingButton: customFloatingButton
+        )
         _session = StateObject(wrappedValue: MeerkatFeedbackScreenSession(screen: screen))
     }
 
@@ -48,129 +41,106 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
                 \.meerkatFeedbackRequest,
                 MeerkatFeedbackRequest(action: session.requestFeedback)
             )
-            .overlay {
-                if presentation == .floating {
-                    MeerkatFeedbackFloatingOverlay(
-                        isVisible: isFloatingVisible,
-                        alignment: MeerkatFeedback.stickyButtonPosition().alignment,
-                        customFloatingButton: customFloatingButton,
-                        onRequest: session.requestFeedback,
-                        onDismiss: dismissFloatingButton
-                    )
-                }
-                FeedbackResultBannerOverlay()
-            }
-            .background {
-                #if os(iOS)
-                if usesShakeTrigger {
-                    ShakeResponderBridge(onShake: session.requestFeedback)
-                }
-                #endif
-            }
-            .sheet(isPresented: $session.showTemplatePicker) {
-                MeerkatTemplatePickerSheet(
-                    screen: screen,
-                    templates: MeerkatFeedback.configuredTemplates,
-                    locale: MeerkatFeedback.configuredLocale,
-                    onSelect: { template in
-                        session.beginFeedbackForm(template: template)
-                    },
-                    onCancel: {
-                        FeedbackEventDispatcher.cancelled(screen: screen, stage: .templatePicker)
-                    }
+            .overlay { floatingOverlay }
+            .background { shakeBackground }
+            .sheet(isPresented: $session.showTemplatePicker) { templatePickerSheet }
+            .sheet(isPresented: $session.showFeedbackForm) { feedbackFormSheet }
+            .onAppear(perform: handleAppear)
+            .onChange(of: isFloatingVisible) { _, isVisible in
+                appearanceTracker.handleVisibilityChange(
+                    isVisible: isVisible,
+                    screen: context.screen
                 )
             }
-            .sheet(isPresented: $session.showFeedbackForm) {
-                if let template = session.pendingTemplate {
-                    MeerkatFeedbackFormSheet(
-                        template: template,
-                        locale: MeerkatFeedback.configuredLocale,
-                        formConfiguration: MeerkatFeedback.formConfiguration,
-                        offerScreenshot: MeerkatFeedback.shouldOfferScreenshotInForm,
-                        onSubmit: session.submitForm,
-                        onCancel: {
-                            FeedbackEventDispatcher.cancelled(screen: screen, stage: .form)
-                        }
-                    )
-                }
-            }
-            .onAppear {
-                isDismissedThisVisit = false
-                MeerkatFeedbackPresentationRegistry.register(screen: screen, presentation: presentation)
-                MeerkatFeedbackShakeRegistry.register(screen: screen, enableShake: enableShake)
-                MeerkatFeedbackRecipientRegistry.register(screen: screen, recipients: mailRecipients)
-                MeerkatFeedbackAPIEndpointRegistry.register(screen: screen, endpoint: apiEndpoint)
-                MeerkatFeedbackSessionRegistry.register(session)
-                visibility.begin(
-                    screen: screen,
-                    minimumDwell: minimumDwell,
-                    revealAfter: revealAfter
-                )
-            }
-            .onDisappear {
-                MeerkatFeedbackSessionRegistry.unregister(screen: screen)
-                MeerkatFeedbackPresentationRegistry.unregister(screen: screen)
-                MeerkatFeedbackShakeRegistry.unregister(screen: screen)
-                MeerkatFeedbackRecipientRegistry.unregister(screen: screen)
-                MeerkatFeedbackAPIEndpointRegistry.unregister(screen: screen)
-                visibility.pauseDwell()
-            }
-    }
-
-    private var resolvedDismissCooldown: Duration {
-        MeerkatFeedback.effectiveDismissCooldown(override: dismissCooldown)
-    }
-
-    private var usesShakeTrigger: Bool {
-        MeerkatFeedbackShakeRegistry.isShakeEnabled(
-            for: screen,
-            bootstrapDefault: MeerkatFeedback.isShakeEnabled
-        )
-    }
-
-    private var isSuppressedByDismiss: Bool {
-        isDismissedThisVisit
-            || MeerkatDismissCooldown.isActive(screen: screen, cooldown: resolvedDismissCooldown)
+            .onDisappear(perform: handleDisappear)
     }
 
     private var isFloatingVisible: Bool {
-        presentation == .floating
-            && !usesShakeTrigger
-            && MeerkatFeedback.canShowStickyButton
-            && visibility.isReady
-            && !isSuppressedByDismiss
+        context.isFloatingVisible(
+            isReady: visibility.isReady,
+            isDismissedThisVisit: isDismissedThisVisit
+        )
+    }
+
+    @ViewBuilder
+    private var floatingOverlay: some View {
+        if context.presentation == .floating {
+            MeerkatFeedbackFloatingOverlay(
+                isVisible: isFloatingVisible,
+                alignment: MeerkatFeedback.stickyButtonPosition().alignment,
+                customFloatingButton: context.customFloatingButton,
+                onRequest: session.requestFeedback,
+                onDismiss: dismissFloatingButton
+            )
+        }
+        FeedbackResultBannerOverlay()
+    }
+
+    @ViewBuilder
+    private var shakeBackground: some View {
+        #if os(iOS)
+        if context.usesShakeTrigger {
+            ShakeResponderBridge(onShake: session.requestFeedback)
+        }
+        #endif
+    }
+
+    private var templatePickerSheet: some View {
+        MeerkatTemplatePickerSheet(
+            screen: context.screen,
+            templates: MeerkatFeedback.configuredTemplates,
+            locale: MeerkatFeedback.configuredLocale,
+            onSelect: { template in
+                session.beginFeedbackForm(template: template)
+            },
+            onCancel: {
+                FeedbackEventDispatcher.cancelled(screen: context.screen, stage: .templatePicker)
+            }
+        )
+    }
+
+    @ViewBuilder
+    private var feedbackFormSheet: some View {
+        if let template = session.pendingTemplate {
+            MeerkatFeedbackFormSheet(
+                template: template,
+                locale: MeerkatFeedback.configuredLocale,
+                formConfiguration: MeerkatFeedback.formConfiguration,
+                offerScreenshot: MeerkatFeedback.shouldOfferScreenshotInForm,
+                onSubmit: session.submitForm,
+                onCancel: {
+                    FeedbackEventDispatcher.cancelled(screen: context.screen, stage: .form)
+                }
+            )
+        }
+    }
+
+    private func handleAppear() {
+        isDismissedThisVisit = false
+        appearanceTracker.reset()
+        MeerkatFeedbackScreenRegistration.register(
+            screen: context.screen,
+            presentation: context.presentation,
+            enableShake: context.enableShake,
+            mailRecipients: context.mailRecipients,
+            apiEndpoint: context.apiEndpoint,
+            session: session
+        )
+        visibility.begin(
+            screen: context.screen,
+            minimumDwell: context.minimumDwell,
+            revealAfter: context.revealAfter
+        )
+        appearanceTracker.reportIfNeeded(isVisible: isFloatingVisible, screen: context.screen)
+    }
+
+    private func handleDisappear() {
+        MeerkatFeedbackScreenRegistration.unregister(screen: context.screen)
+        visibility.pauseDwell()
     }
 
     private func dismissFloatingButton() {
         isDismissedThisVisit = true
-        MeerkatDismissCooldown.recordDismiss(
-            screen: screen,
-            cooldown: resolvedDismissCooldown
-        )
-    }
-}
-
-private extension FeedbackPosition {
-    var alignment: Alignment {
-        switch self {
-        case .topLeading: return .topLeading
-        case .topTrailing: return .topTrailing
-        case .bottomLeading: return .bottomLeading
-        case .bottomTrailing: return .bottomTrailing
-        }
-    }
-}
-
-private struct ShakeResponderBridge: View {
-    let onShake: () -> Void
-
-    var body: some View {
-        #if os(iOS)
-        ShakeResponderView(onShake: onShake)
-            .frame(width: 0, height: 0)
-            .accessibilityHidden(true)
-        #else
-        EmptyView()
-        #endif
+        context.recordDismiss()
     }
 }

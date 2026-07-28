@@ -3,6 +3,14 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [Unreleased]
+
+### Added
+
+- **`FeedbackEventHandler.onAppeared`** — callback when the sticky / custom floating feedback control becomes visible on a screen (after dwell / reveal, when not suppressed by dismiss cooldown or shake).
+- **`FeedbackAppearanceEvent`** — carries the `screen` name for the appearance callback.
+- **Firebase Analytics** — logs `meerkatkit_shown` with a `screen` parameter when the floating control appears (same crash-safe runtime bridge as survey events).
+
 ## [0.4.0] — 2026-07-22
 
 ### Added

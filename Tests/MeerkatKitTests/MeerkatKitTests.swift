@@ -322,6 +322,46 @@ final class MeerkatKitTests: XCTestCase {
     }
 
     @MainActor
+    func testFeedbackEventHandlerAppeared() {
+        var appearedScreen: String?
+        MeerkatFeedback.bootstrap(
+            customDelivery: { _ in },
+            eventHandler: FeedbackEventHandler(
+                onAppeared: { event in
+                    appearedScreen = event.screen
+                }
+            )
+        )
+        FeedbackEventDispatcher.appeared(screen: "Home")
+        XCTAssertEqual(appearedScreen, "Home")
+    }
+
+    @MainActor
+    func testFeedbackAppearanceEventInit() {
+        let event = FeedbackAppearanceEvent(screen: "Profile")
+        XCTAssertEqual(event.screen, "Profile")
+    }
+
+    @MainActor
+    func testAppearanceTrackerReportsOncePerVisibleStretch() {
+        var count = 0
+        MeerkatFeedback.bootstrap(
+            customDelivery: { _ in },
+            eventHandler: FeedbackEventHandler(
+                onAppeared: { _ in count += 1 }
+            )
+        )
+        var tracker = MeerkatFeedbackAppearanceTracker()
+        tracker.reportIfNeeded(isVisible: true, screen: "Home")
+        tracker.reportIfNeeded(isVisible: true, screen: "Home")
+        XCTAssertEqual(count, 1)
+
+        tracker.handleVisibilityChange(isVisible: false, screen: "Home")
+        tracker.handleVisibilityChange(isVisible: true, screen: "Home")
+        XCTAssertEqual(count, 2)
+    }
+
+    @MainActor
     func testPayloadIncludesCustomFieldValues() {
         MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
         let configuration = MeerkatBootstrap.mail(recipients: ["test@example.com"]).configuration(placement: "Home")

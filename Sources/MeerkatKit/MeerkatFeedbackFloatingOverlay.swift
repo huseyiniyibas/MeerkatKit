@@ -28,3 +28,14 @@ struct MeerkatFeedbackFloatingOverlay<CustomFloating: View>: View {
         .animation(.easeOut(duration: 0.2), value: isVisible)
     }
 }
+
+extension FeedbackPosition {
+    var alignment: Alignment {
+        switch self {
+        case .topLeading: return .topLeading
+        case .topTrailing: return .topTrailing
+        case .bottomLeading: return .bottomLeading
+        case .bottomTrailing: return .bottomTrailing
+        }
+    }
+}

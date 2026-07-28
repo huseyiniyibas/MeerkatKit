@@ -37,17 +37,29 @@ public struct FeedbackCancellationEvent: Sendable {
     public let stage: FeedbackCancellationStage
 }
 
+/// Fired when the sticky / custom floating feedback control becomes visible on a screen.
+public struct FeedbackAppearanceEvent: Sendable {
+    public let screen: String
+
+    public init(screen: String) {
+        self.screen = screen
+    }
+}
+
 /// Hooks for observing the feedback lifecycle.
 public struct FeedbackEventHandler {
+    public var onAppeared: (@MainActor (FeedbackAppearanceEvent) -> Void)?
     public var onSubmitted: (@MainActor (FeedbackSubmissionEvent) -> Void)?
     public var onFailed: (@MainActor (FeedbackFailureEvent) -> Void)?
     public var onCancelled: (@MainActor (FeedbackCancellationEvent) -> Void)?
 
     public init(
+        onAppeared: (@MainActor (FeedbackAppearanceEvent) -> Void)? = nil,
         onSubmitted: (@MainActor (FeedbackSubmissionEvent) -> Void)? = nil,
         onFailed: (@MainActor (FeedbackFailureEvent) -> Void)? = nil,
         onCancelled: (@MainActor (FeedbackCancellationEvent) -> Void)? = nil
     ) {
+        self.onAppeared = onAppeared
         self.onSubmitted = onSubmitted
         self.onFailed = onFailed
         self.onCancelled = onCancelled

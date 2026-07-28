@@ -16,9 +16,9 @@ Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery —
 | **Form** | In-app message + star rating (default on); skip with `collectUserInput: false` |
 | **Templates** | Bug / feature / general picker when multiple templates configured; custom templates via ``FeedbackCustomTemplate`` |
 | **Form config** | Optional rating, email field, custom fields via ``FeedbackFormConfiguration`` |
-| **Callbacks** | ``FeedbackEventHandler`` — submitted / failed / cancelled |
+| **Callbacks** | ``FeedbackEventHandler`` — appeared / submitted / failed / cancelled |
 | **Satisfaction survey** | Per-screen like/dislike modal — first view / every view / after N views / after dwell; response callback; optional feedback continuation |
-| **Analytics** | `meerkatkit_like` / `meerkatkit_dislike` / `meerkatkit_bugreport` / … via Firebase — optional, crash-safe when Firebase is absent |
+| **Analytics** | `meerkatkit_shown` / `meerkatkit_like` / `meerkatkit_dislike` / `meerkatkit_bugreport` / … via Firebase — optional, crash-safe when Firebase is absent |
 | **API UX** | Success / offline / failure alert or banner (`apiResultPresentation`) |
 | **Timing** | `minimumDwell`, `revealAfter`, dismiss cooldown (per screen) |
 | **Recipients** | Default at bootstrap; **per-screen mail override** (optional) |
@@ -199,7 +199,7 @@ After a response the like/dislike buttons animate out and a **Send feedback** bu
 MeerkatFeedback.resetSatisfactionSurvey(forScreen: "Chat")  // ask again after big changes
 ```
 
-**Firebase Analytics (optional):** when the host app has Firebase installed *and* configured, MeerkatKit logs `meerkatkit_like` / `meerkatkit_dislike` on response, and `meerkatkit_bugreport` / `meerkatkit_featurerequest` / `meerkatkit_feedback` when a template is picked from the survey continuation. No Firebase dependency is added — Firebase is detected at runtime, and without it (or without `GoogleService-Info.plist`) events are skipped safely instead of crashing.
+**Firebase Analytics (optional):** when the host app has Firebase installed *and* configured, MeerkatKit logs `meerkatkit_shown` when the floating control appears, `meerkatkit_like` / `meerkatkit_dislike` on survey response, and `meerkatkit_bugreport` / `meerkatkit_featurerequest` / `meerkatkit_feedback` when a template is picked from the survey continuation. No Firebase dependency is added — Firebase is detected at runtime, and without it (or without `GoogleService-Info.plist`) events are skipped safely instead of crashing.
 
 See [Satisfaction surveys](Sources/MeerkatKit/MeerkatKit.docc/SatisfactionSurveys.md).
 
