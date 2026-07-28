@@ -3,7 +3,7 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
-## [Unreleased]
+## [0.4.1] — 2026-07-28
 
 ### Added
 
