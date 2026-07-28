@@ -67,7 +67,6 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
         if context.presentation == .floating {
             MeerkatFeedbackFloatingOverlay(
                 isVisible: isFloatingVisible,
-                alignment: MeerkatFeedback.stickyButtonPosition().alignment,
                 customFloatingButton: context.customFloatingButton,
                 onRequest: session.requestFeedback,
                 onDismiss: dismissFloatingButton

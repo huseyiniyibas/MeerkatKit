@@ -573,4 +573,75 @@ final class MeerkatKitTests: XCTestCase {
         )
         XCTAssertEqual(MeerkatFeedback.mailUnavailableFallback, .none)
     }
+
+    func testFloatingButtonPositionFromFeedbackPosition() {
+        XCTAssertEqual(
+            MeerkatFloatingButtonPosition.from(.topLeading),
+            MeerkatFloatingButtonPosition(edge: .leading, normalizedY: 0)
+        )
+        XCTAssertEqual(
+            MeerkatFloatingButtonPosition.from(.bottomTrailing),
+            MeerkatFloatingButtonPosition(edge: .trailing, normalizedY: 1)
+        )
+    }
+
+    func testFloatingButtonSnapChoosesNearestHorizontalEdge() {
+        let container = CGSize(width: 400, height: 800)
+        let button = CGSize(width: 120, height: 40)
+
+        let leading = MeerkatFloatingButtonPositionStore.snap(
+            freeCenter: CGPoint(x: 80, y: 400),
+            containerSize: container,
+            buttonSize: button
+        )
+        XCTAssertEqual(leading.edge, .leading)
+
+        let trailing = MeerkatFloatingButtonPositionStore.snap(
+            freeCenter: CGPoint(x: 320, y: 400),
+            containerSize: container,
+            buttonSize: button
+        )
+        XCTAssertEqual(trailing.edge, .trailing)
+    }
+
+    func testFloatingButtonSnapClampsVerticalRange() {
+        let container = CGSize(width: 400, height: 800)
+        let button = CGSize(width: 120, height: 40)
+        let margin = MeerkatFloatingButtonPositionStore.defaultMargin
+
+        let top = MeerkatFloatingButtonPositionStore.snap(
+            freeCenter: CGPoint(x: 50, y: -100),
+            containerSize: container,
+            buttonSize: button
+        )
+        XCTAssertEqual(top.normalizedY, 0, accuracy: 0.001)
+
+        let bottom = MeerkatFloatingButtonPositionStore.snap(
+            freeCenter: CGPoint(x: 350, y: 9_000),
+            containerSize: container,
+            buttonSize: button
+        )
+        XCTAssertEqual(bottom.normalizedY, 1, accuracy: 0.001)
+
+        let midPoint = MeerkatFloatingButtonPositionStore.point(
+            for: MeerkatFloatingButtonPosition(edge: .trailing, normalizedY: 0.5),
+            containerSize: container,
+            buttonSize: button
+        )
+        let expectedY = margin + button.height / 2
+            + 0.5 * (container.height - 2 * margin - button.height)
+        XCTAssertEqual(midPoint.y, expectedY, accuracy: 0.5)
+        XCTAssertEqual(midPoint.x, container.width - margin - button.width / 2, accuracy: 0.5)
+    }
+
+    func testFloatingButtonPositionPersistence() {
+        #if DEBUG
+        MeerkatFloatingButtonPositionStore.resetAll()
+        let position = MeerkatFloatingButtonPosition(edge: .leading, normalizedY: 0.35)
+        MeerkatFloatingButtonPositionStore.save(position)
+        let loaded = MeerkatFloatingButtonPositionStore.load(default: .bottomTrailing)
+        XCTAssertEqual(loaded, position)
+        MeerkatFloatingButtonPositionStore.resetAll()
+        #endif
+    }
 }

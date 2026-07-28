@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// Configuration and action wiring for ``MeerkatFeedbackModifier``.
+@MainActor
 struct MeerkatFeedbackModifierContext<CustomFloating: View> {
     let screen: String
     let mailRecipients: [String]?

@@ -11,10 +11,12 @@ struct MeerkatSatisfactionSurveySheet: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            VStack(spacing: 28) {
+            VStack(spacing: 32) {
                 Text(titleText)
-                    .font(.title3.bold())
+                    .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
+                    .padding(.horizontal, 12)
+
                 if let response {
                     MeerkatSurveyFollowUpContent(
                         response: response,
@@ -29,22 +31,25 @@ struct MeerkatSatisfactionSurveySheet: View {
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
                 } else {
                     MeerkatSurveyResponseButtons(locale: locale, onRespond: respond)
-                        .transition(.scale(scale: 0.7).combined(with: .opacity))
+                        .transition(.scale(scale: 0.88).combined(with: .opacity))
                 }
             }
-            .padding(28)
+            .padding(.horizontal, 28)
+            .padding(.vertical, 36)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             Button(action: { dismiss() }) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title3)
+                Image(systemName: "xmark")
+                    .font(.caption.weight(.bold))
                     .foregroundStyle(.secondary)
+                    .frame(width: 30, height: 30)
+                    .background(.fill.tertiary, in: Circle())
             }
             .buttonStyle(.plain)
             .padding(16)
             .accessibilityIdentifier("meerkat_survey_close")
         }
-        .animation(.spring(duration: 0.45), value: response)
+        .animation(.spring(response: 0.42, dampingFraction: 0.84), value: response)
         #if os(iOS)
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
@@ -67,56 +72,7 @@ struct MeerkatSatisfactionSurveySheet: View {
     }
 }
 
-private struct MeerkatSurveyResponseButtons: View {
-    let locale: FeedbackLocale
-    let onRespond: (SatisfactionResponse) -> Void
-
-    var body: some View {
-        HStack(spacing: 24) {
-            MeerkatSurveyResponseButton(
-                title: MeerkatLocalizer.text(.surveyLike, locale: locale),
-                systemImage: "hand.thumbsup.fill",
-                tint: .green,
-                accessibilityID: "meerkat_survey_like",
-                action: { onRespond(.like) }
-            )
-            MeerkatSurveyResponseButton(
-                title: MeerkatLocalizer.text(.surveyDislike, locale: locale),
-                systemImage: "hand.thumbsdown.fill",
-                tint: .red,
-                accessibilityID: "meerkat_survey_dislike",
-                action: { onRespond(.dislike) }
-            )
-        }
-    }
-}
-
-private struct MeerkatSurveyResponseButton: View {
-    let title: String
-    let systemImage: String
-    let tint: Color
-    let accessibilityID: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 10) {
-                Image(systemName: systemImage)
-                    .font(.system(size: 34))
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-            }
-            .frame(minWidth: 96)
-            .padding(.vertical, 18)
-            .padding(.horizontal, 14)
-        }
-        .buttonStyle(.bordered)
-        .tint(tint)
-        .accessibilityIdentifier(accessibilityID)
-    }
-}
-
-private struct MeerkatSurveyFollowUpContent: View {
+struct MeerkatSurveyFollowUpContent: View {
     let response: SatisfactionResponse
     let locale: FeedbackLocale
     let offersFeedback: Bool
@@ -124,10 +80,13 @@ private struct MeerkatSurveyFollowUpContent: View {
     let onClose: () -> Void
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 22) {
             Image(systemName: iconName)
-                .font(.system(size: 44))
-                .foregroundStyle(response == .like ? Color.green : Color.orange)
+                .font(.system(size: 40, weight: .semibold))
+                .foregroundStyle(accent)
+                .frame(width: 88, height: 88)
+                .background(accent.opacity(0.14), in: Circle())
+
             if offersFeedback {
                 Button(action: onSendFeedback) {
                     Label(
@@ -135,17 +94,25 @@ private struct MeerkatSurveyFollowUpContent: View {
                         systemImage: "envelope.fill"
                     )
                     .font(.subheadline.weight(.semibold))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(accent)
                 .accessibilityIdentifier("meerkat_survey_feedback")
 
                 Button(MeerkatLocalizer.text(.surveyNotNow, locale: locale), action: onClose)
-                    .font(.subheadline)
+                    .font(.subheadline.weight(.medium))
                     .foregroundStyle(.secondary)
                     .accessibilityIdentifier("meerkat_survey_not_now")
             }
+        }
+    }
+
+    private var accent: Color {
+        switch response {
+        case .like: return Color(red: 0.18, green: 0.72, blue: 0.45)
+        case .dislike: return Color(red: 0.92, green: 0.38, blue: 0.35)
         }
     }
 
