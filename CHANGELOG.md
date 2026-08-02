@@ -3,6 +3,12 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.5] — 2026-08-02
+
+### Fixed
+
+- **CI flake** — timing-sensitive visibility/survey tests now poll until ready instead of fixed short sleeps (macOS runners).
+
 ## [0.4.4] — 2026-08-02
 
 ### Fixed
@@ -253,6 +259,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.4.5]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.1...v0.4.2

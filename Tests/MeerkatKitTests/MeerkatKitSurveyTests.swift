@@ -153,13 +153,14 @@ final class MeerkatKitSurveyTests: XCTestCase {
 
         let controller = MeerkatSurveyScreenController()
         controller.begin(screen: "ControllerFirst", trigger: .firstView)
-        try? await Task.sleep(for: .milliseconds(50))
-        XCTAssertTrue(controller.isPresentingSurvey)
+        let presented = await MeerkatTestAsyncWait.until { controller.isPresentingSurvey }
+        XCTAssertTrue(presented)
         XCTAssertTrue(MeerkatSurveyStore.hasPresented(screen: "ControllerFirst"))
 
         let second = MeerkatSurveyScreenController()
         second.begin(screen: "ControllerFirst", trigger: .firstView)
-        try? await Task.sleep(for: .milliseconds(50))
+        // Give the second controller a moment to potentially present; it must stay false.
+        try? await Task.sleep(for: .milliseconds(100))
         XCTAssertFalse(second.isPresentingSurvey)
         #endif
     }
@@ -172,8 +173,8 @@ final class MeerkatKitSurveyTests: XCTestCase {
         let controller = MeerkatSurveyScreenController()
         controller.begin(screen: "ControllerDwell", trigger: .afterDwell(.milliseconds(60)))
         XCTAssertFalse(controller.isPresentingSurvey)
-        try? await Task.sleep(for: .milliseconds(120))
-        XCTAssertTrue(controller.isPresentingSurvey)
+        let presented = await MeerkatTestAsyncWait.until { controller.isPresentingSurvey }
+        XCTAssertTrue(presented)
         #endif
     }
 
