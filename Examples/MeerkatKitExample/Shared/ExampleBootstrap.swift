@@ -10,7 +10,8 @@ enum ExampleBootstrap {
             title: "Billing issue",
             subject: "Billing issue",
             bodyPrefix: "Describe the billing problem:\n\n",
-            systemImage: "creditcard.fill"
+            systemImage: "creditcard.fill",
+            emoji: "💳"
         )
 
         let formConfiguration = FeedbackFormConfiguration(

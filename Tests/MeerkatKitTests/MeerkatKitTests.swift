@@ -290,11 +290,16 @@ final class MeerkatKitTests: XCTestCase {
                 id: "billing",
                 title: "Billing",
                 subject: "Billing issue",
-                bodyPrefix: "Details:\n\n"
+                bodyPrefix: "Details:\n\n",
+                emoji: "💳"
             )
         )
         XCTAssertEqual(custom.apiIdentifier, "billing")
         XCTAssertEqual(custom.rowTitle(for: .english), "Billing")
+        XCTAssertEqual(custom.emoji, "💳")
+        XCTAssertEqual(FeedbackTemplate.bugReport.emoji, "🐞")
+        XCTAssertEqual(FeedbackTemplate.featureRequest.emoji, "💡")
+        XCTAssertEqual(FeedbackTemplate.general.emoji, "💬")
     }
 
     @MainActor
@@ -608,6 +613,7 @@ final class MeerkatKitTests: XCTestCase {
         let container = CGSize(width: 400, height: 800)
         let button = CGSize(width: 120, height: 40)
         let margin = MeerkatFloatingButtonPositionStore.defaultMargin
+        let chrome = MeerkatFloatingButtonPositionStore.defaultBottomChromeInset
 
         let top = MeerkatFloatingButtonPositionStore.snap(
             freeCenter: CGPoint(x: 50, y: -100),
@@ -628,10 +634,34 @@ final class MeerkatKitTests: XCTestCase {
             containerSize: container,
             buttonSize: button
         )
-        let expectedY = margin + button.height / 2
-            + 0.5 * (container.height - 2 * margin - button.height)
+        let topInset = margin
+        let bottomInset = margin + chrome
+        let expectedY = topInset + button.height / 2
+            + 0.5 * (container.height - topInset - bottomInset - button.height)
         XCTAssertEqual(midPoint.y, expectedY, accuracy: 0.5)
         XCTAssertEqual(midPoint.x, container.width - margin - button.width / 2, accuracy: 0.5)
+    }
+
+    func testFloatingButtonRespectsSafeAreaAndBottomChrome() {
+        let container = CGSize(width: 390, height: 844)
+        let button = CGSize(width: 140, height: 44)
+        let safeArea = MeerkatFloatingLayoutInsets(top: 59, leading: 0, bottom: 34, trailing: 0)
+        let bottom = MeerkatFloatingButtonPositionStore.point(
+            for: MeerkatFloatingButtonPosition(edge: .trailing, normalizedY: 1),
+            containerSize: container,
+            buttonSize: button,
+            safeAreaInsets: safeArea
+        )
+        let expectedY = container.height
+            - MeerkatFloatingButtonPositionStore.defaultMargin
+            - safeArea.bottom
+            - MeerkatFloatingButtonPositionStore.defaultBottomChromeInset
+            - button.height / 2
+        XCTAssertEqual(bottom.y, expectedY, accuracy: 0.5)
+        XCTAssertGreaterThan(
+            container.height - (bottom.y + button.height / 2),
+            safeArea.bottom + 48
+        )
     }
 
     func testFloatingButtonPositionPersistence() {

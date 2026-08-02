@@ -5,7 +5,7 @@ struct MeerkatSurveyResponseButtons: View {
     let onRespond: (SatisfactionResponse) -> Void
 
     var body: some View {
-        HStack(spacing: 28) {
+        HStack(spacing: 12) {
             MeerkatSurveyResponseButton(
                 title: MeerkatLocalizer.text(.surveyLike, locale: locale),
                 systemImage: "hand.thumbsup.fill",
@@ -33,25 +33,31 @@ private struct MeerkatSurveyResponseButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 12) {
+            VStack(spacing: 8) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 28, weight: .semibold))
+                    .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(accent)
-                    .frame(width: 76, height: 76)
+                    .frame(width: 44, height: 44)
                     .background(accent.opacity(0.14), in: Circle())
-                    .overlay {
-                        Circle()
-                            .strokeBorder(accent.opacity(0.28), lineWidth: 1)
-                    }
 
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(.footnote.weight(.semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
-                    .frame(maxWidth: 110)
+                    .minimumScaleFactor(0.85)
             }
-            .padding(.vertical, 4)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .padding(.horizontal, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(accent.opacity(0.08))
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(accent.opacity(0.22), lineWidth: 1)
+            }
         }
         .buttonStyle(MeerkatSurveyPressButtonStyle())
         .accessibilityIdentifier(accessibilityID)
@@ -61,7 +67,7 @@ private struct MeerkatSurveyResponseButton: View {
 private struct MeerkatSurveyPressButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.92 : 1)
+            .scaleEffect(configuration.isPressed ? 0.96 : 1)
             .opacity(configuration.isPressed ? 0.88 : 1)
             .animation(.spring(response: 0.28, dampingFraction: 0.7), value: configuration.isPressed)
     }

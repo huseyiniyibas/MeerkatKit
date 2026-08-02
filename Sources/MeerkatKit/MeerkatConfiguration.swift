@@ -81,6 +81,16 @@ public enum FeedbackTemplate: Hashable, Sendable, Identifiable {
         }
     }
 
+    var emoji: String {
+        switch self {
+        case .bugReport: return "🐞"
+        case .featureRequest: return "💡"
+        case .general: return "💬"
+        case let .custom(template):
+            return template.emoji
+        }
+    }
+
     func rowTitle(for locale: FeedbackLocale) -> String {
         switch self {
         case .bugReport, .featureRequest, .general:

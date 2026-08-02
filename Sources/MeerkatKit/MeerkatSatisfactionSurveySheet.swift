@@ -11,7 +11,7 @@ struct MeerkatSatisfactionSurveySheet: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            VStack(spacing: 32) {
+            VStack(spacing: 24) {
                 Text(titleText)
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
@@ -34,9 +34,10 @@ struct MeerkatSatisfactionSurveySheet: View {
                         .transition(.scale(scale: 0.88).combined(with: .opacity))
                 }
             }
-            .padding(.horizontal, 28)
-            .padding(.vertical, 36)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.horizontal, 24)
+            .padding(.top, 28)
+            .padding(.bottom, 24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
             Button(action: { dismiss() }) {
                 Image(systemName: "xmark")
@@ -80,11 +81,11 @@ struct MeerkatSurveyFollowUpContent: View {
     let onClose: () -> Void
 
     var body: some View {
-        VStack(spacing: 22) {
+        VStack(spacing: 18) {
             Image(systemName: iconName)
-                .font(.system(size: 40, weight: .semibold))
+                .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(accent)
-                .frame(width: 88, height: 88)
+                .frame(width: 52, height: 52)
                 .background(accent.opacity(0.14), in: Circle())
 
             if offersFeedback {

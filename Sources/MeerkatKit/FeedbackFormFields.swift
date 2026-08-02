@@ -94,9 +94,8 @@ struct FeedbackFormCategoryRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: template.systemImage)
-                .font(.title3)
-                .foregroundStyle(.secondary)
+            Text(template.emoji)
+                .font(.title2)
             Text(template.rowTitle(for: locale))
                 .font(.headline)
         }

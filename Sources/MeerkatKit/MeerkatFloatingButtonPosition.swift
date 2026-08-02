@@ -25,9 +25,21 @@ struct MeerkatFloatingButtonPosition: Codable, Equatable, Sendable {
     }
 }
 
+/// Extra padding around the floating button, beyond the container safe area.
+struct MeerkatFloatingLayoutInsets: Equatable, Sendable {
+    var top: CGFloat
+    var leading: CGFloat
+    var bottom: CGFloat
+    var trailing: CGFloat
+
+    static let zero = MeerkatFloatingLayoutInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+}
+
 enum MeerkatFloatingButtonPositionStore {
     private static let defaultsKey = "MeerkatKit.floatingButton.position"
     static let defaultMargin: CGFloat = 16
+    /// Clears typical custom tab bars / FABs that sit above the home indicator.
+    static let defaultBottomChromeInset: CGFloat = 56
 
     static func load(default defaultPosition: FeedbackPosition) -> MeerkatFloatingButtonPosition {
         guard
@@ -48,20 +60,23 @@ enum MeerkatFloatingButtonPositionStore {
         for position: MeerkatFloatingButtonPosition,
         containerSize: CGSize,
         buttonSize: CGSize,
-        margin: CGFloat = defaultMargin
+        margin: CGFloat = defaultMargin,
+        safeAreaInsets: MeerkatFloatingLayoutInsets = .zero,
+        bottomChromeInset: CGFloat = defaultBottomChromeInset
     ) -> CGPoint {
         let range = verticalRange(
             containerHeight: containerSize.height,
             buttonHeight: buttonSize.height,
-            margin: margin
+            topInset: margin + safeAreaInsets.top,
+            bottomInset: margin + safeAreaInsets.bottom + bottomChromeInset
         )
         let y = range.lowerBound + position.normalizedY * (range.upperBound - range.lowerBound)
         let x: CGFloat
         switch position.edge {
         case .leading:
-            x = margin + buttonSize.width / 2
+            x = margin + safeAreaInsets.leading + buttonSize.width / 2
         case .trailing:
-            x = containerSize.width - margin - buttonSize.width / 2
+            x = containerSize.width - margin - safeAreaInsets.trailing - buttonSize.width / 2
         }
         return CGPoint(x: x, y: y)
     }
@@ -70,7 +85,9 @@ enum MeerkatFloatingButtonPositionStore {
         freeCenter: CGPoint,
         containerSize: CGSize,
         buttonSize: CGSize,
-        margin: CGFloat = defaultMargin
+        margin: CGFloat = defaultMargin,
+        safeAreaInsets: MeerkatFloatingLayoutInsets = .zero,
+        bottomChromeInset: CGFloat = defaultBottomChromeInset
     ) -> MeerkatFloatingButtonPosition {
         let edge: MeerkatFloatingButtonEdge = freeCenter.x >= containerSize.width / 2
             ? .trailing
@@ -78,7 +95,8 @@ enum MeerkatFloatingButtonPositionStore {
         let range = verticalRange(
             containerHeight: containerSize.height,
             buttonHeight: buttonSize.height,
-            margin: margin
+            topInset: margin + safeAreaInsets.top,
+            bottomInset: margin + safeAreaInsets.bottom + bottomChromeInset
         )
         let clampedY = min(max(freeCenter.y, range.lowerBound), range.upperBound)
         let span = max(range.upperBound - range.lowerBound, 1)
@@ -95,10 +113,11 @@ enum MeerkatFloatingButtonPositionStore {
     private static func verticalRange(
         containerHeight: CGFloat,
         buttonHeight: CGFloat,
-        margin: CGFloat
+        topInset: CGFloat,
+        bottomInset: CGFloat
     ) -> ClosedRange<CGFloat> {
-        let minY = margin + buttonHeight / 2
-        let maxY = max(minY, containerHeight - margin - buttonHeight / 2)
+        let minY = topInset + buttonHeight / 2
+        let maxY = max(minY, containerHeight - bottomInset - buttonHeight / 2)
         return minY ... maxY
     }
 }
