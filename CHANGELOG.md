@@ -3,6 +3,12 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.4] — 2026-08-02
+
+### Fixed
+
+- **tvOS build** — floating button drag uses `DragGesture`, which is unavailable on tvOS; drag is now compiled out on tvOS so CI/platform builds succeed.
+
 ## [0.4.3] — 2026-08-02
 
 ### Changed
@@ -247,6 +253,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.4.4]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.0...v0.4.1

@@ -9,8 +9,10 @@ struct MeerkatFeedbackFloatingOverlay<CustomFloating: View>: View {
     @State private var storedPosition: MeerkatFloatingButtonPosition
     @State private var dragTranslation: CGSize = .zero
     @State private var buttonSize = CGSize(width: 160, height: 44)
+    #if !os(tvOS)
     @State private var suppressTap = false
     @State private var isSnapping = false
+    #endif
 
     init(
         isVisible: Bool,
@@ -34,20 +36,20 @@ struct MeerkatFeedbackFloatingOverlay<CustomFloating: View>: View {
             let insets = layoutInsets(from: geometry)
             ZStack {
                 if isVisible {
-                    floatingContent
-                        .background(buttonSizeReader)
-                        .position(center(in: geometry.size, insets: insets))
-                        .simultaneousGesture(dragGesture(containerSize: geometry.size, insets: insets))
-                        .transition(.opacity)
+                    positionedButton(containerSize: geometry.size, insets: insets)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         // Tab / navigation transitions inherit animations that yank `.position` off-screen.
         .transaction { transaction in
+            #if !os(tvOS)
             if !isSnapping {
                 transaction.animation = nil
             }
+            #else
+            transaction.animation = nil
+            #endif
         }
         .animation(.easeOut(duration: 0.18), value: isVisible)
         .onPreferenceChange(FloatingButtonSizeKey.self) { size in
@@ -62,14 +64,47 @@ struct MeerkatFeedbackFloatingOverlay<CustomFloating: View>: View {
     }
 
     @ViewBuilder
+    private func positionedButton(
+        containerSize: CGSize,
+        insets: MeerkatFloatingLayoutInsets
+    ) -> some View {
+        let content = floatingContent
+            .background(buttonSizeReader)
+            .position(center(in: containerSize, insets: insets))
+            .transition(.opacity)
+
+        #if os(tvOS)
+        content
+        #else
+        content.simultaneousGesture(dragGesture(containerSize: containerSize, insets: insets))
+        #endif
+    }
+
+    @ViewBuilder
     private var floatingContent: some View {
         if let customFloatingButton {
+            #if os(tvOS)
+            customFloatingButton(onRequest, onDismiss)
+            #else
             customFloatingButton(requestIfAllowed, dismissIfAllowed)
+            #endif
         } else {
             StickyFeedbackButton(
                 locale: MeerkatFeedback.configuredLocale,
-                onTap: requestIfAllowed,
-                onDismiss: dismissIfAllowed
+                onTap: {
+                    #if os(tvOS)
+                    onRequest()
+                    #else
+                    requestIfAllowed()
+                    #endif
+                },
+                onDismiss: {
+                    #if os(tvOS)
+                    onDismiss()
+                    #else
+                    dismissIfAllowed()
+                    #endif
+                }
             )
         }
     }
@@ -102,6 +137,7 @@ struct MeerkatFeedbackFloatingOverlay<CustomFloating: View>: View {
         )
     }
 
+    #if !os(tvOS)
     private func dragGesture(
         containerSize: CGSize,
         insets: MeerkatFloatingLayoutInsets
@@ -151,6 +187,7 @@ struct MeerkatFeedbackFloatingOverlay<CustomFloating: View>: View {
         guard !suppressTap else { return }
         onDismiss()
     }
+    #endif
 }
 
 private struct FloatingButtonSizeKey: PreferenceKey {
