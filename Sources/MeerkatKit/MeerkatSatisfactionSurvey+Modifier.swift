@@ -46,9 +46,13 @@ public extension View {
     /// Collects a like/dislike satisfaction rating for `screen` in a modal.
     ///
     /// The modal appears according to `trigger` — on the first view, on every view,
-    /// after a number of views, or after the user stays on the screen for a duration.
-    /// Once the user responds, the survey never auto-presents again on that screen;
-    /// use ``MeerkatFeedback/resetSatisfactionSurvey(forScreen:)`` to start over.
+    /// after a number of views, every *n*-th view, or after the user stays on the
+    /// screen for a duration.
+    ///
+    /// For most triggers, once the user responds the survey never auto-presents
+    /// again on that screen; use ``MeerkatFeedback/resetSatisfactionSurvey(forScreen:)``
+    /// to start over. ``SatisfactionSurveyTrigger/everyNthView(_:)`` keeps sampling
+    /// on each *n*-th visit even after a previous response.
     ///
     /// After a response the like/dislike buttons animate out and — when
     /// `offersFeedback` is `true` — a feedback button appears that continues into

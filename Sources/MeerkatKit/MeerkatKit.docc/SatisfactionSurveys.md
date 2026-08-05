@@ -27,9 +27,10 @@ Requires `MeerkatFeedback.bootstrap` (mail, API, or custom variant) once at laun
 | ``SatisfactionSurveyTrigger/firstView`` | First appearance after the survey is configured (default) |
 | ``SatisfactionSurveyTrigger/everyView`` | Every appearance until the user responds |
 | ``SatisfactionSurveyTrigger/afterViews(_:)`` | Once the screen has appeared at least *n* times |
+| ``SatisfactionSurveyTrigger/everyNthView(_:)`` | Every *n*-th appearance (10, 20, 30…), including after a previous response |
 | ``SatisfactionSurveyTrigger/afterDwell(_:)`` | After staying on the screen for a duration in one visit |
 
-All triggers stop firing once the user answers. Except for `everyView`, a trigger is also consumed the first time the modal is shown — dismissing without answering does not re-arm it. State is persisted in `UserDefaults` per screen; clear it with:
+Most triggers stop firing once the user answers. `everyNthView` keeps sampling on each *n*-th visit. Except for `everyView` and `everyNthView`, a one-shot trigger is also consumed the first time the modal is shown — dismissing without answering does not re-arm it. State is persisted in `UserDefaults` per screen; clear it with:
 
 ```swift
 MeerkatFeedback.resetSatisfactionSurvey(forScreen: "Chat")

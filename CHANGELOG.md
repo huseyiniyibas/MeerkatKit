@@ -3,6 +3,16 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.6] — 2026-08-05
+
+### Added
+
+- **Satisfaction survey** — `SatisfactionSurveyTrigger.everyNthView(n)` presents on every *n*-th screen appearance (10, 20, 30…), including after a previous response — for periodic sampling on result/detail screens.
+
+### Fixed
+
+- **Satisfaction survey sheet** — uses a content-fitted height detent instead of `.medium`, so like/dislike (and follow-up) no longer sit above a large empty region.
+
 ## [0.4.5] — 2026-08-02
 
 ### Fixed
@@ -259,6 +269,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.4.6]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.2...v0.4.3

@@ -8,6 +8,11 @@ public enum SatisfactionSurveyTrigger: Sendable, Equatable {
     case everyView
     /// Present once the screen has appeared at least `count` times.
     case afterViews(Int)
+    /// Present on every *n*-th appearance (10, 20, 30…), including after a previous response.
+    ///
+    /// Use this for result / detail screens where you want periodic sampling
+    /// (for example every 10th generation result) instead of asking on first open.
+    case everyNthView(Int)
     /// Present after the user stays on the screen for `duration` in a single visit.
     case afterDwell(Duration)
 }

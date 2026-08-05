@@ -93,7 +93,41 @@ final class MeerkatKitSurveyTests: XCTestCase {
     }
 
     @MainActor
-    func testRespondedSkipsAllTriggers() {
+    func testEveryNthViewPresentsOnMultiplesOnly() {
+        XCTAssertEqual(
+            MeerkatSurveyTriggerEvaluator.decision(
+                trigger: .everyNthView(10), viewCount: 1, hasPresented: false, hasResponded: false
+            ),
+            .skip
+        )
+        XCTAssertEqual(
+            MeerkatSurveyTriggerEvaluator.decision(
+                trigger: .everyNthView(10), viewCount: 9, hasPresented: false, hasResponded: false
+            ),
+            .skip
+        )
+        XCTAssertEqual(
+            MeerkatSurveyTriggerEvaluator.decision(
+                trigger: .everyNthView(10), viewCount: 10, hasPresented: false, hasResponded: false
+            ),
+            .present
+        )
+        XCTAssertEqual(
+            MeerkatSurveyTriggerEvaluator.decision(
+                trigger: .everyNthView(10), viewCount: 20, hasPresented: true, hasResponded: true
+            ),
+            .present
+        )
+        XCTAssertEqual(
+            MeerkatSurveyTriggerEvaluator.decision(
+                trigger: .everyNthView(10), viewCount: 15, hasPresented: true, hasResponded: true
+            ),
+            .skip
+        )
+    }
+
+    @MainActor
+    func testRespondedSkipsOneShotTriggers() {
         let triggers: [SatisfactionSurveyTrigger] = [
             .firstView, .everyView, .afterViews(1), .afterDwell(.seconds(1))
         ]

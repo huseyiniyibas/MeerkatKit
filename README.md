@@ -179,7 +179,7 @@ ChatView()
     .meerkatFeedback(screen: "Chat")
     .meerkatSatisfactionSurvey(
         screen: "Chat",
-        trigger: .afterDwell(.seconds(30)),   // or .firstView / .everyView / .afterViews(3)
+        trigger: .everyNthView(10),   // or .firstView / .everyView / .afterViews(3) / .afterDwell(...)
         onResponse: { event in
             print("User tapped \(event.response) on \(event.screen)")
         }
@@ -191,9 +191,10 @@ ChatView()
 | `.firstView` | First appearance (default) |
 | `.everyView` | Every appearance until the user responds |
 | `.afterViews(n)` | Once the screen has appeared at least `n` times |
+| `.everyNthView(n)` | Every *n*-th appearance (10, 20, 30…), including after a previous response |
 | `.afterDwell(duration)` | After staying on the screen for `duration` in one visit |
 
-After a response the like/dislike buttons animate out and a **Send feedback** button appears, continuing into the regular flow (template picker → form → mail/API). Disable that continuation with `offersFeedback: false`. Once answered, the survey never auto-presents again on that screen:
+After a response the like/dislike buttons animate out and a **Send feedback** button appears, continuing into the regular flow (template picker → form → mail/API). Disable that continuation with `offersFeedback: false`. For one-shot triggers, once answered the survey never auto-presents again on that screen (`everyNthView` keeps sampling):
 
 ```swift
 MeerkatFeedback.resetSatisfactionSurvey(forScreen: "Chat")  // ask again after big changes

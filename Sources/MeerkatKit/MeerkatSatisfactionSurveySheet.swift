@@ -52,10 +52,44 @@ struct MeerkatSatisfactionSurveySheet: View {
         }
         .animation(.spring(response: 0.42, dampingFraction: 0.84), value: response)
         #if os(iOS)
-        .presentationDetents([.medium])
+        .presentationDetents([.height(sheetHeight)])
         .presentationDragIndicator(.visible)
         #endif
     }
+
+    #if os(iOS)
+    private var sheetHeight: CGFloat {
+        let dragChrome: CGFloat = 20
+        let topPadding: CGFloat = 28
+        let bottomPadding: CGFloat = 24
+        let titleBlock: CGFloat = 48
+        let sectionSpacing: CGFloat = 24
+
+        if response == nil {
+            let responseButtons: CGFloat = 118
+            return dragChrome + topPadding + titleBlock + sectionSpacing + responseButtons + bottomPadding
+        }
+
+        let icon: CGFloat = 52
+        guard offersFeedback else {
+            return dragChrome + topPadding + titleBlock + sectionSpacing + icon + bottomPadding
+        }
+
+        let followUpSpacing: CGFloat = 18
+        let sendFeedbackButton: CGFloat = 46
+        let notNowButton: CGFloat = 28
+        return dragChrome
+            + topPadding
+            + titleBlock
+            + sectionSpacing
+            + icon
+            + followUpSpacing
+            + sendFeedbackButton
+            + followUpSpacing
+            + notNowButton
+            + bottomPadding
+    }
+    #endif
 
     private var titleText: String {
         let key: MeerkatLocalizedKey = response == nil ? .surveyTitle : .surveyThanks
