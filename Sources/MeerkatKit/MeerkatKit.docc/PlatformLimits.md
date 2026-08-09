@@ -17,6 +17,8 @@ MeerkatKit runs on iOS, iPadOS, macOS, tvOS, and visionOS. Some triggers and del
 | REST API delivery | Yes | Yes | Yes | Yes |
 | Offline queue | Yes | Yes | Yes | Yes |
 | Screenshot toggle | Yes | Yes | No | Yes |
+| Clean capture (hide chrome first) | Yes | Yes | No | Yes |
+| System screenshot → feedback | Yes | No | No | Yes |
 | UIKit bar button | Yes | No | Yes | Yes |
 | AppKit toolbar item | No | Yes | No | No |
 
@@ -64,6 +66,8 @@ See <doc:MailDelivery>.
 On tvOS, the message field uses `TextField` instead of `TextEditor` because `TextEditor` is unavailable on Apple TV.
 
 Screenshot capture is not available on tvOS. When `offerScreenshotInForm` is enabled at bootstrap, the toggle is hidden on tvOS automatically.
+
+When a screenshot is included, MeerkatKit hides its floating chrome before capture so the attachment shows the host app UI. On iOS / iPadOS / visionOS, a system screenshot (while screenshot offering is enabled) opens the feedback flow with **Include screenshot** pre-selected.
 
 Sheet detents (`.medium` / `.large`) and the grabber apply on **iOS only**. visionOS presents the form as a standard sheet without detents.
 

@@ -91,6 +91,7 @@ public enum MeerkatFeedback {
             eventHandler: eventHandler
         )
         startOfflineQueueFlushIfNeeded()
+        startSystemScreenshotObserverIfNeeded()
     }
 
     public static func bootstrap(
@@ -133,6 +134,7 @@ public enum MeerkatFeedback {
             apiResultPresentation: apiResultPresentation
         )
         startOfflineQueueFlushIfNeeded()
+        startSystemScreenshotObserverIfNeeded()
     }
 
     public static func bootstrap(
@@ -168,6 +170,7 @@ public enum MeerkatFeedback {
             formConfiguration: formConfiguration,
             eventHandler: eventHandler
         )
+        startSystemScreenshotObserverIfNeeded()
     }
 
     public static func setUserIdentity(_ identity: FeedbackUserIdentity) {
@@ -235,10 +238,12 @@ public enum MeerkatFeedback {
                 locale: bootstrap.locale,
                 formConfiguration: bootstrap.formConfiguration,
                 offerScreenshot: effectiveOfferScreenshotInForm,
+                defaultIncludeScreenshot: MeerkatFeedbackPendingScreenshot.shouldPreferInclude,
                 onSubmit: { userInput in
                     submitFeedback(screen: screen, template: template, userInput: userInput)
                 },
                 onCancel: {
+                    MeerkatFeedbackPendingScreenshot.clear()
                     FeedbackEventDispatcher.cancelled(screen: screen, stage: .form)
                 }
             )
@@ -252,14 +257,61 @@ public enum MeerkatFeedback {
         template: FeedbackTemplate,
         userInput: FeedbackUserInput?
     ) {
-        guard let bootstrap, bootstrap.isEnabled else { return }
-        let configuration = bootstrap.configuration(placement: screen)
-        let attachments = FeedbackAttachmentCollector.collect(
+        guard bootstrap != nil, isEnabled else { return }
+
+        // When a screenshot is requested, hide MeerkatKit chrome before capture.
+        if effectiveOfferScreenshotInForm, userInput?.includeScreenshot == true {
+            Task { @MainActor in
+                await submitFeedbackAsync(
+                    screen: screen,
+                    template: template,
+                    userInput: userInput
+                )
+            }
+            return
+        }
+
+        finishSubmitFeedback(
+            screen: screen,
+            template: template,
+            userInput: userInput,
+            attachments: FeedbackAttachmentCollector.collect(
+                userInput: userInput,
+                offerScreenshot: effectiveOfferScreenshotInForm,
+                logProvider: bootstrap?.logProvider,
+                crashLogPath: bootstrap?.crashLogPath
+            )
+        )
+    }
+
+    private static func submitFeedbackAsync(
+        screen: String,
+        template: FeedbackTemplate,
+        userInput: FeedbackUserInput?
+    ) async {
+        guard bootstrap != nil, isEnabled else { return }
+        let attachments = await FeedbackAttachmentCollector.collectAsync(
             userInput: userInput,
             offerScreenshot: effectiveOfferScreenshotInForm,
-            logProvider: bootstrap.logProvider,
-            crashLogPath: bootstrap.crashLogPath
+            logProvider: bootstrap?.logProvider,
+            crashLogPath: bootstrap?.crashLogPath
         )
+        finishSubmitFeedback(
+            screen: screen,
+            template: template,
+            userInput: userInput,
+            attachments: attachments
+        )
+    }
+
+    private static func finishSubmitFeedback(
+        screen: String,
+        template: FeedbackTemplate,
+        userInput: FeedbackUserInput?,
+        attachments: [FeedbackAttachment]
+    ) {
+        guard let bootstrap, bootstrap.isEnabled else { return }
+        let configuration = bootstrap.configuration(placement: screen)
         let resolvedIdentity = resolvedUserIdentity(
             bootstrapIdentity: bootstrap.userIdentity,
             userInput: userInput
@@ -331,6 +383,14 @@ public enum MeerkatFeedback {
     private static func startOfflineQueueFlushIfNeeded() {
         guard bootstrap?.apiConfiguration != nil else { return }
         flushOfflineQueue()
+    }
+
+    private static func startSystemScreenshotObserverIfNeeded() {
+        #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
+        if effectiveOfferScreenshotInForm {
+            MeerkatFeedbackSystemScreenshotObserver.startIfNeeded()
+        }
+        #endif
     }
 
     private static func deliver(

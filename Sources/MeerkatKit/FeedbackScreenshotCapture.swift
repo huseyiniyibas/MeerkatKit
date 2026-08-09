@@ -19,9 +19,19 @@ enum FeedbackScreenshotCapture {
         #endif
     }
 
+    /// Hides MeerkatKit chrome, waits for the next layout pass, then captures PNG.
+    @MainActor
+    static func capturePNGHidingChrome(
+        settleDelay: Duration = .milliseconds(50)
+    ) async -> Data? {
+        await MeerkatFeedbackChromeSuppressor.shared.withSuppressed(settleDelay: settleDelay) {
+            capturePNG()
+        }
+    }
+
     @MainActor
     static func capturePNG() -> Data? {
-        #if canImport(UIKit) && !os(watchOS)
+        #if canImport(UIKit) && !os(watchOS) && !os(tvOS)
         guard let window = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .flatMap(\.windows)
@@ -30,7 +40,7 @@ enum FeedbackScreenshotCapture {
         }
         let renderer = UIGraphicsImageRenderer(bounds: window.bounds)
         let image = renderer.image { _ in
-            window.drawHierarchy(in: window.bounds, afterScreenUpdates: false)
+            window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
         }
         return image.pngData()
         #elseif os(macOS)

@@ -13,7 +13,16 @@ MeerkatFeedback.bootstrap(
 )
 ```
 
-When the user opts in, MeerkatKit captures the current window or screen where supported. Screenshot availability varies by platform — see <doc:PlatformLimits>.
+When the user opts in, MeerkatKit:
+
+1. Dismisses the feedback form
+2. Temporarily hides MeerkatKit chrome (floating button / banners)
+3. Captures the host app window
+4. Attaches `screenshot.png` to mail or API delivery
+
+On **iOS / iPadOS / visionOS**, taking a **system screenshot** while MeerkatKit is enabled with screenshot offering also opens the feedback flow for the active screen. MeerkatKit hides itself first, captures a clean screenshot, and pre-checks **Include screenshot** in the form.
+
+Screenshot availability varies by platform — see <doc:PlatformLimits>.
 
 ## Log provider
 

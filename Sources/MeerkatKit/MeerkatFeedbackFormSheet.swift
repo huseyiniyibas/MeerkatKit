@@ -5,6 +5,7 @@ struct MeerkatFeedbackFormSheet: View {
     let locale: FeedbackLocale
     let formConfiguration: FeedbackFormConfiguration
     let offerScreenshot: Bool
+    let defaultIncludeScreenshot: Bool
     let onSubmit: (FeedbackUserInput) -> Void
     let onCancel: () -> Void
 
@@ -13,7 +14,26 @@ struct MeerkatFeedbackFormSheet: View {
     @State private var rating: Int?
     @State private var email = ""
     @State private var customFieldValues: [String: String] = [:]
-    @State private var includeScreenshot = false
+    @State private var includeScreenshot: Bool
+
+    init(
+        template: FeedbackTemplate,
+        locale: FeedbackLocale,
+        formConfiguration: FeedbackFormConfiguration,
+        offerScreenshot: Bool,
+        defaultIncludeScreenshot: Bool = false,
+        onSubmit: @escaping (FeedbackUserInput) -> Void,
+        onCancel: @escaping () -> Void
+    ) {
+        self.template = template
+        self.locale = locale
+        self.formConfiguration = formConfiguration
+        self.offerScreenshot = offerScreenshot
+        self.defaultIncludeScreenshot = defaultIncludeScreenshot
+        self.onSubmit = onSubmit
+        self.onCancel = onCancel
+        _includeScreenshot = State(initialValue: defaultIncludeScreenshot)
+    }
 
     var body: some View {
         NavigationStack {
@@ -52,6 +72,7 @@ struct MeerkatFeedbackFormSheet: View {
                 }
                 .padding()
             }
+            .scrollIndicators(.hidden)
             .navigationTitle(MeerkatLocalizer.text(.formTitle, locale: locale))
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -75,6 +96,12 @@ struct MeerkatFeedbackFormSheet: View {
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         #endif
+        .onReceive(
+            NotificationCenter.default.publisher(for: .meerkatPreferIncludeScreenshot)
+        ) { _ in
+            guard offerScreenshot else { return }
+            includeScreenshot = true
+        }
     }
 
     private var canSubmit: Bool {

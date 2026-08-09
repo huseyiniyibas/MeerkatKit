@@ -10,6 +10,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         locale: FeedbackLocale,
         formConfiguration: FeedbackFormConfiguration,
         offerScreenshot: Bool,
+        defaultIncludeScreenshot: Bool = false,
         onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void,
         onCancel: @escaping @MainActor () -> Void
     ) {
@@ -25,6 +26,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
                 locale: locale,
                 formConfiguration: formConfiguration,
                 offerScreenshot: offerScreenshot,
+                defaultIncludeScreenshot: defaultIncludeScreenshot,
                 onSubmit: onSubmit,
                 onCancel: onCancel
             )
@@ -52,6 +54,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         locale: FeedbackLocale,
         formConfiguration: FeedbackFormConfiguration,
         offerScreenshot: Bool,
+        defaultIncludeScreenshot: Bool = false,
         onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void,
         onCancel: @escaping @MainActor () -> Void
     ) {
@@ -67,6 +70,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
                 locale: locale,
                 formConfiguration: formConfiguration,
                 offerScreenshot: offerScreenshot,
+                defaultIncludeScreenshot: defaultIncludeScreenshot,
                 onSubmit: onSubmit,
                 onCancel: onCancel
             )
@@ -88,6 +92,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
         locale: FeedbackLocale,
         formConfiguration: FeedbackFormConfiguration,
         offerScreenshot: Bool,
+        defaultIncludeScreenshot: Bool = false,
         onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void,
         onCancel: @escaping @MainActor () -> Void
     ) {
@@ -103,6 +108,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
                 locale: locale,
                 formConfiguration: formConfiguration,
                 offerScreenshot: offerScreenshot,
+                defaultIncludeScreenshot: defaultIncludeScreenshot,
                 onSubmit: { userInput in
                     if let windowID = windowIDBox.id {
                         MeerkatFeedbackStandaloneWindowRegistry.closeWindow(id: windowID)

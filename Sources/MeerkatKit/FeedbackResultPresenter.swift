@@ -103,10 +103,11 @@ struct FeedbackResultBanner: Equatable {
 
 struct FeedbackResultBannerOverlay: View {
     @ObservedObject private var controller = FeedbackResultBannerController.shared
+    @ObservedObject private var chromeSuppressor = MeerkatFeedbackChromeSuppressor.shared
 
     var body: some View {
         VStack {
-            if let banner = controller.banner {
+            if let banner = controller.banner, !chromeSuppressor.isSuppressed {
                 FeedbackResultBannerView(banner: banner)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }

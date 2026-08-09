@@ -70,7 +70,7 @@ Pass `nil` to clear an override. Overrides from `.meerkatFeedback(mailRecipients
 
 ## Attachments
 
-Screenshots, logs, and crash files are attached when using the **iOS Mail composer** or **REST API** delivery.
+Screenshots, logs, and crash files are attached when using the **iOS Mail composer** or **REST API** delivery. Screenshot capture hides MeerkatKit chrome first — see <doc:AttachmentsAndIdentity>.
 
 `mailto:` URLs and share-sheet fallback carry **text only** — attachments are not included on those paths.
 

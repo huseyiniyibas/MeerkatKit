@@ -24,7 +24,7 @@ Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery —
 | **Recipients** | Default at bootstrap; **per-screen mail override** (optional) |
 | **API routing** | Default endpoint at bootstrap; **per-screen API endpoint override** (optional) |
 | **Identity** | `userId`, `email`, anonymous mode in metadata & API JSON |
-| **Attachments** | Screenshot toggle in form, log provider, crash log path |
+| **Attachments** | Screenshot toggle (hides MeerkatKit chrome before capture); system screenshot opens feedback on iOS/visionOS; log provider; crash log path |
 | **UIKit** | Bar button item + `meerkatRequestFeedback(screen:)` |
 | **i18n** | 14 languages for UI labels |
 

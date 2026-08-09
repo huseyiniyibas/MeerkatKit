@@ -3,6 +3,17 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.7] — 2026-08-09
+
+### Added
+
+- **Clean screenshot capture** — when **Include screenshot** is on, MeerkatKit hides its floating chrome (and banners) before capturing, then attaches `screenshot.png` to mail / API.
+- **System screenshot → feedback** (iOS / iPadOS / visionOS) — with `offerScreenshotInForm: true`, a system screenshot opens the feedback flow on the active screen with the screenshot toggle pre-checked (chrome is hidden for the capture).
+
+### Changed
+
+- Feedback form `ScrollView` hides scroll indicators.
+
 ## [0.4.6] — 2026-08-05
 
 ### Added

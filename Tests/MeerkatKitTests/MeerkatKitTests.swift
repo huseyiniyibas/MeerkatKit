@@ -673,4 +673,92 @@ final class MeerkatKitTests: XCTestCase {
         MeerkatFloatingButtonPositionStore.resetAll()
         #endif
     }
+
+    @MainActor
+    func testChromeSuppressorNesting() {
+        #if DEBUG
+        MeerkatFeedbackChromeSuppressor.shared.resetAll()
+        #endif
+        let chrome = MeerkatFeedbackChromeSuppressor.shared
+        XCTAssertFalse(chrome.isSuppressed)
+        chrome.begin()
+        XCTAssertTrue(chrome.isSuppressed)
+        chrome.begin()
+        XCTAssertTrue(chrome.isSuppressed)
+        chrome.end()
+        XCTAssertTrue(chrome.isSuppressed)
+        chrome.end()
+        XCTAssertFalse(chrome.isSuppressed)
+        #if DEBUG
+        MeerkatFeedbackChromeSuppressor.shared.resetAll()
+        #endif
+    }
+
+    @MainActor
+    func testPendingScreenshotPreferAndConsume() {
+        #if DEBUG
+        MeerkatFeedbackPendingScreenshot.resetAll()
+        #endif
+        XCTAssertFalse(MeerkatFeedbackPendingScreenshot.shouldPreferInclude)
+        let png = Data([0x89, 0x50, 0x4E, 0x47])
+        MeerkatFeedbackPendingScreenshot.store(png)
+        XCTAssertTrue(MeerkatFeedbackPendingScreenshot.shouldPreferInclude)
+        XCTAssertEqual(MeerkatFeedbackPendingScreenshot.consumePNG(), png)
+        XCTAssertFalse(MeerkatFeedbackPendingScreenshot.shouldPreferInclude)
+        XCTAssertNil(MeerkatFeedbackPendingScreenshot.consumePNG())
+    }
+
+    @MainActor
+    func testCollectAsyncUsesPendingScreenshotWithoutRecapture() async {
+        #if DEBUG
+        MeerkatFeedbackPendingScreenshot.resetAll()
+        #endif
+        let png = Data([0x01, 0x02, 0x03, 0x04])
+        MeerkatFeedbackPendingScreenshot.store(png)
+        let attachments = await FeedbackAttachmentCollector.collectAsync(
+            userInput: FeedbackUserInput(message: "Bug", includeScreenshot: true),
+            offerScreenshot: true,
+            logProvider: nil,
+            crashLogPath: nil,
+            sheetDismissDelay: .milliseconds(0)
+        )
+        XCTAssertEqual(attachments.count, 1)
+        XCTAssertEqual(attachments[0].filename, "screenshot.png")
+        XCTAssertEqual(attachments[0].data, png)
+        XCTAssertFalse(MeerkatFeedbackPendingScreenshot.shouldPreferInclude)
+    }
+
+    @MainActor
+    func testCollectAsyncClearsPendingWhenScreenshotNotIncluded() async {
+        #if DEBUG
+        MeerkatFeedbackPendingScreenshot.resetAll()
+        #endif
+        MeerkatFeedbackPendingScreenshot.store(Data([0xAA]))
+        let attachments = await FeedbackAttachmentCollector.collectAsync(
+            userInput: FeedbackUserInput(message: "Hi", includeScreenshot: false),
+            offerScreenshot: true,
+            logProvider: nil,
+            crashLogPath: nil,
+            sheetDismissDelay: .milliseconds(0)
+        )
+        XCTAssertTrue(attachments.isEmpty)
+        XCTAssertFalse(MeerkatFeedbackPendingScreenshot.shouldPreferInclude)
+    }
+
+    @MainActor
+    func testSessionRegistryTracksActiveScreen() {
+        #if DEBUG
+        MeerkatFeedbackSessionRegistry.resetAll()
+        #endif
+        let home = MeerkatFeedbackScreenSession(screen: "Home")
+        let settings = MeerkatFeedbackScreenSession(screen: "Settings")
+        MeerkatFeedbackSessionRegistry.register(home)
+        MeerkatFeedbackSessionRegistry.register(settings)
+        XCTAssertEqual(MeerkatFeedbackSessionRegistry.activeScreen, "Settings")
+        MeerkatFeedbackSessionRegistry.markActive("Home")
+        XCTAssertEqual(MeerkatFeedbackSessionRegistry.activeScreen, "Home")
+        #if DEBUG
+        MeerkatFeedbackSessionRegistry.resetAll()
+        #endif
+    }
 }

@@ -5,6 +5,7 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
 
     @StateObject private var session: MeerkatFeedbackScreenSession
     @StateObject private var visibility = MeerkatFeedbackVisibilityController()
+    @ObservedObject private var chromeSuppressor = MeerkatFeedbackChromeSuppressor.shared
     @State private var isDismissedThisVisit = false
     @State private var appearanceTracker = MeerkatFeedbackAppearanceTracker()
 
@@ -44,9 +45,12 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
             .overlay { floatingOverlay }
             .background { shakeBackground }
             .sheet(isPresented: $session.showTemplatePicker) { templatePickerSheet }
-            .sheet(isPresented: $session.showFeedbackForm) { feedbackFormSheet }
+            .sheet(
+                isPresented: $session.showFeedbackForm,
+                onDismiss: session.handleFeedbackFormDismissed
+            ) { feedbackFormSheet }
             .onAppear(perform: handleAppear)
-            .onChange(of: isFloatingVisible) { _, isVisible in
+            .onChange(of: isFloatingReady) { _, isVisible in
                 appearanceTracker.handleVisibilityChange(
                     isVisible: isVisible,
                     screen: context.screen
@@ -55,11 +59,16 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
             .onDisappear(perform: handleDisappear)
     }
 
-    private var isFloatingVisible: Bool {
+    /// Floating readiness without chrome-suppression (used for appearance analytics).
+    private var isFloatingReady: Bool {
         context.isFloatingVisible(
             isReady: visibility.isReady,
             isDismissedThisVisit: isDismissedThisVisit
         )
+    }
+
+    private var isFloatingVisible: Bool {
+        isFloatingReady && !chromeSuppressor.isSuppressed
     }
 
     @ViewBuilder
@@ -106,9 +115,10 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
                 locale: MeerkatFeedback.configuredLocale,
                 formConfiguration: MeerkatFeedback.formConfiguration,
                 offerScreenshot: MeerkatFeedback.shouldOfferScreenshotInForm,
+                defaultIncludeScreenshot: session.defaultIncludeScreenshot,
                 onSubmit: session.submitForm,
                 onCancel: {
-                    FeedbackEventDispatcher.cancelled(screen: context.screen, stage: .form)
+                    session.showFeedbackForm = false
                 }
             )
         }
@@ -125,12 +135,13 @@ public struct MeerkatFeedbackModifier<CustomFloating: View>: ViewModifier {
             apiEndpoint: context.apiEndpoint,
             session: session
         )
+        MeerkatFeedbackSessionRegistry.markActive(context.screen)
         visibility.begin(
             screen: context.screen,
             minimumDwell: context.minimumDwell,
             revealAfter: context.revealAfter
         )
-        appearanceTracker.reportIfNeeded(isVisible: isFloatingVisible, screen: context.screen)
+        appearanceTracker.reportIfNeeded(isVisible: isFloatingReady, screen: context.screen)
     }
 
     private func handleDisappear() {

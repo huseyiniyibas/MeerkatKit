@@ -7,6 +7,9 @@ final class MeerkatFeedbackScreenSession: ObservableObject {
     @Published var showTemplatePicker = false
     @Published var showFeedbackForm = false
     @Published private(set) var pendingTemplate: FeedbackTemplate?
+    @Published private(set) var defaultIncludeScreenshot = false
+
+    private var didSubmitFeedbackForm = false
 
     init(screen: String) {
         self.screen = screen
@@ -34,11 +37,15 @@ final class MeerkatFeedbackScreenSession: ObservableObject {
             )
             return
         }
+        didSubmitFeedbackForm = false
+        defaultIncludeScreenshot = MeerkatFeedbackPendingScreenshot.shouldPreferInclude
         showFeedbackForm = true
     }
 
     func submitForm(_ userInput: FeedbackUserInput) {
+        didSubmitFeedbackForm = true
         showFeedbackForm = false
+        defaultIncludeScreenshot = false
         let template = pendingTemplate ?? MeerkatFeedback.configuredTemplates.first ?? .general
         MeerkatFeedback.submitFeedback(
             screen: screen,
@@ -46,18 +53,47 @@ final class MeerkatFeedbackScreenSession: ObservableObject {
             userInput: userInput
         )
     }
+
+    func handleFeedbackFormDismissed() {
+        defaultIncludeScreenshot = false
+        guard !didSubmitFeedbackForm else {
+            didSubmitFeedbackForm = false
+            return
+        }
+        MeerkatFeedbackPendingScreenshot.clear()
+        FeedbackEventDispatcher.cancelled(screen: screen, stage: .form)
+    }
 }
 
 @MainActor
 enum MeerkatFeedbackSessionRegistry {
     private static var sessions: [String: MeerkatFeedbackScreenSession] = [:]
+    private static var activeScreenOrder: [String] = []
 
     static func register(_ session: MeerkatFeedbackScreenSession) {
         sessions[session.screen] = session
+        markActive(session.screen)
     }
 
     static func unregister(screen: String) {
         sessions.removeValue(forKey: screen)
+        activeScreenOrder.removeAll { $0 == screen }
+    }
+
+    static func markActive(_ screen: String) {
+        activeScreenOrder.removeAll { $0 == screen }
+        activeScreenOrder.append(screen)
+    }
+
+    static var activeScreen: String? {
+        if let last = activeScreenOrder.last, sessions[last] != nil {
+            return last
+        }
+        return sessions.keys.sorted().last
+    }
+
+    static var isPresentingFeedbackUI: Bool {
+        sessions.values.contains { $0.showFeedbackForm || $0.showTemplatePicker }
     }
 
     static func requestFeedback(screen: String) {
@@ -79,6 +115,7 @@ enum MeerkatFeedbackSessionRegistry {
     #if DEBUG
     static func resetAll() {
         sessions.removeAll()
+        activeScreenOrder.removeAll()
     }
     #endif
 }
