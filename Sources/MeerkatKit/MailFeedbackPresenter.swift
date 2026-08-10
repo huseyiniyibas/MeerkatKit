@@ -34,7 +34,7 @@ enum MailFeedbackPresenter {
                 context: MailComposeContext(screen: screen, template: template, payload: payload)
             )
 
-            presenter.present(composer, animated: true)
+            TopViewControllerFinder.presentAfterDismissalsIfNeeded(composer, from: presenter)
             return .composerPresented
         }
 

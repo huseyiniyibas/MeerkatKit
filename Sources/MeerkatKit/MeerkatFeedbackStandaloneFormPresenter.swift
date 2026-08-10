@@ -38,7 +38,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
                 sheetController.prefersGrabberVisible = true
             }
             #endif
-            presenter.present(host, animated: true)
+            TopViewControllerFinder.presentAfterDismissalsIfNeeded(host, from: presenter)
         }
     }
 }
@@ -76,7 +76,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
             )
             let host = UIHostingController(rootView: sheet)
             host.modalPresentationStyle = .fullScreen
-            presenter.present(host, animated: true)
+            TopViewControllerFinder.presentAfterDismissalsIfNeeded(host, from: presenter)
         }
     }
 }

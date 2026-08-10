@@ -40,8 +40,10 @@ MeerkatFeedback.resetSatisfactionSurvey(forScreen: "Chat")
 
 1. The modal shows localized **Like** / **Dislike** buttons.
 2. On tap, your `onResponse` callback runs and the buttons animate out.
-3. With `offersFeedback: true` (default) a **Send feedback** button animates in. Tapping it opens the regular feedback flow — template picker (bug report / feature request / …) and then the form or mail composer, exactly like `MeerkatFeedback.requestFeedback(screen:)`.
+3. With `offersFeedback: true` (default) a **Send feedback** button animates in. Tapping it dismisses the survey, then opens the regular feedback flow — template picker (bug report / feature request / …) and then the form or mail composer, exactly like `MeerkatFeedback.requestFeedback(screen:)`. The survey sheet is fully dismissed first so presentation never fails silently.
 4. With `offersFeedback: false` the modal thanks the user and dismisses itself.
+
+You do **not** need `.meerkatFeedback` on the same screen for the continuation to work — MeerkatKit falls back to the standalone UIKit presenter when no session is registered.
 
 ## Firebase Analytics events
 

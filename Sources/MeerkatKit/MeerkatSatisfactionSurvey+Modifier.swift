@@ -7,6 +7,7 @@ public struct MeerkatSatisfactionSurveyModifier: ViewModifier {
     let onResponse: SatisfactionSurveyResponseAction?
 
     @StateObject private var controller = MeerkatSurveyScreenController()
+    @State private var shouldContinueToFeedback = false
 
     public func body(content: Content) -> some View {
         content
@@ -16,12 +17,15 @@ public struct MeerkatSatisfactionSurveyModifier: ViewModifier {
             .onDisappear {
                 controller.end()
             }
-            .sheet(isPresented: $controller.isPresentingSurvey) {
+            .sheet(
+                isPresented: $controller.isPresentingSurvey,
+                onDismiss: handleSurveyDismissed
+            ) {
                 MeerkatSatisfactionSurveySheet(
                     locale: MeerkatFeedback.configuredLocale,
                     offersFeedback: offersFeedback,
                     onRespond: handleResponse,
-                    onContinueToFeedback: continueToFeedback
+                    onContinueToFeedback: markContinueToFeedback
                 )
             }
     }
@@ -32,11 +36,18 @@ public struct MeerkatSatisfactionSurveyModifier: ViewModifier {
         onResponse?(SatisfactionSurveyEvent(screen: screen, response: response))
     }
 
-    private func continueToFeedback() {
+    private func markContinueToFeedback() {
         MeerkatSurveyAnalytics.noteContinuation(screen: screen)
+        shouldContinueToFeedback = true
+    }
+
+    private func handleSurveyDismissed() {
+        guard shouldContinueToFeedback else { return }
+        shouldContinueToFeedback = false
         let screen = self.screen
+        // Let the presentation stack fully settle before opening the feedback sheet.
         Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(500))
+            try? await Task.sleep(for: .milliseconds(100))
             MeerkatFeedback.requestFeedback(screen: screen)
         }
     }

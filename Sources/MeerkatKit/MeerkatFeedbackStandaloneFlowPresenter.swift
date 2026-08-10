@@ -51,7 +51,7 @@ enum MeerkatFeedbackStandaloneFlowPresenter {
                 sheetController.prefersGrabberVisible = true
             }
             #endif
-            presenter.present(host, animated: true)
+            TopViewControllerFinder.presentAfterDismissalsIfNeeded(host, from: presenter)
         }
     }
 }
@@ -102,7 +102,7 @@ enum MeerkatFeedbackStandaloneFlowPresenter {
             )
             let host = UIHostingController(rootView: sheet)
             host.modalPresentationStyle = .fullScreen
-            presenter.present(host, animated: true)
+            TopViewControllerFinder.presentAfterDismissalsIfNeeded(host, from: presenter)
         }
     }
 }

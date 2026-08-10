@@ -3,6 +3,12 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.8] — 2026-08-09
+
+### Fixed
+
+- **Survey → Send feedback** — continuation waited on a fixed delay while the survey sheet was still dismissing, so the template picker often failed to present (notably when the screen had no `.meerkatFeedback` session). Feedback now opens from the survey sheet’s `onDismiss`, and UIKit presents wait until mid-dismiss controllers clear.
+
 ## [0.4.7] — 2026-08-09
 
 ### Added
@@ -280,6 +286,8 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.4.8]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.7...v0.4.8
+[0.4.7]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.6...v0.4.7
 [0.4.6]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.3...v0.4.4
