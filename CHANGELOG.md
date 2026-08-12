@@ -3,6 +3,12 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.9] — 2026-08-12
+
+### Fixed
+
+- **Form → native Mail** — submitting the in-app form presented `MFMailComposeViewController` from the still-visible form sheet, so Mail vanished when the sheet dismissed. Delivery now waits for the form `onDismiss` (and a settled presentation stack), then presents Mail from the underlying screen.
+
 ## [0.4.8] — 2026-08-09
 
 ### Fixed
@@ -286,6 +292,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.4.9]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.8...v0.4.9
 [0.4.8]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.7...v0.4.8
 [0.4.7]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.6...v0.4.7
 [0.4.6]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.5...v0.4.6

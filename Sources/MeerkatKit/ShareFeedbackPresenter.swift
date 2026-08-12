@@ -25,23 +25,26 @@ import UIKit
 private enum ShareFeedbackPresenterIOS {
     @MainActor
     static func present(subject: String, body: String) {
-        guard let presenter = TopViewControllerFinder.topViewController() else {
-            print("MeerkatKit: Could not find a view controller to present share sheet.")
-            return
-        }
-
         let items: [Any] = ["\(subject)\n\n\(body)"]
         let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
-        if let popover = controller.popoverPresentationController {
-            popover.sourceView = presenter.view
-            popover.sourceRect = CGRect(
-                x: presenter.view.bounds.midX,
-                y: presenter.view.bounds.midY,
-                width: 0,
-                height: 0
-            )
+        Task { @MainActor in
+            await TopViewControllerFinder.waitUntilPresentationStackSettles()
+            guard let presenter = TopViewControllerFinder.topViewController(),
+                  !presenter.isBeingDismissed else {
+                print("MeerkatKit: Could not find a view controller to present share sheet.")
+                return
+            }
+            if let popover = controller.popoverPresentationController {
+                popover.sourceView = presenter.view
+                popover.sourceRect = CGRect(
+                    x: presenter.view.bounds.midX,
+                    y: presenter.view.bounds.midY,
+                    width: 0,
+                    height: 0
+                )
+            }
+            presenter.present(controller, animated: true)
         }
-        presenter.present(controller, animated: true)
     }
 }
 #endif

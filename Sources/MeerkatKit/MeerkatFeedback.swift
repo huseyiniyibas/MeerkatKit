@@ -240,7 +240,12 @@ public enum MeerkatFeedback {
                 offerScreenshot: effectiveOfferScreenshotInForm,
                 defaultIncludeScreenshot: MeerkatFeedbackPendingScreenshot.shouldPreferInclude,
                 onSubmit: { userInput in
-                    submitFeedback(screen: screen, template: template, userInput: userInput)
+                    Task { @MainActor in
+                        #if canImport(UIKit) && !os(watchOS)
+                        await TopViewControllerFinder.waitUntilPresentationStackSettles()
+                        #endif
+                        submitFeedback(screen: screen, template: template, userInput: userInput)
+                    }
                 },
                 onCancel: {
                     MeerkatFeedbackPendingScreenshot.clear()

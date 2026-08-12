@@ -27,8 +27,8 @@ Pass an empty `headerMetadata` array to omit the metadata block entirely. Footer
 ## Delivery flow
 
 1. User completes the in-app form (unless `collectUserInput: false`).
-2. MeerkatKit builds a ``FeedbackPayload`` with metadata and attachments.
-3. **iOS** — presents `MFMailComposeViewController` when Mail is configured.
+2. The form sheet is fully dismissed first, then MeerkatKit builds a ``FeedbackPayload`` with metadata and attachments.
+3. **iOS** — presents `MFMailComposeViewController` from the underlying screen when Mail is configured. Presenting from the form itself would dismiss Mail together with the sheet.
 4. **Other platforms** — opens a `mailto:` URL, then falls back if needed.
 
 ## Mail unavailable fallback

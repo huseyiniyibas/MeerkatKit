@@ -11,13 +11,6 @@ enum MailFeedbackPresenter {
         template: FeedbackTemplate
     ) -> MailPresentationResult {
         if MFMailComposeViewController.canSendMail() {
-            guard let presenter = TopViewControllerFinder.topViewController() else {
-                return attemptMailtoThenFallback(
-                    payload: payload,
-                    recipients: recipients
-                )
-            }
-
             let composer = MFMailComposeViewController()
             composer.setToRecipients(recipients)
             composer.setSubject("[\(payload.placement)] \(payload.subject)")
@@ -34,11 +27,73 @@ enum MailFeedbackPresenter {
                 context: MailComposeContext(screen: screen, template: template, payload: payload)
             )
 
-            TopViewControllerFinder.presentAfterDismissalsIfNeeded(composer, from: presenter)
+            presentComposerWhenReady(
+                composer,
+                payload: payload,
+                recipients: recipients,
+                screen: screen,
+                template: template
+            )
             return .composerPresented
         }
 
         return attemptMailtoThenFallback(payload: payload, recipients: recipients)
+    }
+
+    @MainActor
+    private static func presentComposerWhenReady(
+        _ composer: MFMailComposeViewController,
+        payload: FeedbackPayload,
+        recipients: [String],
+        screen: String,
+        template: FeedbackTemplate
+    ) {
+        Task { @MainActor in
+            await TopViewControllerFinder.waitUntilPresentationStackSettles()
+            guard let presenter = TopViewControllerFinder.topViewController(),
+                  !presenter.isBeingDismissed else {
+                let result = attemptMailtoThenFallback(
+                    payload: payload,
+                    recipients: recipients
+                )
+                dispatchMailFallbackResult(
+                    result,
+                    screen: screen,
+                    template: template,
+                    payload: payload
+                )
+                return
+            }
+            presenter.view.window?.endEditing(true)
+            presenter.present(composer, animated: true)
+        }
+    }
+
+    @MainActor
+    private static func dispatchMailFallbackResult(
+        _ result: MailPresentationResult,
+        screen: String,
+        template: FeedbackTemplate,
+        payload: FeedbackPayload
+    ) {
+        switch result {
+        case .composerPresented:
+            break
+        case .deliveredImmediately:
+            FeedbackEventDispatcher.submitted(
+                screen: screen,
+                template: template,
+                payload: payload,
+                channel: .mail
+            )
+        case .failed:
+            FeedbackEventDispatcher.failed(
+                screen: screen,
+                template: template,
+                error: .mailUnavailable,
+                queuedOffline: false
+            )
+        }
     }
 
     @MainActor

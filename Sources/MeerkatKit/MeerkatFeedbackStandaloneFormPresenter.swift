@@ -20,8 +20,7 @@ enum MeerkatFeedbackStandaloneFormPresenter {
             onCancel: onCancel
         ) {
             guard let presenter = TopViewControllerFinder.topViewController() else { return }
-
-            let sheet = MeerkatFeedbackFormSheet(
+            let host = makeHost(
                 template: template,
                 locale: locale,
                 formConfiguration: formConfiguration,
@@ -30,7 +29,6 @@ enum MeerkatFeedbackStandaloneFormPresenter {
                 onSubmit: onSubmit,
                 onCancel: onCancel
             )
-            let host = UIHostingController(rootView: sheet)
             host.modalPresentationStyle = .pageSheet
             #if os(iOS)
             if let sheetController = host.sheetPresentationController {
@@ -40,6 +38,37 @@ enum MeerkatFeedbackStandaloneFormPresenter {
             #endif
             TopViewControllerFinder.presentAfterDismissalsIfNeeded(host, from: presenter)
         }
+    }
+
+    private static func makeHost(
+        template: FeedbackTemplate,
+        locale: FeedbackLocale,
+        formConfiguration: FeedbackFormConfiguration,
+        offerScreenshot: Bool,
+        defaultIncludeScreenshot: Bool,
+        onSubmit: @escaping @MainActor (FeedbackUserInput) -> Void,
+        onCancel: @escaping @MainActor () -> Void
+    ) -> UIHostingController<MeerkatFeedbackFormSheet> {
+        final class HostBox: @unchecked Sendable {
+            var host: UIViewController?
+        }
+        let hostBox = HostBox()
+        let sheet = MeerkatFeedbackFormSheet(
+            template: template,
+            locale: locale,
+            formConfiguration: formConfiguration,
+            offerScreenshot: offerScreenshot,
+            defaultIncludeScreenshot: defaultIncludeScreenshot,
+            onSubmit: { userInput in
+                TopViewControllerFinder.dismissThenPresentReady(hostBox.host) {
+                    onSubmit(userInput)
+                }
+            },
+            onCancel: onCancel
+        )
+        let host = UIHostingController(rootView: sheet)
+        hostBox.host = host
+        return host
     }
 }
 #elseif os(tvOS)
@@ -64,17 +93,25 @@ enum MeerkatFeedbackStandaloneFormPresenter {
             onCancel: onCancel
         ) {
             guard let presenter = TopViewControllerFinder.topViewController() else { return }
-
+            final class HostBox: @unchecked Sendable {
+                var host: UIViewController?
+            }
+            let hostBox = HostBox()
             let sheet = MeerkatFeedbackFormSheet(
                 template: template,
                 locale: locale,
                 formConfiguration: formConfiguration,
                 offerScreenshot: offerScreenshot,
                 defaultIncludeScreenshot: defaultIncludeScreenshot,
-                onSubmit: onSubmit,
+                onSubmit: { userInput in
+                    TopViewControllerFinder.dismissThenPresentReady(hostBox.host) {
+                        onSubmit(userInput)
+                    }
+                },
                 onCancel: onCancel
             )
             let host = UIHostingController(rootView: sheet)
+            hostBox.host = host
             host.modalPresentationStyle = .fullScreen
             TopViewControllerFinder.presentAfterDismissalsIfNeeded(host, from: presenter)
         }

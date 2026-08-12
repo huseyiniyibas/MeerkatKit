@@ -10,6 +10,7 @@ final class MeerkatFeedbackScreenSession: ObservableObject {
     @Published private(set) var defaultIncludeScreenshot = false
 
     private var didSubmitFeedbackForm = false
+    private var pendingSubmitInput: FeedbackUserInput?
 
     init(screen: String) {
         self.screen = screen
@@ -38,30 +39,45 @@ final class MeerkatFeedbackScreenSession: ObservableObject {
             return
         }
         didSubmitFeedbackForm = false
+        pendingSubmitInput = nil
         defaultIncludeScreenshot = MeerkatFeedbackPendingScreenshot.shouldPreferInclude
         showFeedbackForm = true
     }
 
     func submitForm(_ userInput: FeedbackUserInput) {
         didSubmitFeedbackForm = true
-        showFeedbackForm = false
+        pendingSubmitInput = userInput
         defaultIncludeScreenshot = false
-        let template = pendingTemplate ?? MeerkatFeedback.configuredTemplates.first ?? .general
-        MeerkatFeedback.submitFeedback(
-            screen: screen,
-            template: template,
-            userInput: userInput
-        )
+        showFeedbackForm = false
     }
 
     func handleFeedbackFormDismissed() {
         defaultIncludeScreenshot = false
+        if let userInput = pendingSubmitInput {
+            pendingSubmitInput = nil
+            didSubmitFeedbackForm = false
+            deliverSubmittedForm(userInput)
+            return
+        }
         guard !didSubmitFeedbackForm else {
             didSubmitFeedbackForm = false
             return
         }
         MeerkatFeedbackPendingScreenshot.clear()
         FeedbackEventDispatcher.cancelled(screen: screen, stage: .form)
+    }
+
+    private func deliverSubmittedForm(_ userInput: FeedbackUserInput) {
+        let template = pendingTemplate ?? MeerkatFeedback.configuredTemplates.first ?? .general
+        let screen = self.screen
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(100))
+            MeerkatFeedback.submitFeedback(
+                screen: screen,
+                template: template,
+                userInput: userInput
+            )
+        }
     }
 }
 

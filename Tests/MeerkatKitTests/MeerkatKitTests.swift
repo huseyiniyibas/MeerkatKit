@@ -168,6 +168,59 @@ final class MeerkatKitTests: XCTestCase {
     }
 
     @MainActor
+    func testSubmitFormDeliversAfterSheetDismiss() async {
+        #if DEBUG
+        MeerkatFeedbackSessionRegistry.resetAll()
+        #endif
+        var deliveredMessage: String?
+        MeerkatFeedback.bootstrap(
+            customDelivery: { payload in
+                deliveredMessage = payload.userInput?.message
+            }
+        )
+        let session = MeerkatFeedbackScreenSession(screen: "Settings")
+        MeerkatFeedbackSessionRegistry.register(session)
+        session.beginFeedbackForm(template: .general)
+        session.submitForm(FeedbackUserInput(message: "Native mail please"))
+        XCTAssertNil(deliveredMessage)
+        XCTAssertFalse(session.showFeedbackForm)
+
+        session.handleFeedbackFormDismissed()
+        let delivered = await MeerkatTestAsyncWait.until {
+            deliveredMessage == "Native mail please"
+        }
+        XCTAssertTrue(delivered)
+        #if DEBUG
+        MeerkatFeedbackSessionRegistry.resetAll()
+        #endif
+    }
+
+    @MainActor
+    func testCancelFormDoesNotDeliver() {
+        #if DEBUG
+        MeerkatFeedbackSessionRegistry.resetAll()
+        #endif
+        var delivered = false
+        var cancelled = false
+        MeerkatFeedback.bootstrap(
+            customDelivery: { _ in delivered = true },
+            eventHandler: FeedbackEventHandler(
+                onCancelled: { _ in cancelled = true }
+            )
+        )
+        let session = MeerkatFeedbackScreenSession(screen: "Settings")
+        MeerkatFeedbackSessionRegistry.register(session)
+        session.beginFeedbackForm(template: .general)
+        session.showFeedbackForm = false
+        session.handleFeedbackFormDismissed()
+        XCTAssertFalse(delivered)
+        XCTAssertTrue(cancelled)
+        #if DEBUG
+        MeerkatFeedbackSessionRegistry.resetAll()
+        #endif
+    }
+
+    @MainActor
     func testPerScreenMailRecipients() {
         #if DEBUG
         MeerkatFeedbackRecipientRegistry.resetAll()
