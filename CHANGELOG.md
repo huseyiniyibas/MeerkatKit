@@ -3,6 +3,14 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.10] — 2026-08-13
+
+### Added
+
+- **Extra mail metadata** — apps can append optional fields to the mail header (after App / Version / Screen / Device / OS / App Store ID). Built-in optional ``FeedbackUserIdentity/userId`` still renders as **User ID**; ``FeedbackExtraField`` covers any other developer key/value (plan, locale, experiment, or a custom stand-in for user id).
+- ``MeerkatFeedback/setExtraMetadata(_:)`` and ``MeerkatFeedback/setExtraMetadataProvider(_:)`` — provider is evaluated at submit time and overlays bootstrap fields.
+- Localized **User ID** mail label in all 14 UI languages.
+
 ## [0.4.9] — 2026-08-12
 
 ### Fixed

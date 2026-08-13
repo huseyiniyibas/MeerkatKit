@@ -24,7 +24,7 @@ The project links the local MeerkatKit package at the repo root (`../..`).
 - Custom template (`billing`) in template picker
 - Form config: email field + custom field
 - Event handlers (`onSubmitted` / `onFailed` / `onCancelled`)
-- Screenshot toggle, log provider, crash log path, user identity
+- Screenshot toggle, log provider, crash log path, user identity, extra metadata
 - UIKit bar button screen
 - AppKit toolbar item (`MeerkatFeedbackAppKit.makeToolbarItem`)
 

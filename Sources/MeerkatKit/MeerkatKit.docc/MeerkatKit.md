@@ -41,6 +41,8 @@ Typical integration:
 - ``FeedbackEventHandler``
 - ``FeedbackAppearanceEvent``
 - ``FeedbackPayload``
+- ``FeedbackUserIdentity``
+- ``FeedbackExtraField``
 - ``SatisfactionSurveyTrigger``
 - ``SatisfactionResponse``
 - ``SatisfactionSurveyEvent``

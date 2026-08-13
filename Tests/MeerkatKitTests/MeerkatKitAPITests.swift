@@ -7,6 +7,7 @@ final class MeerkatKitAPITests: XCTestCase {
         #if DEBUG
         FeedbackOfflineQueue.resetAll()
         MetadataCollector.resetUserIdentity()
+        ExtraMetadataStore.resetAll()
         #endif
         APIFeedbackDelivery.urlSession = .shared
     }

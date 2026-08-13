@@ -24,6 +24,8 @@ MeerkatFeedback.bootstrap(
 
 Pass an empty `headerMetadata` array to omit the metadata block entirely. Footer keys are optional — include `appStoreID` when you set `appStoreID` at bootstrap.
 
+Optional **User ID** (via ``FeedbackUserIdentity``) and developer ``FeedbackExtraField`` values are appended after these keys. See <doc:AttachmentsAndIdentity>.
+
 ## Delivery flow
 
 1. User completes the in-app form (unless `collectUserInput: false`).

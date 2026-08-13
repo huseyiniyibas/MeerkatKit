@@ -23,7 +23,7 @@ Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery —
 | **Timing** | `minimumDwell`, `revealAfter`, dismiss cooldown (per screen) |
 | **Recipients** | Default at bootstrap; **per-screen mail override** (optional) |
 | **API routing** | Default endpoint at bootstrap; **per-screen API endpoint override** (optional) |
-| **Identity** | `userId`, `email`, anonymous mode in metadata & API JSON |
+| **Identity** | `userId`, `email`, anonymous mode; optional developer extra fields in mail metadata & API JSON |
 | **Attachments** | Screenshot toggle (hides MeerkatKit chrome before capture); system screenshot opens feedback on iOS/visionOS; log provider; crash log path |
 | **UIKit** | Bar button item + `meerkatRequestFeedback(screen:)` |
 | **i18n** | 14 languages for UI labels |
@@ -270,7 +270,33 @@ MeerkatFeedback.bootstrap(
     userIdentity: FeedbackUserIdentity(userId: "u_123", email: "user@example.com")
 )
 MeerkatFeedback.setUserIdentity(.anonymous)
+MeerkatFeedback.setUserIdentity(FeedbackUserIdentity(userId: currentUserId))
 ```
+
+`userId` is optional. When set (and not anonymous), it appears in the mail header as **User ID**.
+
+## Extra metadata
+
+Append any other developer fields in the same mail block — instead of, or in addition to, user id:
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    extraMetadata: [
+        FeedbackExtraField(key: "plan", value: "premium", label: "Plan")
+    ]
+)
+
+MeerkatFeedback.setExtraMetadata([
+    FeedbackExtraField(key: "locale", value: "en-US", label: "Locale")
+])
+
+MeerkatFeedback.setExtraMetadataProvider {
+    [FeedbackExtraField(key: "plan", value: currentPlan, label: "Plan")]
+}
+```
+
+Built-in keys (`appName`, `appVersion`, …) cannot be overwritten. If both identity `userId` and an extra `userId` are set, identity wins.
 
 ## Screenshots & logs
 
@@ -338,6 +364,7 @@ MeerkatFeedback.present(screen: "Profile", template: .bugReport)
 | `mailUnavailableFallback` | `.shareSheet` |
 | `offerScreenshotInForm` | `false` (mail) / `true` (API bootstrap) |
 | `userIdentity` | `.anonymous` |
+| `extraMetadata` | `[]` |
 
 ## Modifier reference
 

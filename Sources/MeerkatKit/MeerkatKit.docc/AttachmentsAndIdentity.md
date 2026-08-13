@@ -72,12 +72,39 @@ MeerkatFeedback.setUserIdentity(FeedbackUserIdentity(userId: "u_456"))
 
 Anonymous mode omits identity fields from the API payload. Non-anonymous identity is included in email body metadata.
 
+## Extra metadata
+
+Apps can append extra lines to the mail header (after App, Version, Screen, Device, OS, App Store ID, and optional User ID):
+
+```swift
+MeerkatFeedback.bootstrap(
+    recipients: ["feedback@yourapp.com"],
+    extraMetadata: [
+        FeedbackExtraField(key: "plan", value: "premium", label: "Plan")
+    ]
+)
+
+MeerkatFeedback.setExtraMetadata([
+    FeedbackExtraField(key: "store", value: "US", label: "Store")
+])
+
+MeerkatFeedback.setExtraMetadataProvider {
+    guard let uid = currentUserId else { return [] }
+    return [FeedbackExtraField(key: "userId", value: uid)]
+}
+```
+
+Prefer ``MeerkatFeedback/setUserIdentity(_:)`` for the built-in **User ID** line (also copied into API `userIdentity`). Use extra fields for anything else, or as a custom stand-in when you do not want the identity API.
+
+The provider is called at submission time. Same-key values from the provider replace bootstrap / ``MeerkatFeedback/setExtraMetadata(_:)`` fields.
+
 ## API vs mail
 
 | Field | Mail body | API JSON |
 |---|---|---|
 | `userId` | Metadata section | `userId` field |
 | `email` | Metadata section | `email` field |
+| Extra fields | Metadata section | `metadata` keys |
 | Screenshot | Attachment | Base64 in JSON |
 | Log provider output | Attachment | Base64 in JSON |
 | Crash log | Attachment | Base64 in JSON |
@@ -87,4 +114,5 @@ Anonymous mode omits identity fields from the API payload. Non-anonymous identit
 - <doc:APIDelivery>
 - <doc:MailDelivery>
 - ``FeedbackUserIdentity``
+- ``FeedbackExtraField``
 - ``MeerkatFeedback``

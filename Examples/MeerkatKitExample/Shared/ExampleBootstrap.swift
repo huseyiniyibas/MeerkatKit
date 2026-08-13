@@ -48,6 +48,9 @@ enum ExampleBootstrap {
             offerScreenshotInForm: true,
             crashLogPath: crashLogPath,
             userIdentity: FeedbackUserIdentity(userId: "demo-user"),
+            extraMetadata: [
+                FeedbackExtraField(key: "plan", value: "pro", label: "Plan")
+            ],
             formConfiguration: formConfiguration,
             eventHandler: eventHandler,
             apiResultPresentation: .banner

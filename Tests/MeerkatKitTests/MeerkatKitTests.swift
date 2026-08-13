@@ -87,6 +87,7 @@ final class MeerkatKitTests: XCTestCase {
             .labelRecipients,
             .formEmailPlaceholder,
             .labelEmail,
+            .labelUserID,
             .apiSuccessTitle,
             .apiSuccessMessage,
             .apiOfflineTitle,
@@ -287,6 +288,135 @@ final class MeerkatKitTests: XCTestCase {
         XCTAssertTrue(payload.body.contains(String(repeating: "=", count: 40)))
         XCTAssertTrue(payload.body.contains("Screen: Settings"))
         XCTAssertFalse(payload.body.contains("bundleId"))
+    }
+
+    @MainActor
+    func testEmailBodyIncludesUserIdentity() {
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            appStoreID: "6751549199",
+            userIdentity: FeedbackUserIdentity(userId: "firebase-uid-1")
+        )
+        let configuration = MeerkatBootstrap.mail(recipients: ["test@example.com"])
+            .configuration(placement: "EditReceipt")
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "EditReceipt",
+            templateOverride: .bugReport,
+            userInput: FeedbackUserInput(message: "Broken", rating: 2),
+            userIdentity: FeedbackUserIdentity(userId: "firebase-uid-1")
+        )
+
+        XCTAssertEqual(payload.metadata["userId"], "firebase-uid-1")
+        XCTAssertTrue(payload.body.contains("User ID: firebase-uid-1"))
+        XCTAssertTrue(payload.body.contains("App Store ID: 6751549199"))
+    }
+
+    @MainActor
+    func testEmailBodyIncludesExtraMetadata() {
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            extraMetadata: [
+                FeedbackExtraField(key: "plan", value: "premium", label: "Plan"),
+                FeedbackExtraField(key: "store", value: "US")
+            ]
+        )
+        let configuration = MeerkatBootstrap.mail(recipients: ["test@example.com"])
+            .configuration(placement: "Home")
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "Home",
+            templateOverride: .general
+        )
+
+        XCTAssertEqual(payload.metadata["plan"], "premium")
+        XCTAssertEqual(payload.metadata["store"], "US")
+        XCTAssertTrue(payload.body.contains("Plan: premium"))
+        XCTAssertTrue(payload.body.contains("store: US"))
+    }
+
+    @MainActor
+    func testExtraMetadataProviderOverlaysBootstrapFields() {
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            extraMetadata: [FeedbackExtraField(key: "plan", value: "free")]
+        )
+        MeerkatFeedback.setExtraMetadataProvider {
+            [
+                FeedbackExtraField(key: "plan", value: "premium"),
+                FeedbackExtraField(key: "cohort", value: "beta")
+            ]
+        }
+        let configuration = MeerkatBootstrap.mail(recipients: ["test@example.com"])
+            .configuration(placement: "Home")
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "Home",
+            templateOverride: .general
+        )
+
+        XCTAssertEqual(payload.metadata["plan"], "premium")
+        XCTAssertEqual(payload.metadata["cohort"], "beta")
+        XCTAssertTrue(payload.body.contains("plan: premium"))
+        XCTAssertTrue(payload.body.contains("cohort: beta"))
+    }
+
+    @MainActor
+    func testExtraMetadataDoesNotOverwriteBuiltInKeys() {
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            extraMetadata: [FeedbackExtraField(key: "appName", value: "Hacked")]
+        )
+        let configuration = MeerkatBootstrap.mail(recipients: ["test@example.com"])
+            .configuration(placement: "Home")
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "Home",
+            templateOverride: .general
+        )
+
+        XCTAssertNotEqual(payload.metadata["appName"], "Hacked")
+        XCTAssertFalse(payload.body.contains("Hacked"))
+    }
+
+    @MainActor
+    func testIdentityUserIdWinsOverExtraUserId() {
+        let identity = FeedbackUserIdentity(userId: "identity-uid")
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            userIdentity: identity,
+            extraMetadata: [FeedbackExtraField(key: "userId", value: "extra-uid")]
+        )
+        let configuration = MeerkatBootstrap.mail(recipients: ["test@example.com"])
+            .configuration(placement: "Home")
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "Home",
+            templateOverride: .general,
+            userIdentity: identity
+        )
+
+        XCTAssertEqual(payload.metadata["userId"], "identity-uid")
+        XCTAssertTrue(payload.body.contains("User ID: identity-uid"))
+        XCTAssertFalse(payload.body.contains("extra-uid"))
+    }
+
+    @MainActor
+    func testAnonymousIdentityStillAllowsExtraUserId() {
+        MeerkatFeedback.bootstrap(
+            recipients: ["test@example.com"],
+            extraMetadata: [FeedbackExtraField(key: "userId", value: "extra-uid")]
+        )
+        let configuration = MeerkatBootstrap.mail(recipients: ["test@example.com"])
+            .configuration(placement: "Home")
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "Home",
+            templateOverride: .general
+        )
+
+        XCTAssertEqual(payload.metadata["userId"], "extra-uid")
+        XCTAssertTrue(payload.body.contains("User ID: extra-uid"))
     }
 
     @MainActor

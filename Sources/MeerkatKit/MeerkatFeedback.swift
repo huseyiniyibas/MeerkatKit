@@ -65,11 +65,14 @@ public enum MeerkatFeedback {
         offerScreenshotInForm: Bool = false,
         crashLogPath: String? = nil,
         userIdentity: FeedbackUserIdentity = .anonymous,
+        extraMetadata: [FeedbackExtraField] = [],
         formConfiguration: FeedbackFormConfiguration = .default,
         eventHandler: FeedbackEventHandler? = nil
     ) {
         MetadataCollector.setAppStoreID(appStoreID)
         MetadataCollector.setUserIdentity(userIdentity)
+        ExtraMetadataStore.setFields(extraMetadata)
+        ExtraMetadataStore.setProvider(nil)
         bootstrap = .mail(
             recipients: recipients,
             headerMetadata: headerMetadata.isEmpty
@@ -109,12 +112,15 @@ public enum MeerkatFeedback {
         offerScreenshotInForm: Bool = true,
         crashLogPath: String? = nil,
         userIdentity: FeedbackUserIdentity = .anonymous,
+        extraMetadata: [FeedbackExtraField] = [],
         formConfiguration: FeedbackFormConfiguration = .default,
         eventHandler: FeedbackEventHandler? = nil,
         apiResultPresentation: FeedbackAPIResultPresentation = .alert
     ) {
         MetadataCollector.setAppStoreID(appStoreID)
         MetadataCollector.setUserIdentity(userIdentity)
+        ExtraMetadataStore.setFields(extraMetadata)
+        ExtraMetadataStore.setProvider(nil)
         bootstrap = .api(
             endpoint: endpoint,
             headers: headers,
@@ -150,11 +156,14 @@ public enum MeerkatFeedback {
         offerScreenshotInForm: Bool = false,
         crashLogPath: String? = nil,
         userIdentity: FeedbackUserIdentity = .anonymous,
+        extraMetadata: [FeedbackExtraField] = [],
         formConfiguration: FeedbackFormConfiguration = .default,
         eventHandler: FeedbackEventHandler? = nil
     ) {
         MetadataCollector.setAppStoreID(appStoreID)
         MetadataCollector.setUserIdentity(userIdentity)
+        ExtraMetadataStore.setFields(extraMetadata)
+        ExtraMetadataStore.setProvider(nil)
         bootstrap = .custom(
             customDelivery,
             templates: templates,
@@ -176,6 +185,16 @@ public enum MeerkatFeedback {
     public static func setUserIdentity(_ identity: FeedbackUserIdentity) {
         bootstrap?.userIdentity = identity
         MetadataCollector.setUserIdentity(identity)
+    }
+
+    /// Replaces developer extra fields shown in the mail metadata block and API `metadata`.
+    public static func setExtraMetadata(_ fields: [FeedbackExtraField]) {
+        ExtraMetadataStore.setFields(fields)
+    }
+
+    /// Evaluated at submit time. Overlay on bootstrap / ``setExtraMetadata(_:)`` fields (same key wins).
+    public static func setExtraMetadataProvider(_ provider: (() -> [FeedbackExtraField])?) {
+        ExtraMetadataStore.setProvider(provider)
     }
 
     public static func setLogProvider(_ provider: (() -> String?)?) {
@@ -474,6 +493,8 @@ enum FeedbackPayloadBuilder {
         )
         appendIdentityMetadata(&metadata, identity: userIdentity)
         appendUserInputMetadata(&metadata, userInput: userInput)
+        let extraFields = ExtraMetadataStore.resolved()
+        appendExtraMetadata(&metadata, fields: extraFields)
 
         var orderedKeys = MetadataCollector.orderedKeys(
             headerKeys: headerKeys,
@@ -481,6 +502,7 @@ enum FeedbackPayloadBuilder {
             includesAppStoreID: includesAppStoreID
         )
         appendIdentityKeys(&orderedKeys, identity: userIdentity)
+        appendExtraKeys(&orderedKeys, fields: extraFields, metadata: metadata)
 
         let subject = template.subject(for: configuration.locale)
         let body = FeedbackEmailComposer.composeBody(
@@ -488,7 +510,8 @@ enum FeedbackPayloadBuilder {
             locale: configuration.locale,
             orderedKeys: orderedKeys,
             template: template,
-            userInput: userInput
+            userInput: userInput,
+            extraLabels: ExtraMetadataStore.labels(for: extraFields)
         )
 
         return FeedbackPayload(
@@ -538,6 +561,50 @@ enum FeedbackPayloadBuilder {
         }
         if identity.email != nil, !keys.contains(where: { $0.lowercased() == "email" }) {
             keys.append("email")
+        }
+    }
+
+    private static func appendExtraMetadata(
+        _ metadata: inout [String: String],
+        fields: [FeedbackExtraField]
+    ) {
+        for field in fields {
+            let normalized = field.key.lowercased()
+            if reservedExtraKeys.contains(normalized) {
+                continue
+            }
+            if metadata.contains(where: { $0.key.lowercased() == normalized }) {
+                continue
+            }
+            metadata[field.key] = field.value
+        }
+    }
+
+    private static let reservedExtraKeys: Set<String> = [
+        "appname",
+        "appversion",
+        "buildnumber",
+        "devicemodel",
+        "osversion",
+        "screen",
+        "placement",
+        "appstoreid",
+        "bundleid",
+        "devicename"
+    ]
+
+    private static func appendExtraKeys(
+        _ keys: inout [String],
+        fields: [FeedbackExtraField],
+        metadata: [String: String]
+    ) {
+        for field in fields {
+            let normalized = field.key.lowercased()
+            guard metadata.contains(where: { $0.key.lowercased() == normalized }) else { continue }
+            if keys.contains(where: { $0.lowercased() == normalized }) {
+                continue
+            }
+            keys.append(field.key)
         }
     }
 
