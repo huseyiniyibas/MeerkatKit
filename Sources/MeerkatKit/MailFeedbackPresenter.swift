@@ -161,8 +161,15 @@ private final class MailComposeDelegate: NSObject, MFMailComposeViewControllerDe
                     payload: context.payload,
                     channel: .mail
                 )
-            case .cancelled, .failed:
+            case .cancelled:
                 FeedbackEventDispatcher.cancelled(screen: context.screen, stage: .form)
+            case .failed:
+                FeedbackEventDispatcher.failed(
+                    screen: context.screen,
+                    template: context.template,
+                    error: .networkFailure(error?.localizedDescription ?? "Mail send failed"),
+                    queuedOffline: false
+                )
             @unknown default:
                 FeedbackEventDispatcher.cancelled(screen: context.screen, stage: .form)
             }

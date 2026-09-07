@@ -503,6 +503,7 @@ enum FeedbackPayloadBuilder {
         )
         appendIdentityKeys(&orderedKeys, identity: userIdentity)
         appendExtraKeys(&orderedKeys, fields: extraFields, metadata: metadata)
+        let footerOrderedKeys = MetadataCollector.orderedFooterKeys(footerKeys)
 
         let subject = template.subject(for: configuration.locale)
         let body = FeedbackEmailComposer.composeBody(
@@ -511,7 +512,8 @@ enum FeedbackPayloadBuilder {
             orderedKeys: orderedKeys,
             template: template,
             userInput: userInput,
-            extraLabels: ExtraMetadataStore.labels(for: extraFields)
+            extraLabels: ExtraMetadataStore.labels(for: extraFields),
+            footerKeys: footerOrderedKeys
         )
 
         return FeedbackPayload(

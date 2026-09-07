@@ -41,14 +41,20 @@ enum MeerkatFeedbackSystemScreenshotObserver {
         }
 
         Task { @MainActor in
-            if let png = await FeedbackScreenshotCapture.capturePNGHidingChrome() {
-                MeerkatFeedbackPendingScreenshot.store(png)
-            } else {
-                MeerkatFeedbackPendingScreenshot.markPreferInclude()
-            }
-
             guard let screen = MeerkatFeedbackSessionRegistry.activeScreen else {
                 return
+            }
+
+            if let png = await FeedbackScreenshotCapture.capturePNGHidingChrome() {
+                guard MeerkatFeedbackSessionRegistry.activeScreen == screen else {
+                    return
+                }
+                MeerkatFeedbackPendingScreenshot.store(png)
+            } else {
+                guard MeerkatFeedbackSessionRegistry.activeScreen == screen else {
+                    return
+                }
+                MeerkatFeedbackPendingScreenshot.markPreferInclude()
             }
             MeerkatFeedback.requestFeedback(screen: screen)
         }

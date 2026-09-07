@@ -3,6 +3,19 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.11] — 2026-09-07
+
+### Fixed
+
+- **Extra field labels** — custom `label` values no longer replace built-in mail labels (`App`, `User ID`, `Email`, …).
+- **footerMetadata** — footer keys now render after the user message (and `orderedKeys` no longer ignores them).
+- **Duplicate email** — form email is omitted from the user-input section when it already appears in the metadata block.
+- **Extra `userId` stand-in** — anonymous developer extra `userId` / `email` now populate API `userIdentity` as well as mail metadata. Form and custom-field values stay out of `userIdentity`.
+- **Mail composer `.failed`** — reports `onFailed` instead of `onCancelled`.
+- **System screenshot** — pending PNG is stored only when an active feedback screen exists.
+- **Empty identity** — `FeedbackUserIdentity()` with no `userId` or `email` is treated as anonymous.
+- Extra field values flatten embedded newlines so they cannot inject fake metadata lines.
+
 ## [0.4.10] — 2026-08-13
 
 ### Added
@@ -300,6 +313,8 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.4.11]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.10...v0.4.11
+[0.4.10]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.9...v0.4.10
 [0.4.9]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.8...v0.4.9
 [0.4.8]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.7...v0.4.8
 [0.4.7]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.6...v0.4.7

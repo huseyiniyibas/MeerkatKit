@@ -73,7 +73,7 @@ enum ExtraMetadataStore {
         var result: [FeedbackExtraField] = []
         for field in fields {
             let key = field.key.trimmingCharacters(in: .whitespacesAndNewlines)
-            let value = field.value.trimmingCharacters(in: .whitespacesAndNewlines)
+            let value = flattenedValue(field.value)
             guard !key.isEmpty, !value.isEmpty else { continue }
             let cleaned = FeedbackExtraField(key: key, value: value, label: field.label)
             if let index = result.firstIndex(where: { $0.key.lowercased() == key.lowercased() }) {
@@ -83,5 +83,13 @@ enum ExtraMetadataStore {
             result.append(cleaned)
         }
         return result
+    }
+
+    private static func flattenedValue(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: "\r\n", with: " ")
+            .replacingOccurrences(of: "\n", with: " ")
+            .replacingOccurrences(of: "\r", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

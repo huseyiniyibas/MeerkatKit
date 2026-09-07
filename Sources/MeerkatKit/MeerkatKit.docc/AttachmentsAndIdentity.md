@@ -94,7 +94,7 @@ MeerkatFeedback.setExtraMetadataProvider {
 }
 ```
 
-Prefer ``MeerkatFeedback/setUserIdentity(_:)`` for the built-in **User ID** line (also copied into API `userIdentity`). Use extra fields for anything else, or as a custom stand-in when you do not want the identity API.
+Prefer ``MeerkatFeedback/setUserIdentity(_:)`` for the built-in **User ID** line (also copied into API `userIdentity`). An extra `userId` / `email` stand-in (when identity is anonymous) is copied into API `userIdentity` and mail metadata. Form and custom-field values are not promoted into `userIdentity`. Use extra fields for anything else. Built-in mail labels cannot be overwritten by ``FeedbackExtraField/label``.
 
 The provider is called at submission time. Same-key values from the provider replace bootstrap / ``MeerkatFeedback/setExtraMetadata(_:)`` fields.
 

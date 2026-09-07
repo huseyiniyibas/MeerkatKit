@@ -296,7 +296,7 @@ MeerkatFeedback.setExtraMetadataProvider {
 }
 ```
 
-Built-in keys (`appName`, `appVersion`, …) cannot be overwritten. If both identity `userId` and an extra `userId` are set, identity wins.
+Built-in keys (`appName`, `appVersion`, …) and their mail labels cannot be overwritten. If both identity `userId` and an extra `userId` are set, identity wins. An anonymous extra `userId` / `email` stand-in is also copied into API `userIdentity`.
 
 ## Screenshots & logs
 

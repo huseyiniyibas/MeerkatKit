@@ -56,6 +56,50 @@ final class MeerkatKitAPITests: XCTestCase {
     }
 
     @MainActor
+    func testAPIModelIncludesExtraUserIdStandIn() throws {
+        resetState()
+        MeerkatFeedback.bootstrap(
+            api: URL(string: "https://api.example.com/feedback")!,
+            extraMetadata: [FeedbackExtraField(key: "userId", value: "extra-uid")]
+        )
+        let configuration = MeerkatBootstrap.api(
+            endpoint: URL(string: "https://api.example.com/feedback")!
+        ).configuration(placement: "Home")
+        let payload = FeedbackPayloadBuilder.build(
+            configuration: configuration,
+            placementOverride: "Home",
+            templateOverride: .general
+        )
+        let extras = ExtraMetadataStore.resolved()
+        let model = FeedbackAPIModel.make(
+            from: payload,
+            identity: .anonymous,
+            extraFields: extras
+        )
+        XCTAssertEqual(payload.metadata["userId"], "extra-uid")
+        XCTAssertEqual(model.userIdentity?.userId, "extra-uid")
+    }
+
+    @MainActor
+    func testAPIModelDoesNotPromoteFormFieldsToUserIdentity() throws {
+        resetState()
+        let payload = FeedbackPayload(
+            placement: "Home",
+            template: .general,
+            subject: "Feedback",
+            body: "body",
+            metadata: ["userId": "form-uid", "email": "form@test.com"],
+            userInput: FeedbackUserInput(
+                message: "Hi",
+                email: "form@test.com",
+                customFields: ["userId": "form-uid"]
+            )
+        )
+        let model = FeedbackAPIModel.make(from: payload, identity: .anonymous)
+        XCTAssertNil(model.userIdentity)
+    }
+
+    @MainActor
     func testUserIdentityInMetadata() {
         resetState()
         #if DEBUG

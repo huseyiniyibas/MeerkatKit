@@ -33,7 +33,11 @@ enum APIFeedbackDelivery {
         configuration: FeedbackAPIConfiguration,
         identity: FeedbackUserIdentity?
     ) async -> APIFeedbackSubmitResult {
-        let model = FeedbackAPIModel.make(from: payload, identity: identity)
+        let model = FeedbackAPIModel.make(
+            from: payload,
+            identity: identity,
+            extraFields: ExtraMetadataStore.resolved()
+        )
         guard let body = try? model.encoded() else {
             print("MeerkatKit: Failed to encode API payload.")
             return APIFeedbackSubmitResult(outcome: .failed, error: .encodingFailed)

@@ -28,13 +28,15 @@ struct FeedbackAPIModel: Codable, Equatable {
     let userIdentity: UserIdentity?
     let attachments: [Attachment]
 
-    static func make(from payload: FeedbackPayload, identity: FeedbackUserIdentity?) -> FeedbackAPIModel {
-        let resolvedIdentity: UserIdentity?
-        if let identity, !identity.isAnonymous {
-            resolvedIdentity = UserIdentity(userId: identity.userId, email: identity.email)
-        } else {
-            resolvedIdentity = nil
-        }
+    static func make(
+        from payload: FeedbackPayload,
+        identity: FeedbackUserIdentity?,
+        extraFields: [FeedbackExtraField] = []
+    ) -> FeedbackAPIModel {
+        let resolvedIdentity = resolvedAPIIdentity(
+            identity: identity,
+            extraFields: extraFields
+        )
 
         let userInput = payload.userInput.map {
             UserInput(
@@ -69,5 +71,22 @@ struct FeedbackAPIModel: Codable, Equatable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         return try encoder.encode(self)
+    }
+
+    private static func resolvedAPIIdentity(
+        identity: FeedbackUserIdentity?,
+        extraFields: [FeedbackExtraField]
+    ) -> UserIdentity? {
+        if let identity, !identity.isAnonymous {
+            return UserIdentity(userId: identity.userId, email: identity.email)
+        }
+        let extras = Dictionary(
+            extraFields.map { ($0.key.lowercased(), $0.value) },
+            uniquingKeysWith: { _, latest in latest }
+        )
+        let userId = extras["userid"]
+        let email = extras["email"]
+        guard userId != nil || email != nil else { return nil }
+        return UserIdentity(userId: userId, email: email)
     }
 }

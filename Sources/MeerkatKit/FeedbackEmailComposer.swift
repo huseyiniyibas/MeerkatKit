@@ -15,100 +15,74 @@ enum FeedbackEmailComposer {
         orderedKeys: [String],
         template: FeedbackTemplate,
         userInput: FeedbackUserInput?,
-        extraLabels: [String: String] = [:]
+        extraLabels: [String: String] = [:],
+        footerKeys: [String] = []
     ) -> String {
         var consumedKeys = Set<String>()
-        let infoLines = orderedKeys.compactMap { key -> String? in
-            let normalized = key.lowercased()
-            if consumedKeys.contains(normalized) {
-                return nil
-            }
-
-            if normalized == "appversion" {
-                consumedKeys.insert("appversion")
-                consumedKeys.insert("buildnumber")
-                guard let version = metadata["appVersion"], !version.isEmpty else { return nil }
-                let build = metadata["buildNumber"]
-                let value: String
-                if let build, !build.isEmpty, build != "unknown", build != "—" {
-                    value = "\(version) (\(build))"
-                } else {
-                    value = version
-                }
-                return "\(label(for: key, locale: locale, extraLabels: extraLabels)): \(value)"
-            }
-
-            if normalized == "buildnumber" {
-                return nil
-            }
-
-            let resolvedValue = metadata[key] ?? metadata.first { $0.key.lowercased() == normalized }?.value
-            guard let value = resolvedValue, !value.isEmpty, value != "—" else { return nil }
-            consumedKeys.insert(normalized)
-            return "\(label(for: key, locale: locale, extraLabels: extraLabels)): \(value)"
+        let infoBlock = FeedbackEmailMetadataLines.render(
+            keys: orderedKeys,
+            metadata: metadata,
+            locale: locale,
+            extraLabels: extraLabels,
+            consumedKeys: &consumedKeys
+        )
+        let separator = String(repeating: "=", count: 40)
+        var sections: [String] = []
+        if !infoBlock.isEmpty {
+            sections.append(infoBlock)
         }
 
-        let infoBlock = infoLines.joined(separator: "\n")
-        let separator = String(repeating: "=", count: 40)
-        var sections: [String] = [infoBlock]
+        appendUserInputSections(
+            to: &sections,
+            userInput: userInput,
+            template: template,
+            locale: locale,
+            separator: separator,
+            consumedKeys: &consumedKeys
+        )
 
-        if let userInput {
-            if let rating = userInput.rating {
-                sections.append(
-                    "\(MeerkatLocalizer.text(.labelRating, locale: locale)): \(rating)/5"
-                )
-            }
-            if let email = userInput.email, !email.isEmpty {
-                sections.append("\(MeerkatLocalizer.text(.labelEmail, locale: locale)): \(email)")
-            }
-            for (key, value) in userInput.customFields.sorted(by: { $0.key < $1.key }) where !value.isEmpty {
-                sections.append("\(key): \(value)")
-            }
-            let prefix = template.bodyPrefix(for: locale)
-            sections.append("\(prefix)\(userInput.message)")
-        } else {
-            sections.append(MeerkatLocalizer.text(.promptTypeBelow, locale: locale))
-            sections.append(separator)
-            sections.append("")
-            sections.append("")
+        let footerBlock = FeedbackEmailMetadataLines.render(
+            keys: footerKeys,
+            metadata: metadata,
+            locale: locale,
+            extraLabels: extraLabels,
+            consumedKeys: &consumedKeys
+        )
+        if !footerBlock.isEmpty {
+            sections.append(footerBlock)
         }
 
         return sections.joined(separator: "\n\n") + "\n"
     }
 
-    private static func label(
-        for key: String,
+    private static func appendUserInputSections(
+        to sections: inout [String],
+        userInput: FeedbackUserInput?,
+        template: FeedbackTemplate,
         locale: FeedbackLocale,
-        extraLabels: [String: String]
-    ) -> String {
-        if let custom = extraLabels[key]?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !custom.isEmpty {
-            return custom
+        separator: String,
+        consumedKeys: inout Set<String>
+    ) {
+        guard let userInput else {
+            sections.append(MeerkatLocalizer.text(.promptTypeBelow, locale: locale))
+            sections.append(separator)
+            sections.append("")
+            sections.append("")
+            return
         }
-        if let custom = extraLabels.first(where: { $0.key.lowercased() == key.lowercased() })?.value
-            .trimmingCharacters(in: .whitespacesAndNewlines),
-           !custom.isEmpty {
-            return custom
+        if let rating = userInput.rating {
+            sections.append(
+                "\(MeerkatLocalizer.text(.labelRating, locale: locale)): \(rating)/5"
+            )
         }
-        switch key.lowercased() {
-        case "appname":
-            return MeerkatLocalizer.text(.labelApp, locale: locale)
-        case "appversion", "buildnumber":
-            return MeerkatLocalizer.text(.labelVersion, locale: locale)
-        case "screen", "placement":
-            return MeerkatLocalizer.text(.labelScreen, locale: locale)
-        case "devicemodel", "devicename":
-            return MeerkatLocalizer.text(.labelDevice, locale: locale)
-        case "osversion":
-            return MeerkatLocalizer.text(.labelOS, locale: locale)
-        case "appstoreid":
-            return MeerkatLocalizer.text(.labelAppStoreID, locale: locale)
-        case "userid":
-            return MeerkatLocalizer.text(.labelUserID, locale: locale)
-        case "email":
-            return MeerkatLocalizer.text(.labelEmail, locale: locale)
-        default:
-            return key
+        if let email = userInput.email, !email.isEmpty, !consumedKeys.contains("email") {
+            sections.append("\(MeerkatLocalizer.text(.labelEmail, locale: locale)): \(email)")
+            consumedKeys.insert("email")
         }
+        for (key, value) in userInput.customFields.sorted(by: { $0.key < $1.key }) where !value.isEmpty {
+            sections.append("\(key): \(value)")
+        }
+        let prefix = template.bodyPrefix(for: locale)
+        sections.append("\(prefix)\(userInput.message)")
     }
 }

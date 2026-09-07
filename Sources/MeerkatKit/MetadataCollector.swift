@@ -77,13 +77,20 @@ enum MetadataCollector {
         includesAppStoreID: Bool
     ) -> [String] {
         var keys = headerKeys.isEmpty ? FeedbackEmailComposer.defaultMetadataKeys : headerKeys
-        if includesAppStoreID, !keys.contains(where: { $0.lowercased() == "appstoreid" }) {
+        let footerHasAppStoreID = footerKeys.contains { $0.lowercased() == "appstoreid" }
+        if includesAppStoreID,
+           !keys.contains(where: { $0.lowercased() == "appstoreid" }),
+           !footerHasAppStoreID {
             keys.append("appStoreID")
         }
         if !keys.contains(where: { $0.lowercased() == "screen" }) {
             keys.insert("screen", at: min(3, keys.count))
         }
         return keys
+    }
+
+    static func orderedFooterKeys(_ footerKeys: [String]) -> [String] {
+        footerKeys.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
     }
 
     private static func resolveValue(for key: String) -> String {
