@@ -17,14 +17,14 @@ Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery —
 | **Templates** | Bug / feature / general picker when multiple templates configured; custom templates via ``FeedbackCustomTemplate`` |
 | **Form config** | Optional rating, email field, custom fields via ``FeedbackFormConfiguration`` |
 | **Callbacks** | ``FeedbackEventHandler`` — appeared / submitted / failed / cancelled |
-| **Satisfaction survey** | Per-screen like/dislike modal — first view / every view / after N views / after dwell; response callback; optional feedback continuation |
+| **Satisfaction survey** | Per-screen like/dislike modal — first view / every view / after N views / after dwell; dislike reason chips; kill switch; response callback; optional feedback continuation |
 | **Analytics** | `meerkatkit_shown` / `meerkatkit_like` / `meerkatkit_dislike` / `meerkatkit_bugreport` / … via Firebase — optional, crash-safe when Firebase is absent |
 | **API UX** | Success / offline / failure alert or banner (`apiResultPresentation`) |
 | **Timing** | `minimumDwell`, `revealAfter`, dismiss cooldown (per screen) |
 | **Recipients** | Default at bootstrap; **per-screen mail override** (optional) |
 | **API routing** | Default endpoint at bootstrap; **per-screen API endpoint override** (optional) |
 | **Identity** | `userId`, `email`, anonymous mode; optional developer extra fields in mail metadata & API JSON |
-| **Attachments** | Screenshot toggle (hides MeerkatKit chrome before capture); system screenshot opens feedback on iOS/visionOS; log provider; crash log path |
+| **Attachments** | Screenshot toggle + markup; photo library / pending host images (up to 3); system screenshot opens feedback on iOS/visionOS; log provider; crash log path |
 | **UIKit** | Bar button item + `meerkatRequestFeedback(screen:)` |
 | **i18n** | 14 languages for UI labels |
 
@@ -295,6 +295,8 @@ MeerkatFeedback.setExtraMetadataProvider {
     [FeedbackExtraField(key: "plan", value: currentPlan, label: "Plan")]
 }
 ```
+
+Helpers: `FeedbackExtraField.subscription`, `.experiment`, `.appLocale`.
 
 Built-in keys (`appName`, `appVersion`, …) and their mail labels cannot be overwritten. If both identity `userId` and an extra `userId` are set, identity wins. An anonymous extra `userId` / `email` stand-in is also copied into API `userIdentity`.
 

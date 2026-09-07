@@ -15,6 +15,7 @@ struct MeerkatFeedbackFormSheet: View {
     @State private var email = ""
     @State private var customFieldValues: [String: String] = [:]
     @State private var includeScreenshot: Bool
+    @State private var photoAttachments: [Data]
 
     init(
         template: FeedbackTemplate,
@@ -33,6 +34,7 @@ struct MeerkatFeedbackFormSheet: View {
         self.onSubmit = onSubmit
         self.onCancel = onCancel
         _includeScreenshot = State(initialValue: defaultIncludeScreenshot)
+        _photoAttachments = State(initialValue: MeerkatFeedbackPendingPhotos.peek())
     }
 
     var body: some View {
@@ -63,12 +65,14 @@ struct MeerkatFeedbackFormSheet: View {
                             values: $customFieldValues
                         )
                     }
-                    if offerScreenshot {
-                        FeedbackScreenshotToggle(
-                            label: MeerkatLocalizer.text(.formIncludeScreenshot, locale: locale),
-                            isOn: $includeScreenshot
-                        )
-                    }
+                    FeedbackFormMediaSection(
+                        locale: locale,
+                        offerScreenshot: offerScreenshot,
+                        includeScreenshot: $includeScreenshot,
+                        offerPhotoLibrary: MeerkatFeedback.effectiveOfferPhotoLibraryInForm,
+                        maxPhotos: MeerkatFeedback.maxPhotoAttachments,
+                        photos: $photoAttachments
+                    )
                 }
                 .padding()
             }
@@ -80,6 +84,7 @@ struct MeerkatFeedbackFormSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(MeerkatLocalizer.text(.formCancel, locale: locale)) {
+                        MeerkatFeedbackPendingPhotos.clear()
                         onCancel()
                         dismiss()
                     }
@@ -135,7 +140,8 @@ struct MeerkatFeedbackFormSheet: View {
                 rating: formConfiguration.collectRating ? rating : nil,
                 email: formConfiguration.collectEmail ? trimmedEmail : nil,
                 customFields: normalizedCustomFields,
-                includeScreenshot: includeScreenshot
+                includeScreenshot: includeScreenshot,
+                photoAttachments: photoAttachments
             )
         )
         dismiss()

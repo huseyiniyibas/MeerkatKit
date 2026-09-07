@@ -7,6 +7,7 @@ final class MeerkatKitTests: XCTestCase {
         #if DEBUG
         ExtraMetadataStore.resetAll()
         MetadataCollector.resetUserIdentity()
+        MeerkatFeedbackPendingPhotos.resetAll()
         #endif
         MetadataCollector.setAppStoreID(nil)
     }
@@ -97,6 +98,8 @@ final class MeerkatKitTests: XCTestCase {
             .formEmailPlaceholder,
             .labelEmail,
             .labelUserID,
+            .formAddPhotos,
+            .annotationDone,
             .apiSuccessTitle,
             .apiSuccessMessage,
             .apiOfflineTitle,
@@ -509,6 +512,25 @@ final class MeerkatKitTests: XCTestCase {
             $0.localizedCaseInsensitiveContains("email:") && $0.contains("user@test.com")
         }
         XCTAssertEqual(emailLines.count, 1)
+    }
+
+    @MainActor
+    func testExtraFieldConvenienceFactories() {
+        XCTAssertEqual(FeedbackExtraField.subscription("premium").key, "plan")
+        XCTAssertEqual(FeedbackExtraField.subscription("premium").value, "premium")
+        XCTAssertEqual(FeedbackExtraField.experiment("paywall", variant: "b").value, "paywall:b")
+        XCTAssertEqual(FeedbackExtraField.appLocale("en-US").key, "locale")
+    }
+
+    @MainActor
+    func testPhotoAttachmentsAreCollected() {
+        MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
+        let jpeg = Data([0xFF, 0xD8, 0xFF])
+        let input = FeedbackUserInput(message: "Hi", photoAttachments: [jpeg])
+        let attachments = FeedbackAttachmentCollector.photoAttachments(from: input)
+        XCTAssertEqual(attachments.count, 1)
+        XCTAssertEqual(attachments[0].filename, "photo-1.jpg")
+        XCTAssertEqual(attachments[0].mimeType, "image/jpeg")
     }
 
     @MainActor

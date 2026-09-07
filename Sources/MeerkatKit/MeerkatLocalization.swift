@@ -41,6 +41,19 @@ enum MeerkatLocalizedKey {
     case surveyThanks
     case surveySendFeedback
     case surveyNotNow
+    case formAddPhotos
+    case formPhotosCount
+    case annotationTitle
+    case annotationPen
+    case annotationCircle
+    case annotationArrow
+    case annotationClear
+    case annotationDone
+    case surveyDislikeReasonPrompt
+    case surveyReasonWrongResult
+    case surveyReasonTooSlow
+    case surveyReasonCrash
+    case surveyReasonOther
 }
 
 enum MeerkatLocalizer {
@@ -96,7 +109,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "Dislike",
             .surveyThanks: "Thanks for your response!",
             .surveySendFeedback: "Send feedback",
-            .surveyNotNow: "Not now"
+            .surveyNotNow: "Not now",
+            .formAddPhotos: "Add photos",
+            .formPhotosCount: "%d of %d",
+            .annotationTitle: "Mark up screenshot",
+            .annotationPen: "Pen",
+            .annotationCircle: "Circle",
+            .annotationArrow: "Arrow",
+            .annotationClear: "Clear",
+            .annotationDone: "Done",
+            .surveyDislikeReasonPrompt: "What went wrong?",
+            .surveyReasonWrongResult: "Wrong result",
+            .surveyReasonTooSlow: "Too slow",
+            .surveyReasonCrash: "Crash or freeze",
+            .surveyReasonOther: "Other"
         ],
         "tr": [
             .feedbackButton: "Geri Bildirim",
@@ -138,7 +164,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "Beğenmedim",
             .surveyThanks: "Yanıtınız için teşekkürler!",
             .surveySendFeedback: "Geri bildirim gönder",
-            .surveyNotNow: "Şimdi değil"
+            .surveyNotNow: "Şimdi değil",
+            .formAddPhotos: "Fotoğraf ekle",
+            .formPhotosCount: "%d / %d",
+            .annotationTitle: "Ekran görüntüsünü işaretle",
+            .annotationPen: "Kalem",
+            .annotationCircle: "Daire",
+            .annotationArrow: "Ok",
+            .annotationClear: "Temizle",
+            .annotationDone: "Bitti",
+            .surveyDislikeReasonPrompt: "Ne ters gitti?",
+            .surveyReasonWrongResult: "Yanlış sonuç",
+            .surveyReasonTooSlow: "Çok yavaş",
+            .surveyReasonCrash: "Çökme veya donma",
+            .surveyReasonOther: "Diğer"
         ],
         "es": [
             .feedbackButton: "Comentarios",
@@ -180,7 +219,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "No me gusta",
             .surveyThanks: "¡Gracias por tu respuesta!",
             .surveySendFeedback: "Enviar comentarios",
-            .surveyNotNow: "Ahora no"
+            .surveyNotNow: "Ahora no",
+            .formAddPhotos: "Añadir fotos",
+            .formPhotosCount: "%d de %d",
+            .annotationTitle: "Marcar captura",
+            .annotationPen: "Lápiz",
+            .annotationCircle: "Círculo",
+            .annotationArrow: "Flecha",
+            .annotationClear: "Borrar",
+            .annotationDone: "Hecho",
+            .surveyDislikeReasonPrompt: "¿Qué salió mal?",
+            .surveyReasonWrongResult: "Resultado incorrecto",
+            .surveyReasonTooSlow: "Demasiado lento",
+            .surveyReasonCrash: "Bloqueo o cierre",
+            .surveyReasonOther: "Otro"
         ],
         "fr": [
             .feedbackButton: "Retour",
@@ -222,7 +274,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "Je n'aime pas",
             .surveyThanks: "Merci pour votre réponse !",
             .surveySendFeedback: "Envoyer un retour",
-            .surveyNotNow: "Pas maintenant"
+            .surveyNotNow: "Pas maintenant",
+            .formAddPhotos: "Ajouter des photos",
+            .formPhotosCount: "%d sur %d",
+            .annotationTitle: "Annoter la capture",
+            .annotationPen: "Stylo",
+            .annotationCircle: "Cercle",
+            .annotationArrow: "Flèche",
+            .annotationClear: "Effacer",
+            .annotationDone: "Terminé",
+            .surveyDislikeReasonPrompt: "Qu'est-ce qui n'a pas fonctionné ?",
+            .surveyReasonWrongResult: "Mauvais résultat",
+            .surveyReasonTooSlow: "Trop lent",
+            .surveyReasonCrash: "Plantage",
+            .surveyReasonOther: "Autre"
         ],
         "de": [
             .feedbackButton: "Rückmeldung",
@@ -264,7 +329,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "Gefällt mir nicht",
             .surveyThanks: "Danke für deine Antwort!",
             .surveySendFeedback: "Feedback senden",
-            .surveyNotNow: "Jetzt nicht"
+            .surveyNotNow: "Jetzt nicht",
+            .formAddPhotos: "Fotos hinzufügen",
+            .formPhotosCount: "%d von %d",
+            .annotationTitle: "Screenshot markieren",
+            .annotationPen: "Stift",
+            .annotationCircle: "Kreis",
+            .annotationArrow: "Pfeil",
+            .annotationClear: "Löschen",
+            .annotationDone: "Fertig",
+            .surveyDislikeReasonPrompt: "Was ist schiefgelaufen?",
+            .surveyReasonWrongResult: "Falsches Ergebnis",
+            .surveyReasonTooSlow: "Zu langsam",
+            .surveyReasonCrash: "Absturz",
+            .surveyReasonOther: "Sonstiges"
         ],
         "ja": [
             .feedbackButton: "フィードバック",
@@ -306,7 +384,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "悪い",
             .surveyThanks: "ご回答ありがとうございます！",
             .surveySendFeedback: "フィードバックを送信",
-            .surveyNotNow: "後で"
+            .surveyNotNow: "後で",
+            .formAddPhotos: "写真を追加",
+            .formPhotosCount: "%d / %d",
+            .annotationTitle: "スクリーンショットに書き込む",
+            .annotationPen: "ペン",
+            .annotationCircle: "円",
+            .annotationArrow: "矢印",
+            .annotationClear: "クリア",
+            .annotationDone: "完了",
+            .surveyDislikeReasonPrompt: "何が問題でしたか？",
+            .surveyReasonWrongResult: "結果が違う",
+            .surveyReasonTooSlow: "遅い",
+            .surveyReasonCrash: "クラッシュ",
+            .surveyReasonOther: "その他"
         ],
         "it": [
             .feedbackButton: "Feedback",
@@ -348,7 +439,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "Non mi piace",
             .surveyThanks: "Grazie per la tua risposta!",
             .surveySendFeedback: "Invia feedback",
-            .surveyNotNow: "Non ora"
+            .surveyNotNow: "Non ora",
+            .formAddPhotos: "Aggiungi foto",
+            .formPhotosCount: "%d di %d",
+            .annotationTitle: "Annota screenshot",
+            .annotationPen: "Penna",
+            .annotationCircle: "Cerchio",
+            .annotationArrow: "Freccia",
+            .annotationClear: "Cancella",
+            .annotationDone: "Fatto",
+            .surveyDislikeReasonPrompt: "Cos'è andato storto?",
+            .surveyReasonWrongResult: "Risultato sbagliato",
+            .surveyReasonTooSlow: "Troppo lento",
+            .surveyReasonCrash: "Crash",
+            .surveyReasonOther: "Altro"
         ],
         "pt": [
             .feedbackButton: "Feedback",
@@ -390,7 +494,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "Não gostei",
             .surveyThanks: "Obrigado pela sua resposta!",
             .surveySendFeedback: "Enviar feedback",
-            .surveyNotNow: "Agora não"
+            .surveyNotNow: "Agora não",
+            .formAddPhotos: "Adicionar fotos",
+            .formPhotosCount: "%d de %d",
+            .annotationTitle: "Marcar captura",
+            .annotationPen: "Caneta",
+            .annotationCircle: "Círculo",
+            .annotationArrow: "Seta",
+            .annotationClear: "Limpar",
+            .annotationDone: "Concluído",
+            .surveyDislikeReasonPrompt: "O que deu errado?",
+            .surveyReasonWrongResult: "Resultado errado",
+            .surveyReasonTooSlow: "Muito lento",
+            .surveyReasonCrash: "Travamento",
+            .surveyReasonOther: "Outro"
         ],
         "ru": [
             .feedbackButton: "Обратная связь",
@@ -432,7 +549,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "Не нравится",
             .surveyThanks: "Спасибо за ваш ответ!",
             .surveySendFeedback: "Отправить отзыв",
-            .surveyNotNow: "Не сейчас"
+            .surveyNotNow: "Не сейчас",
+            .formAddPhotos: "Добавить фото",
+            .formPhotosCount: "%d из %d",
+            .annotationTitle: "Разметить снимок",
+            .annotationPen: "Перо",
+            .annotationCircle: "Круг",
+            .annotationArrow: "Стрелка",
+            .annotationClear: "Очистить",
+            .annotationDone: "Готово",
+            .surveyDislikeReasonPrompt: "Что пошло не так?",
+            .surveyReasonWrongResult: "Неверный результат",
+            .surveyReasonTooSlow: "Слишком медленно",
+            .surveyReasonCrash: "Сбой",
+            .surveyReasonOther: "Другое"
         ],
         "ko": [
             .feedbackButton: "피드백",
@@ -474,7 +604,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "별로예요",
             .surveyThanks: "응답해 주셔서 감사합니다!",
             .surveySendFeedback: "피드백 보내기",
-            .surveyNotNow: "나중에"
+            .surveyNotNow: "나중에",
+            .formAddPhotos: "사진 추가",
+            .formPhotosCount: "%d / %d",
+            .annotationTitle: "스크린샷에 표시",
+            .annotationPen: "펜",
+            .annotationCircle: "원",
+            .annotationArrow: "화살표",
+            .annotationClear: "지우기",
+            .annotationDone: "완료",
+            .surveyDislikeReasonPrompt: "무엇이 문제였나요?",
+            .surveyReasonWrongResult: "잘못된 결과",
+            .surveyReasonTooSlow: "너무 느림",
+            .surveyReasonCrash: "충돌",
+            .surveyReasonOther: "기타"
         ],
         "zh-hans": [
             .feedbackButton: "反馈",
@@ -516,7 +659,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "不喜欢",
             .surveyThanks: "感谢您的回复！",
             .surveySendFeedback: "发送反馈",
-            .surveyNotNow: "暂不"
+            .surveyNotNow: "暂不",
+            .formAddPhotos: "添加照片",
+            .formPhotosCount: "%d / %d",
+            .annotationTitle: "标注截图",
+            .annotationPen: "画笔",
+            .annotationCircle: "圆形",
+            .annotationArrow: "箭头",
+            .annotationClear: "清除",
+            .annotationDone: "完成",
+            .surveyDislikeReasonPrompt: "出了什么问题？",
+            .surveyReasonWrongResult: "结果不对",
+            .surveyReasonTooSlow: "太慢",
+            .surveyReasonCrash: "崩溃",
+            .surveyReasonOther: "其他"
         ],
         "zh-hant": [
             .feedbackButton: "回饋",
@@ -558,7 +714,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "不喜歡",
             .surveyThanks: "感謝您的回覆！",
             .surveySendFeedback: "傳送回饋",
-            .surveyNotNow: "暫不"
+            .surveyNotNow: "暫不",
+            .formAddPhotos: "新增照片",
+            .formPhotosCount: "%d / %d",
+            .annotationTitle: "標註截圖",
+            .annotationPen: "畫筆",
+            .annotationCircle: "圓形",
+            .annotationArrow: "箭頭",
+            .annotationClear: "清除",
+            .annotationDone: "完成",
+            .surveyDislikeReasonPrompt: "出了什麼問題？",
+            .surveyReasonWrongResult: "結果不對",
+            .surveyReasonTooSlow: "太慢",
+            .surveyReasonCrash: "當機",
+            .surveyReasonOther: "其他"
         ],
         "nl": [
             .feedbackButton: "Feedback",
@@ -600,7 +769,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "Vind ik niet leuk",
             .surveyThanks: "Bedankt voor je antwoord!",
             .surveySendFeedback: "Feedback versturen",
-            .surveyNotNow: "Niet nu"
+            .surveyNotNow: "Niet nu",
+            .formAddPhotos: "Foto's toevoegen",
+            .formPhotosCount: "%d van %d",
+            .annotationTitle: "Screenshot markeren",
+            .annotationPen: "Potlood",
+            .annotationCircle: "Cirkel",
+            .annotationArrow: "Pijl",
+            .annotationClear: "Wissen",
+            .annotationDone: "Klaar",
+            .surveyDislikeReasonPrompt: "Wat ging er mis?",
+            .surveyReasonWrongResult: "Verkeerd resultaat",
+            .surveyReasonTooSlow: "Te traag",
+            .surveyReasonCrash: "Crash",
+            .surveyReasonOther: "Anders"
         ],
         "ar": [
             .feedbackButton: "ملاحظات",
@@ -642,7 +824,20 @@ enum MeerkatLocalizer {
             .surveyDislike: "لم يعجبني",
             .surveyThanks: "شكرًا على إجابتك!",
             .surveySendFeedback: "إرسال ملاحظات",
-            .surveyNotNow: "ليس الآن"
+            .surveyNotNow: "ليس الآن",
+            .formAddPhotos: "إضافة صور",
+            .formPhotosCount: "%d من %d",
+            .annotationTitle: "تحديد لقطة الشاشة",
+            .annotationPen: "قلم",
+            .annotationCircle: "دائرة",
+            .annotationArrow: "سهم",
+            .annotationClear: "مسح",
+            .annotationDone: "تم",
+            .surveyDislikeReasonPrompt: "ما الذي حدث؟",
+            .surveyReasonWrongResult: "نتيجة خاطئة",
+            .surveyReasonTooSlow: "بطيء جداً",
+            .surveyReasonCrash: "تعطل",
+            .surveyReasonOther: "أخرى"
         ]
     ]
 }

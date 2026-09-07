@@ -46,3 +46,4 @@ Typical integration:
 - ``SatisfactionSurveyTrigger``
 - ``SatisfactionResponse``
 - ``SatisfactionSurveyEvent``
+- ``SatisfactionDislikeReason``

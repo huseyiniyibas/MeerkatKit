@@ -30,10 +30,23 @@ public struct MeerkatSatisfactionSurveyModifier: ViewModifier {
             }
     }
 
-    private func handleResponse(_ response: SatisfactionResponse) {
+    private func handleResponse(
+        _ response: SatisfactionResponse,
+        _ dislikeReason: SatisfactionDislikeReason?
+    ) {
         MeerkatSurveyStore.recordResponse(response, screen: screen)
-        MeerkatSurveyAnalytics.logResponse(response, screen: screen)
-        onResponse?(SatisfactionSurveyEvent(screen: screen, response: response))
+        MeerkatSurveyAnalytics.logResponse(
+            response,
+            screen: screen,
+            dislikeReason: dislikeReason
+        )
+        onResponse?(
+            SatisfactionSurveyEvent(
+                screen: screen,
+                response: response,
+                dislikeReason: dislikeReason
+            )
+        )
     }
 
     private func markContinueToFeedback() {

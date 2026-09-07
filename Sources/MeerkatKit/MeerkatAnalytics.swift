@@ -38,13 +38,21 @@ enum MeerkatSurveyAnalytics {
     private static var continuationScreen: String?
 
     /// Logs `meerkatkit_like` / `meerkatkit_dislike` with the screen name.
-    static func logResponse(_ response: SatisfactionResponse, screen: String) {
+    static func logResponse(
+        _ response: SatisfactionResponse,
+        screen: String,
+        dislikeReason: SatisfactionDislikeReason? = nil
+    ) {
         let name: String
         switch response {
         case .like: name = "meerkatkit_like"
         case .dislike: name = "meerkatkit_dislike"
         }
-        MeerkatAnalytics.logEvent(name, parameters: ["screen": screen])
+        var parameters = ["screen": screen]
+        if let dislikeReason {
+            parameters["reason"] = dislikeReason.analyticsValue
+        }
+        MeerkatAnalytics.logEvent(name, parameters: parameters)
     }
 
     /// Marks that the next feedback flow on `screen` originates from the survey modal.

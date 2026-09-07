@@ -56,6 +56,14 @@ enum ExampleBootstrap {
             apiResultPresentation: .banner
         )
         MeerkatFeedback.setLogProvider { "Example log line\nSecond line" }
+        MeerkatFeedback.setOfferPhotoLibraryInForm(true)
+        MeerkatFeedback.setExtraMetadataProvider {
+            [
+                FeedbackExtraField.subscription("pro"),
+                FeedbackExtraField.experiment("onboarding", variant: "a"),
+                FeedbackExtraField.appLocale(Locale.current.identifier)
+            ]
+        }
         #else
         MeerkatFeedback.bootstrap(
             recipients: ["feedback@example.com"],

@@ -17,13 +17,8 @@ enum FeedbackAttachmentCollector {
             )
         }
 
-        if let logAttachment = FeedbackLogAttachment.makeAttachment(
-            logProvider: logProvider,
-            crashLogPath: crashLogPath
-        ) {
-            attachments.append(logAttachment)
-        }
-
+        attachments.append(contentsOf: photoAttachments(from: userInput))
+        appendLog(to: &attachments, logProvider: logProvider, crashLogPath: crashLogPath)
         return attachments
     }
 
@@ -45,8 +40,6 @@ enum FeedbackAttachmentCollector {
             if let pending = MeerkatFeedbackPendingScreenshot.consumePNG() {
                 png = pending
             } else {
-                // Hide chrome immediately so the floating button does not flash back
-                // while the form sheet finishes dismissing.
                 png = await MeerkatFeedbackChromeSuppressor.shared.withSuppressed(
                     settleDelay: sheetDismissDelay
                 ) {
@@ -62,13 +55,38 @@ enum FeedbackAttachmentCollector {
             MeerkatFeedbackPendingScreenshot.clear()
         }
 
+        attachments.append(contentsOf: photoAttachments(from: userInput))
+        appendLog(to: &attachments, logProvider: logProvider, crashLogPath: crashLogPath)
+        return attachments
+    }
+
+    static func photoAttachments(from userInput: FeedbackUserInput?) -> [FeedbackAttachment] {
+        let images: [Data]
+        if let userInput {
+            images = userInput.photoAttachments
+            MeerkatFeedbackPendingPhotos.clear()
+        } else {
+            images = MeerkatFeedbackPendingPhotos.consume()
+        }
+        return images.enumerated().map { index, data in
+            FeedbackAttachment(
+                filename: "photo-\(index + 1).jpg",
+                mimeType: "image/jpeg",
+                data: FeedbackPhotoEncoder.jpegData(from: data)
+            )
+        }
+    }
+
+    private static func appendLog(
+        to attachments: inout [FeedbackAttachment],
+        logProvider: (() -> String?)?,
+        crashLogPath: String?
+    ) {
         if let logAttachment = FeedbackLogAttachment.makeAttachment(
             logProvider: logProvider,
             crashLogPath: crashLogPath
         ) {
             attachments.append(logAttachment)
         }
-
-        return attachments
     }
 }

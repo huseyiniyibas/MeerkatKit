@@ -3,6 +3,16 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.12] — 2026-09-07
+
+### Added
+
+- **Photo attachments** — form can add up to 3 library photos; ``MeerkatFeedback/setPendingPhotoAttachments(_:)`` prefills host images (last generation, receipt, …).
+- **Screenshot markup** — after capture, users can draw with pen, circle, and arrow before the PNG is attached (`offerScreenshotAnnotation`, on by default when screenshots are offered).
+- **Dislike reasons** — after a satisfaction dislike, reason chips (wrong result / too slow / crash / other) are logged as Firebase `reason` and passed on ``SatisfactionSurveyEvent/dislikeReason``.
+- **Extra field helpers** — ``FeedbackExtraField/subscription(_:)``, ``FeedbackExtraField/experiment(_:variant:)``, ``FeedbackExtraField/appLocale(_:)``.
+- **Survey kill switch** — ``MeerkatFeedback/setSatisfactionSurveysEnabled(_:)`` for Remote Config.
+
 ## [0.4.11] — 2026-09-07
 
 ### Fixed
@@ -313,6 +323,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - Initial release: floating feedback button, shake (iOS), Mail delivery, metadata, EN/TR templates.
 - iOS 17+, macOS 14+, tvOS 17+ (later raised to 17.5 / 14.5).
 
+[0.4.12]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.11...v0.4.12
 [0.4.11]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.10...v0.4.11
 [0.4.10]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.9...v0.4.10
 [0.4.9]: https://github.com/huseyiniyibas/MeerkatKit/compare/v0.4.8...v0.4.9

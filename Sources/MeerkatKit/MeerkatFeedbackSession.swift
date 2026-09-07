@@ -64,6 +64,7 @@ final class MeerkatFeedbackScreenSession: ObservableObject {
             return
         }
         MeerkatFeedbackPendingScreenshot.clear()
+        MeerkatFeedbackPendingPhotos.clear()
         FeedbackEventDispatcher.cancelled(screen: screen, stage: .form)
     }
 

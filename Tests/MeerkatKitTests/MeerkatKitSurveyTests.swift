@@ -8,6 +8,7 @@ final class MeerkatKitSurveyTests: XCTestCase {
         MeerkatSurveyStore.resetAll()
         MeerkatSurveyAnalytics.clearContinuation()
         MeerkatSurveyScreenController.appearDelayOverride = nil
+        MeerkatSurveyAvailability.resetAll()
         #endif
     }
 
@@ -17,6 +18,7 @@ final class MeerkatKitSurveyTests: XCTestCase {
         MeerkatSurveyStore.resetAll()
         MeerkatSurveyAnalytics.clearContinuation()
         MeerkatSurveyScreenController.appearDelayOverride = nil
+        MeerkatSurveyAvailability.resetAll()
         #endif
     }
 
@@ -311,7 +313,19 @@ final class MeerkatKitSurveyTests: XCTestCase {
             .surveyDislike,
             .surveyThanks,
             .surveySendFeedback,
-            .surveyNotNow
+            .surveyNotNow,
+            .surveyDislikeReasonPrompt,
+            .surveyReasonWrongResult,
+            .surveyReasonTooSlow,
+            .surveyReasonCrash,
+            .surveyReasonOther,
+            .formAddPhotos,
+            .annotationTitle,
+            .annotationPen,
+            .annotationCircle,
+            .annotationArrow,
+            .annotationClear,
+            .annotationDone
         ]
 
         for languageCode in languageCodes where languageCode != "en" {
@@ -328,5 +342,29 @@ final class MeerkatKitSurveyTests: XCTestCase {
 
         XCTAssertEqual(MeerkatLocalizer.text(.surveyLike, languageCode: "tr"), "Beğendim")
         XCTAssertEqual(MeerkatLocalizer.text(.surveyDislike, languageCode: "tr"), "Beğenmedim")
+    }
+
+    @MainActor
+    func testSurveyKillSwitchSkipsPresentation() async {
+        #if DEBUG
+        MeerkatFeedback.bootstrap(recipients: ["test@example.com"])
+        MeerkatFeedback.setSatisfactionSurveysEnabled(false)
+        defer { MeerkatFeedback.setSatisfactionSurveysEnabled(true) }
+
+        MeerkatSurveyScreenController.appearDelayOverride = .zero
+        let controller = MeerkatSurveyScreenController()
+        controller.begin(screen: "KillSwitch", trigger: .firstView)
+        try? await Task.sleep(for: .milliseconds(50))
+        XCTAssertFalse(controller.isPresentingSurvey)
+        XCTAssertEqual(MeerkatSurveyStore.viewCount(screen: "KillSwitch"), 0)
+        #endif
+    }
+
+    @MainActor
+    func testDislikeReasonAnalyticsValue() {
+        XCTAssertEqual(SatisfactionDislikeReason.wrongResult.analyticsValue, "wrongResult")
+        XCTAssertEqual(SatisfactionDislikeReason.tooSlow.analyticsValue, "tooSlow")
+        XCTAssertEqual(SatisfactionDislikeReason.crash.analyticsValue, "crash")
+        XCTAssertEqual(SatisfactionDislikeReason.other.analyticsValue, "other")
     }
 }

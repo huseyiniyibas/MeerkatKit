@@ -14,6 +14,9 @@ struct MeerkatBootstrap {
     var mailUnavailableFallback: MailUnavailableFallback
     var apiConfiguration: FeedbackAPIConfiguration?
     var offerScreenshotInForm: Bool
+    var offerPhotoLibraryInForm: Bool = false
+    var maxPhotoAttachments: Int = 3
+    var offerScreenshotAnnotation: Bool = true
     var crashLogPath: String?
     var logProvider: (() -> String?)?
     var userIdentity: FeedbackUserIdentity

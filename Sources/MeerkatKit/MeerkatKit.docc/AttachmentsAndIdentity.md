@@ -22,6 +22,19 @@ When the user opts in, MeerkatKit:
 
 On **iOS / iPadOS / visionOS**, taking a **system screenshot** while MeerkatKit is enabled with screenshot offering also opens the feedback flow for the active screen. MeerkatKit hides itself first, captures a clean screenshot, and pre-checks **Include screenshot** in the form.
 
+After capture, MeerkatKit presents a markup canvas (pen, circle, arrow) when screenshot annotation is enabled (default). Disable with ``MeerkatFeedback/setOfferScreenshotAnnotation(_:)``.
+
+## Photos
+
+Enable the photo-library picker (iOS / iPadOS / macOS / visionOS) and attach up to three images:
+
+```swift
+MeerkatFeedback.setOfferPhotoLibraryInForm(true)
+MeerkatFeedback.setPendingPhotoAttachments([generatedJPEG])
+```
+
+Pending images appear as thumbnails in the form. The host can push the last generation or receipt photo right before `requestFeedback`.
+
 Screenshot availability varies by platform — see <doc:PlatformLimits>.
 
 ## Log provider

@@ -27,6 +27,17 @@ public enum SatisfactionResponse: String, Sendable, Equatable {
 public struct SatisfactionSurveyEvent: Sendable {
     public let screen: String
     public let response: SatisfactionResponse
+    public let dislikeReason: SatisfactionDislikeReason?
+
+    public init(
+        screen: String,
+        response: SatisfactionResponse,
+        dislikeReason: SatisfactionDislikeReason? = nil
+    ) {
+        self.screen = screen
+        self.response = response
+        self.dislikeReason = dislikeReason
+    }
 }
 
 /// Code block executed when the user answers the satisfaction survey.

@@ -39,9 +39,16 @@ MeerkatFeedback.resetSatisfactionSurvey(forScreen: "Chat")
 ## Response flow
 
 1. The modal shows localized **Like** / **Dislike** buttons.
-2. On tap, your `onResponse` callback runs and the buttons animate out.
-3. With `offersFeedback: true` (default) a **Send feedback** button animates in. Tapping it dismisses the survey, then opens the regular feedback flow — template picker (bug report / feature request / …) and then the form or mail composer, exactly like `MeerkatFeedback.requestFeedback(screen:)`. The survey sheet is fully dismissed first so presentation never fails silently.
-4. With `offersFeedback: false` the modal thanks the user and dismisses itself.
+2. **Dislike** first asks a reason (wrong result, too slow, crash, other). The `reason` value is added to `meerkatkit_dislike` and ``SatisfactionSurveyEvent/dislikeReason``.
+3. On like — or after a dislike reason — your `onResponse` callback runs and the buttons animate out.
+4. With `offersFeedback: true` (default) a **Send feedback** button animates in. Tapping it dismisses the survey, then opens the regular feedback flow — template picker (bug report / feature request / …) and then the form or mail composer, exactly like `MeerkatFeedback.requestFeedback(screen:)`. The survey sheet is fully dismissed first so presentation never fails silently.
+5. With `offersFeedback: false` the modal thanks the user and dismisses itself.
+
+Disable every survey without removing modifiers (Remote Config):
+
+```swift
+MeerkatFeedback.setSatisfactionSurveysEnabled(remoteConfig.bool(forKey: "meerkat_surveys"))
+```
 
 You do **not** need `.meerkatFeedback` on the same screen for the continuation to work — MeerkatKit falls back to the standalone UIKit presenter when no session is registered.
 

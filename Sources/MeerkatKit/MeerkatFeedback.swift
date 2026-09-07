@@ -219,6 +219,49 @@ public enum MeerkatFeedback {
         bootstrap?.isEnabled ?? false
     }
 
+    /// Host-supplied images (last generation, receipt photo, …) prefilled in the form.
+    public static func setPendingPhotoAttachments(_ images: [Data]) {
+        MeerkatFeedbackPendingPhotos.set(images)
+    }
+
+    public static func setOfferPhotoLibraryInForm(_ enabled: Bool) {
+        bootstrap?.offerPhotoLibraryInForm = enabled
+    }
+
+    public static func setOfferScreenshotAnnotation(_ enabled: Bool) {
+        bootstrap?.offerScreenshotAnnotation = enabled
+    }
+
+    public static func setMaxPhotoAttachments(_ count: Int) {
+        bootstrap?.maxPhotoAttachments = max(1, min(count, 6))
+    }
+
+    /// Remote-config friendly kill switch for satisfaction surveys. Default is `true`.
+    public static func setSatisfactionSurveysEnabled(_ enabled: Bool) {
+        MeerkatSurveyAvailability.setEnabled(enabled)
+    }
+
+    public static var areSatisfactionSurveysEnabled: Bool {
+        MeerkatSurveyAvailability.surveysEnabled
+    }
+
+    public static var effectiveOfferPhotoLibraryInForm: Bool {
+        #if os(tvOS)
+        return false
+        #else
+        return bootstrap?.offerPhotoLibraryInForm ?? false
+        #endif
+    }
+
+    public static var maxPhotoAttachments: Int {
+        bootstrap?.maxPhotoAttachments ?? 3
+    }
+
+    public static var effectiveOfferScreenshotAnnotation: Bool {
+        guard effectiveOfferScreenshotInForm else { return false }
+        return bootstrap?.offerScreenshotAnnotation ?? true
+    }
+
     public static func requestFeedback(screen: String) {
         MeerkatFeedbackSessionRegistry.requestFeedback(screen: screen)
     }
@@ -268,6 +311,7 @@ public enum MeerkatFeedback {
                 },
                 onCancel: {
                     MeerkatFeedbackPendingScreenshot.clear()
+                    MeerkatFeedbackPendingPhotos.clear()
                     FeedbackEventDispatcher.cancelled(screen: screen, stage: .form)
                 }
             )
@@ -283,7 +327,7 @@ public enum MeerkatFeedback {
     ) {
         guard bootstrap != nil, isEnabled else { return }
 
-        // When a screenshot is requested, hide MeerkatKit chrome before capture.
+        // Screenshot capture (and optional markup) must wait until chrome is hidden.
         if effectiveOfferScreenshotInForm, userInput?.includeScreenshot == true {
             Task { @MainActor in
                 await submitFeedbackAsync(
@@ -314,12 +358,13 @@ public enum MeerkatFeedback {
         userInput: FeedbackUserInput?
     ) async {
         guard bootstrap != nil, isEnabled else { return }
-        let attachments = await FeedbackAttachmentCollector.collectAsync(
+        var attachments = await FeedbackAttachmentCollector.collectAsync(
             userInput: userInput,
             offerScreenshot: effectiveOfferScreenshotInForm,
             logProvider: bootstrap?.logProvider,
             crashLogPath: bootstrap?.crashLogPath
         )
+        attachments = await annotateScreenshotIfNeeded(attachments)
         finishSubmitFeedback(
             screen: screen,
             template: template,

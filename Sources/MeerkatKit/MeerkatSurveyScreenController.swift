@@ -24,7 +24,8 @@ final class MeerkatSurveyScreenController: ObservableObject {
     }
 
     func begin(screen: String, trigger: SatisfactionSurveyTrigger) {
-        guard MeerkatFeedback.isEnabled else { return }
+        guard MeerkatFeedback.isEnabled,
+              MeerkatFeedback.areSatisfactionSurveysEnabled else { return }
 
         let viewCount = MeerkatSurveyStore.registerView(screen: screen)
         let decision = MeerkatSurveyTriggerEvaluator.decision(
