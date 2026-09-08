@@ -12,9 +12,9 @@ struct ExampleSurveyView: View {
                 LabeledContent("Last response", value: lastResponse)
             }
             Section("Behavior") {
-                Text("The like/dislike modal appears on every visit until you respond.")
-                Text("After responding, the buttons animate out and a feedback button appears.")
-                Text("With Firebase configured, meerkatkit_like / meerkatkit_dislike events are logged.")
+                Text("The 1–5 star modal appears on every visit until you respond.")
+                Text("4–5 stars continue to the App Store. 1–3 stars collect private feedback.")
+                Text("With Firebase configured, meerkatkit_like / meerkatkit_dislike events include star_rating.")
             }
             Section {
                 Button("Reset survey state") {
@@ -29,7 +29,7 @@ struct ExampleSurveyView: View {
             screen: "Survey",
             trigger: .everyView,
             onResponse: { event in
-                lastResponse = event.response.rawValue
+                lastResponse = "\(event.starRating) (\(event.response.rawValue))"
                 print("Example: survey \(event.response.rawValue) on \(event.screen)")
             }
         )

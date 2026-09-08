@@ -158,8 +158,9 @@ final class MeerkatKitSurveyTests: XCTestCase {
         XCTAssertTrue(MeerkatSurveyStore.hasPresented(screen: "Chat"))
 
         XCTAssertNil(MeerkatSurveyStore.response(screen: "Chat"))
-        MeerkatSurveyStore.recordResponse(.like, screen: "Chat")
+        MeerkatSurveyStore.recordResponse(.like, screen: "Chat", starRating: 5)
         XCTAssertEqual(MeerkatSurveyStore.response(screen: "Chat"), .like)
+        XCTAssertEqual(MeerkatSurveyStore.starRating(screen: "Chat"), 5)
 
         MeerkatSurveyStore.reset(screen: "Chat")
         XCTAssertEqual(MeerkatSurveyStore.viewCount(screen: "Chat"), 0)
@@ -309,11 +310,20 @@ final class MeerkatKitSurveyTests: XCTestCase {
         ]
         let surveyKeys: [MeerkatLocalizedKey] = [
             .surveyTitle,
+            .surveySubtitle,
             .surveyLike,
             .surveyDislike,
             .surveyThanks,
             .surveySendFeedback,
             .surveyNotNow,
+            .surveyPositiveTitle,
+            .surveyPositiveBody,
+            .surveyRateOnAppStore,
+            .surveyMaybeLater,
+            .surveyNegativeTitle,
+            .surveyNegativeBody,
+            .surveyFeedbackPlaceholder,
+            .surveySkip,
             .surveyDislikeReasonPrompt,
             .surveyReasonWrongResult,
             .surveyReasonTooSlow,
@@ -342,6 +352,29 @@ final class MeerkatKitSurveyTests: XCTestCase {
 
         XCTAssertEqual(MeerkatLocalizer.text(.surveyLike, languageCode: "tr"), "Beğendim")
         XCTAssertEqual(MeerkatLocalizer.text(.surveyDislike, languageCode: "tr"), "Beğenmedim")
+        XCTAssertEqual(
+            MeerkatLocalizer.format(.surveyTitle, locale: .english, "Pantry Buddy"),
+            "How would you rate Pantry Buddy?"
+        )
+    }
+
+    @MainActor
+    func testStarRatingMapsToGatedPaths() {
+        XCTAssertEqual(SatisfactionResponse.from(starRating: 1), .dislike)
+        XCTAssertEqual(SatisfactionResponse.from(starRating: 3), .dislike)
+        XCTAssertEqual(SatisfactionResponse.from(starRating: 4), .like)
+        XCTAssertEqual(SatisfactionResponse.from(starRating: 5), .like)
+        XCTAssertTrue(SatisfactionResponse.like.isPositive)
+        XCTAssertFalse(SatisfactionResponse.dislike.isPositive)
+    }
+
+    @MainActor
+    func testWriteReviewURLUsesAppStoreID() {
+        XCTAssertEqual(
+            MeerkatAppStoreReview.writeReviewURL(appStoreID: "6751549199")?.absoluteString,
+            "https://apps.apple.com/app/id6751549199?action=write-review"
+        )
+        XCTAssertNil(MeerkatAppStoreReview.writeReviewURL(appStoreID: "  "))
     }
 
     @MainActor

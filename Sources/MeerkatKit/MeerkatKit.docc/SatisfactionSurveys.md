@@ -1,10 +1,10 @@
 # Satisfaction surveys
 
-Collect like/dislike ratings per screen with a configurable trigger, response callbacks, an optional continuation into the feedback flow, and crash-safe Firebase Analytics events.
+Collect a 1–5 star rating per screen with a configurable trigger. High ratings go to the public App Store review; low ratings stay private as in-app feedback.
 
 ## Overview
 
-Attach `meerkatSatisfactionSurvey(screen:trigger:offersFeedback:onResponse:)` to any screen — an image generation result, a chat conversation, a paywall. MeerkatKit presents a compact like/dislike modal according to the trigger you pick:
+Attach `meerkatSatisfactionSurvey(screen:trigger:offersFeedback:onResponse:)` to any screen — an image generation result, a chat conversation, a paywall. MeerkatKit presents a compact star-rating modal according to the trigger you pick:
 
 ```swift
 ChatView()
@@ -13,12 +13,12 @@ ChatView()
         screen: "Chat",
         trigger: .afterDwell(.seconds(30)),
         onResponse: { event in
-            print("\(event.response) on \(event.screen)")
+            print("\(event.starRating) stars on \(event.screen)")
         }
     )
 ```
 
-Requires `MeerkatFeedback.bootstrap` (mail, API, or custom variant) once at launch, like the rest of MeerkatKit.
+Requires `MeerkatFeedback.bootstrap` (mail, API, or custom variant) once at launch, like the rest of MeerkatKit. Pass `appStoreID` at bootstrap so 4–5 star ratings open the App Store write-review page.
 
 ## Triggers
 
@@ -38,11 +38,12 @@ MeerkatFeedback.resetSatisfactionSurvey(forScreen: "Chat")
 
 ## Response flow
 
-1. The modal shows localized **Like** / **Dislike** buttons.
-2. **Dislike** first asks a reason (wrong result, too slow, crash, other). The `reason` value is added to `meerkatkit_dislike` and ``SatisfactionSurveyEvent/dislikeReason``.
-3. On like — or after a dislike reason — your `onResponse` callback runs and the buttons animate out.
-4. With `offersFeedback: true` (default) a **Send feedback** button animates in. Tapping it dismisses the survey, then opens the regular feedback flow — template picker (bug report / feature request / …) and then the form or mail composer, exactly like `MeerkatFeedback.requestFeedback(screen:)`. The survey sheet is fully dismissed first so presentation never fails silently.
-5. With `offersFeedback: false` the modal thanks the user and dismisses itself.
+1. The modal asks **How would you rate [App Name]?** with five tappable stars and **Not now**.
+2. **4–5 stars** → “Awesome, thank you!” and a **Rate on the App Store** button. That CTA opens `https://apps.apple.com/app/id{id}?action=write-review` when `appStoreID` was set at bootstrap; otherwise it falls back to `SKStoreReviewController`. **Maybe later** dismisses without leaving the app.
+3. **1–3 stars** → “Sorry to hear that” with a private text field. **Send feedback** submits through the regular MeerkatKit delivery path (mail / API / custom) — not the App Store. **Skip** dismisses.
+4. `onResponse` runs as soon as a star is tapped. ``SatisfactionSurveyEvent/starRating`` is 1…5; ``SatisfactionSurveyEvent/response`` is ``SatisfactionResponse/like`` for 4–5 and ``dislike`` for 1–3.
+
+With `offersFeedback: false`, the 1–3 star path skips the text field and auto-dismisses after a short thank-you.
 
 Disable every survey without removing modifiers (Remote Config):
 
@@ -50,7 +51,7 @@ Disable every survey without removing modifiers (Remote Config):
 MeerkatFeedback.setSatisfactionSurveysEnabled(remoteConfig.bool(forKey: "meerkat_surveys"))
 ```
 
-You do **not** need `.meerkatFeedback` on the same screen for the continuation to work — MeerkatKit falls back to the standalone UIKit presenter when no session is registered.
+You do **not** need `.meerkatFeedback` on the same screen for the low-star submission to work.
 
 ## Firebase Analytics events
 
@@ -59,8 +60,8 @@ When the host app links Firebase **and** has called `FirebaseApp.configure()`, M
 | Event | When |
 |---|---|
 | `meerkatkit_shown` | Sticky / custom floating feedback control becomes visible |
-| `meerkatkit_like` | Like tapped |
-| `meerkatkit_dislike` | Dislike tapped |
+| `meerkatkit_like` | 4–5 stars tapped (`star_rating` is 4 or 5) |
+| `meerkatkit_dislike` | 1–3 stars tapped (`star_rating` is 1, 2, or 3) |
 | `meerkatkit_bugreport` / `meerkatkit_featurerequest` / `meerkatkit_feedback` | Template chosen in a feedback flow started from the survey modal (custom templates log `meerkatkit_<id>`) |
 
 MeerkatKit has **no Firebase dependency**. Firebase is looked up at runtime through the Objective-C runtime; when Firebase is missing or unconfigured (for example, no `GoogleService-Info.plist`), events are skipped silently and nothing crashes.

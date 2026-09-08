@@ -17,7 +17,7 @@ Floating button, shake-to-trigger, in-app form, Mail / API / custom delivery —
 | **Templates** | Bug / feature / general picker when multiple templates configured; custom templates via ``FeedbackCustomTemplate`` |
 | **Form config** | Optional rating, email field, custom fields via ``FeedbackFormConfiguration`` |
 | **Callbacks** | ``FeedbackEventHandler`` — appeared / submitted / failed / cancelled |
-| **Satisfaction survey** | Per-screen like/dislike modal — first view / every view / after N views / after dwell; dislike reason chips; kill switch; response callback; optional feedback continuation |
+| **Satisfaction survey** | Per-screen 1–5 star modal — 4–5 stars open App Store review, 1–3 stars stay private; triggers: first view / every view / after N views / every Nth / after dwell; kill switch; response callback |
 | **Analytics** | `meerkatkit_shown` / `meerkatkit_like` / `meerkatkit_dislike` / `meerkatkit_bugreport` / … via Firebase — optional, crash-safe when Firebase is absent |
 | **API UX** | Success / offline / failure alert or banner (`apiResultPresentation`) |
 | **Timing** | `minimumDwell`, `revealAfter`, dismiss cooldown (per screen) |
@@ -170,9 +170,9 @@ SettingsView()
 
 Shake (`enableShake: true`) hides the sticky button on that screen; dismiss cooldown does not affect shake.
 
-## Satisfaction survey (like / dislike)
+## Satisfaction survey (star rating → App Store)
 
-Collect a quick like/dislike rating on any screen — an image generation result, a chat, a paywall:
+Collect a 1–5 star rating on any screen. 4–5 stars continue to the App Store write-review page; 1–3 stars collect private feedback:
 
 ```swift
 ChatView()
@@ -181,7 +181,7 @@ ChatView()
         screen: "Chat",
         trigger: .everyNthView(10),   // or .firstView / .everyView / .afterViews(3) / .afterDwell(...)
         onResponse: { event in
-            print("User tapped \(event.response) on \(event.screen)")
+            print("User tapped \(event.starRating) stars on \(event.screen)")
         }
     )
 ```
@@ -194,7 +194,7 @@ ChatView()
 | `.everyNthView(n)` | Every *n*-th appearance (10, 20, 30…), including after a previous response |
 | `.afterDwell(duration)` | After staying on the screen for `duration` in one visit |
 
-After a response the like/dislike buttons animate out and a **Send feedback** button appears, continuing into the regular flow (template picker → form → mail/API). Disable that continuation with `offersFeedback: false`. For one-shot triggers, once answered the survey never auto-presents again on that screen (`everyNthView` keeps sampling):
+After a star is tapped, 4–5 stars show **Rate on the App Store** (write-review URL when `appStoreID` is set at bootstrap). 1–3 stars show a private text field; **Send feedback** uses the regular mail/API/custom delivery. Disable that field with `offersFeedback: false`. For one-shot triggers, once answered the survey never auto-presents again on that screen (`everyNthView` keeps sampling):
 
 ```swift
 MeerkatFeedback.resetSatisfactionSurvey(forScreen: "Chat")  // ask again after big changes

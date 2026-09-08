@@ -3,6 +3,14 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [0.4.13] — 2026-09-08
+
+### Changed
+
+- **Gated star rating** — the satisfaction survey is now 1–5 stars instead of Like/Dislike.
+- **4–5 stars** open the App Store write-review page (`appStoreID` from bootstrap) or fall back to `SKStoreReviewController`.
+- **1–3 stars** collect private feedback in the sheet and submit through mail / API / custom delivery — not the App Store.
+
 ## [0.4.12] — 2026-09-07
 
 ### Added

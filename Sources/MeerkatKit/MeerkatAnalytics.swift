@@ -37,11 +37,12 @@ enum MeerkatAnalytics {
 enum MeerkatSurveyAnalytics {
     private static var continuationScreen: String?
 
-    /// Logs `meerkatkit_like` / `meerkatkit_dislike` with the screen name.
+    /// Logs `meerkatkit_like` / `meerkatkit_dislike` with the screen name and star rating.
     static func logResponse(
         _ response: SatisfactionResponse,
         screen: String,
-        dislikeReason: SatisfactionDislikeReason? = nil
+        dislikeReason: SatisfactionDislikeReason? = nil,
+        starRating: Int? = nil
     ) {
         let name: String
         switch response {
@@ -51,6 +52,9 @@ enum MeerkatSurveyAnalytics {
         var parameters = ["screen": screen]
         if let dislikeReason {
             parameters["reason"] = dislikeReason.analyticsValue
+        }
+        if let starRating, starRating > 0 {
+            parameters["star_rating"] = String(starRating)
         }
         MeerkatAnalytics.logEvent(name, parameters: parameters)
     }

@@ -7,7 +7,7 @@ public struct MeerkatSatisfactionSurveyModifier: ViewModifier {
     let onResponse: SatisfactionSurveyResponseAction?
 
     @StateObject private var controller = MeerkatSurveyScreenController()
-    @State private var shouldContinueToFeedback = false
+    @State private var pendingAction: MeerkatSurveyDismissAction = .none
 
     public func body(content: Content) -> some View {
         content
@@ -25,71 +25,87 @@ public struct MeerkatSatisfactionSurveyModifier: ViewModifier {
                     locale: MeerkatFeedback.configuredLocale,
                     offersFeedback: offersFeedback,
                     onRespond: handleResponse,
-                    onContinueToFeedback: markContinueToFeedback
+                    onContinueToAppStore: { pendingAction = .appStore },
+                    onContinueToFeedback: { stars, message in
+                        pendingAction = .feedback(stars: stars, message: message)
+                    }
                 )
             }
     }
 
-    private func handleResponse(
-        _ response: SatisfactionResponse,
-        _ dislikeReason: SatisfactionDislikeReason?
-    ) {
-        MeerkatSurveyStore.recordResponse(response, screen: screen)
+    private func handleResponse(_ response: SatisfactionResponse, _ starRating: Int) {
+        MeerkatSurveyStore.recordResponse(response, screen: screen, starRating: starRating)
         MeerkatSurveyAnalytics.logResponse(
             response,
             screen: screen,
-            dislikeReason: dislikeReason
+            starRating: starRating
         )
         onResponse?(
             SatisfactionSurveyEvent(
                 screen: screen,
                 response: response,
-                dislikeReason: dislikeReason
+                starRating: starRating
             )
         )
     }
 
-    private func markContinueToFeedback() {
-        MeerkatSurveyAnalytics.noteContinuation(screen: screen)
-        shouldContinueToFeedback = true
-    }
-
     private func handleSurveyDismissed() {
-        guard shouldContinueToFeedback else { return }
-        shouldContinueToFeedback = false
+        let action = pendingAction
+        pendingAction = .none
         let screen = self.screen
-        // Let the presentation stack fully settle before opening the feedback sheet.
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(100))
-            MeerkatFeedback.requestFeedback(screen: screen)
+            switch action {
+            case .none:
+                break
+            case .appStore:
+                MeerkatAppStoreReview.request()
+            case let .feedback(stars, message):
+                MeerkatSurveyAnalytics.noteContinuation(screen: screen)
+                MeerkatFeedback.submitFeedback(
+                    screen: screen,
+                    template: .general,
+                    userInput: FeedbackUserInput(
+                        message: message.trimmingCharacters(in: .whitespacesAndNewlines),
+                        rating: stars
+                    )
+                )
+            }
         }
     }
 }
 
+private enum MeerkatSurveyDismissAction {
+    case none
+    case appStore
+    case feedback(stars: Int, message: String)
+}
+
 public extension View {
-    /// Collects a like/dislike satisfaction rating for `screen` in a modal.
+    /// Collects a 1–5 star satisfaction rating for `screen` in a modal.
     ///
     /// The modal appears according to `trigger` — on the first view, on every view,
     /// after a number of views, every *n*-th view, or after the user stays on the
     /// screen for a duration.
+    ///
+    /// 4–5 stars continue to the App Store write-review page (or the native review
+    /// prompt when no App Store ID is configured). 1–3 stars collect private
+    /// feedback and submit it through the regular MeerkatKit delivery path.
     ///
     /// For most triggers, once the user responds the survey never auto-presents
     /// again on that screen; use ``MeerkatFeedback/resetSatisfactionSurvey(forScreen:)``
     /// to start over. ``SatisfactionSurveyTrigger/everyNthView(_:)`` keeps sampling
     /// on each *n*-th visit even after a previous response.
     ///
-    /// After a response the like/dislike buttons animate out and — when
-    /// `offersFeedback` is `true` — a feedback button appears that continues into
-    /// the regular MeerkatKit feedback flow (template picker → form → delivery).
-    ///
     /// When the host app has Firebase Analytics installed and configured,
-    /// `meerkatkit_like` / `meerkatkit_dislike` events are logged automatically.
-    /// Without Firebase the events are skipped safely — never a crash.
+    /// `meerkatkit_like` / `meerkatkit_dislike` events are logged automatically
+    /// with a `star_rating` parameter. Without Firebase the events are skipped
+    /// safely — never a crash.
     ///
     /// - Parameter screen: Screen name used for persistence, analytics, and the feedback continuation.
     /// - Parameter trigger: When the modal is shown. Defaults to ``SatisfactionSurveyTrigger/firstView``.
-    /// - Parameter offersFeedback: Shows the feedback continuation button after a response. Defaults to `true`.
-    /// - Parameter onResponse: Code block executed when the user taps like or dislike.
+    /// - Parameter offersFeedback: Shows the private-feedback field after a 1–3 star rating. Defaults to `true`.
+    /// - Parameter onResponse: Code block executed when the user taps a star.
     func meerkatSatisfactionSurvey(
         screen: String,
         trigger: SatisfactionSurveyTrigger = .firstView,

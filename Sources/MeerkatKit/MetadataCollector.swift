@@ -32,9 +32,15 @@ enum MetadataCollector {
     #endif
 
     static var includesConfiguredAppStoreID: Bool {
-        guard let configuredAppStoreID else { return false }
-        return !configuredAppStoreID.isEmpty
+        resolvedAppStoreID != nil
     }
+
+    static var resolvedAppStoreID: String? {
+        guard let configuredAppStoreID, !configuredAppStoreID.isEmpty else { return nil }
+        return configuredAppStoreID
+    }
+
+    static var resolvedAppName: String { appName }
 
     static func collect(
         headerKeys: [String],

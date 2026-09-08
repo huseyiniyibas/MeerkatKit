@@ -16,7 +16,7 @@ The project links the local MeerkatKit package at the repo root (`../..`).
 - Mail bootstrap (Release)
 - Floating button + shake on Home with per-screen mail override
 - Timing: `minimumDwell`, `revealAfter`, `dismissCooldown`
-- Satisfaction survey: like/dislike modal with `.everyView` trigger, response callback, reset button
+- Satisfaction survey: 1–5 star modal with `.everyView` trigger, App Store / private feedback paths, reset button
 - Custom floating button chip
 - Mail delivery screen with per-screen recipients
 - Custom delivery integration pattern

@@ -3,16 +3,16 @@ import SwiftUI
 struct MeerkatSatisfactionSurveySheet: View {
     let locale: FeedbackLocale
     let offersFeedback: Bool
-    let onRespond: (SatisfactionResponse, SatisfactionDislikeReason?) -> Void
-    let onContinueToFeedback: () -> Void
+    let onRespond: (SatisfactionResponse, Int) -> Void
+    let onContinueToAppStore: () -> Void
+    let onContinueToFeedback: (Int, String) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @State private var response: SatisfactionResponse?
-    @State private var needsDislikeReason = false
+    @State private var phase: MeerkatSurveyPhase = .rating
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            VStack(spacing: 24) {
+            VStack(spacing: 20) {
                 Text(titleText)
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
@@ -37,66 +37,75 @@ struct MeerkatSatisfactionSurveySheet: View {
             .padding(16)
             .accessibilityIdentifier("meerkat_survey_close")
         }
-        .animation(.spring(response: 0.42, dampingFraction: 0.84), value: response)
-        .animation(.spring(response: 0.42, dampingFraction: 0.84), value: needsDislikeReason)
+        .animation(.spring(response: 0.42, dampingFraction: 0.84), value: phase)
         #if os(iOS)
-        .presentationDetents([.height(MeerkatSurveySheetHeight.value(
-            hasResponse: response != nil,
-            needsDislikeReason: needsDislikeReason,
-            offersFeedback: offersFeedback
-        ))])
+        .presentationDetents([.height(MeerkatSurveySheetHeight.value(phase: phase, offersFeedback: offersFeedback))])
         .presentationDragIndicator(.visible)
         #endif
     }
 
     @ViewBuilder
     private var content: some View {
-        if needsDislikeReason {
-            MeerkatSurveyDislikeReasonChips(locale: locale, onSelect: selectDislikeReason)
-        } else if let response {
-            MeerkatSurveyFollowUpContent(
-                response: response,
+        switch phase {
+        case .rating:
+            MeerkatSurveyStarRating(
                 locale: locale,
-                offersFeedback: offersFeedback,
-                onSendFeedback: {
-                    onContinueToFeedback()
+                onSelect: selectStars,
+                onNotNow: { dismiss() }
+            )
+        case let .positive(stars):
+            MeerkatSurveyPositiveFollowUp(
+                locale: locale,
+                onRateOnAppStore: {
+                    _ = stars
+                    onContinueToAppStore()
                     dismiss()
                 },
-                onClose: { dismiss() }
+                onMaybeLater: { dismiss() }
             )
-        } else {
-            MeerkatSurveyResponseButtons(locale: locale, onRespond: respond)
+        case let .negative(stars):
+            MeerkatSurveyNegativeFollowUp(
+                locale: locale,
+                starRating: stars,
+                offersFeedback: offersFeedback,
+                onSendFeedback: { message in
+                    onContinueToFeedback(stars, message)
+                    dismiss()
+                },
+                onSkip: { dismiss() }
+            )
         }
     }
 
     private var titleText: String {
-        if needsDislikeReason {
-            return MeerkatLocalizer.text(.surveyDislikeReasonPrompt, locale: locale)
-        }
-        let key: MeerkatLocalizedKey = response == nil ? .surveyTitle : .surveyThanks
-        return MeerkatLocalizer.text(key, locale: locale)
-    }
-
-    private func respond(_ value: SatisfactionResponse) {
-        switch value {
-        case .like:
-            response = value
-            onRespond(value, nil)
-            autoDismissIfNeeded()
-        case .dislike:
-            needsDislikeReason = true
+        switch phase {
+        case .rating:
+            return MeerkatLocalizer.format(
+                .surveyTitle,
+                locale: locale,
+                MetadataCollector.resolvedAppName
+            )
+        case .positive:
+            return MeerkatLocalizer.text(.surveyPositiveTitle, locale: locale)
+        case .negative:
+            return MeerkatLocalizer.text(.surveyNegativeTitle, locale: locale)
         }
     }
 
-    private func selectDislikeReason(_ reason: SatisfactionDislikeReason) {
-        needsDislikeReason = false
-        response = .dislike
-        onRespond(.dislike, reason)
-        autoDismissIfNeeded()
+    private func selectStars(_ stars: Int) {
+        let response = SatisfactionResponse.from(starRating: stars)
+        onRespond(response, stars)
+        if response.isPositive {
+            phase = .positive(stars: stars)
+        } else {
+            phase = .negative(stars: stars)
+            if !offersFeedback {
+                autoDismiss()
+            }
+        }
     }
 
-    private func autoDismissIfNeeded() {
-        guard !offersFeedback else { return }
+    private func autoDismiss() {
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(1_400))
             dismiss()
@@ -104,22 +113,21 @@ struct MeerkatSatisfactionSurveySheet: View {
     }
 }
 
+enum MeerkatSurveyPhase: Equatable {
+    case rating
+    case positive(stars: Int)
+    case negative(stars: Int)
+}
+
 enum MeerkatSurveySheetHeight {
-    static func value(
-        hasResponse: Bool,
-        needsDislikeReason: Bool,
-        offersFeedback: Bool
-    ) -> CGFloat {
-        let chrome: CGFloat = 20 + 28 + 24 + 48 + 24
-        if needsDislikeReason {
-            return chrome + 132
+    static func value(phase: MeerkatSurveyPhase, offersFeedback: Bool) -> CGFloat {
+        switch phase {
+        case .rating:
+            return 320
+        case .positive:
+            return 300
+        case .negative:
+            return offersFeedback ? 460 : 260
         }
-        if !hasResponse {
-            return chrome + 118
-        }
-        if !offersFeedback {
-            return chrome + 52
-        }
-        return chrome + 52 + 18 + 46 + 18 + 28
     }
 }
