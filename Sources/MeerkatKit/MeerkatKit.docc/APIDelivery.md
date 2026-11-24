@@ -21,7 +21,11 @@ Set `apiResultPresentation: .none` to suppress built-in UI and handle outcomes i
 
 ## Offline queue
 
-Failed requests are persisted locally when `offlineRetryEnabled` is `true`. Call ``MeerkatFeedback/flushOfflineQueue()`` to retry manually; bootstrap also flushes automatically.
+Requests that fail for a transient reason — no network, a timeout, HTTP `408` / `425` / `429`, or any `5xx` — are persisted locally when `offlineRetryEnabled` is `true`. Call ``MeerkatFeedback/flushOfflineQueue()`` to retry manually; MeerkatKit also flushes on bootstrap and after the next successful submission.
+
+Permanent rejections (other `4xx` statuses such as `400`, `401`, `404`) are reported as failures right away and are never queued, because sending the same request again cannot succeed.
+
+The queue is stored as a file in Application Support (Caches on tvOS) and keeps at most 50 submissions; the oldest are dropped first. Request headers are stored with each entry, so prefer short-lived tokens in `headers`.
 
 ## Per-screen endpoint
 

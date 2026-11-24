@@ -49,6 +49,8 @@ enum MeerkatSurveyStore {
         UserDefaults.standard.set(response.rawValue, forKey: responsePrefix + screen)
         if let starRating {
             UserDefaults.standard.set(starRating, forKey: starPrefix + screen)
+        } else {
+            UserDefaults.standard.removeObject(forKey: starPrefix + screen)
         }
     }
 

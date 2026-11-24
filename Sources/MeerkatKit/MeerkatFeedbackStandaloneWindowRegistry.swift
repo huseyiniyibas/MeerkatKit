@@ -25,6 +25,9 @@ enum MeerkatFeedbackStandaloneWindowRegistry {
         let window = NSWindow(contentViewController: host)
         window.title = title
         window.styleMask = [.titled, .closable]
+        // The registry owns the window under ARC; the AppKit default (`true`) would release
+        // it a second time on close and crash.
+        window.isReleasedWhenClosed = false
         window.delegate = closeHandler
         window.center()
 

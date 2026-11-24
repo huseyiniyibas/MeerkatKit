@@ -24,6 +24,10 @@ enum APIFeedbackDelivery {
                 outcome: result.outcome,
                 error: result.error
             )
+            // The server is reachable again, so retry anything queued earlier.
+            if result.outcome == .success, configuration.offlineRetryEnabled {
+                _ = await FeedbackOfflineQueue.flush()
+            }
         }
     }
 
@@ -52,8 +56,11 @@ enum APIFeedbackDelivery {
             )
             return APIFeedbackSubmitResult(outcome: .success, error: nil)
         } catch let error as APIFeedbackError {
+            print("MeerkatKit: API delivery failed — HTTP status \(error.statusCode)")
             let deliveryError = FeedbackDeliveryError.unsuccessfulStatus(error.statusCode)
-            if configuration.offlineRetryEnabled {
+            // Retrying a request the server rejected for good (bad payload, auth, wrong URL)
+            // can never succeed; report it as failed instead of promising a retry.
+            if configuration.offlineRetryEnabled, error.isRetryable {
                 FeedbackOfflineQueue.enqueue(
                     endpoint: configuration.endpoint,
                     headers: configuration.headers,
@@ -111,6 +118,19 @@ enum APIFeedbackError: Error, Equatable {
         switch self {
         case let .unsuccessfulStatus(code):
             return code
+        }
+    }
+
+    /// `true` when sending the same request again later may succeed: server errors,
+    /// timeouts, and rate limiting. Other statuses are permanent rejections.
+    var isRetryable: Bool {
+        switch statusCode {
+        case 408, 425, 429:
+            return true
+        case 500 ... 599:
+            return true
+        default:
+            return false
         }
     }
 }

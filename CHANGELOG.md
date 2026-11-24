@@ -3,6 +3,26 @@
 All notable changes to MeerkatKit are documented here.  
 Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 
+## [Unreleased]
+
+### Fixed
+
+- **Stale screenshot** — a pending system screenshot is now discarded when the user submits without it, instead of being attached to their next, unrelated report.
+- **`screen` / `placement` in `headerMetadata`** — listing either key no longer blanks the value. The Screen line is rendered once, where you listed it (header or footer), instead of being forced to the fourth row.
+- **Global shake** — `bootstrap(enableShake: true)` now works with `.meerkatFeedback(screen:)`. The modifier's default `enableShake: false` used to mask it, leaving the screen with neither shake nor a sticky button.
+- **Offline queue lost submissions** — feedback queued while a flush was in flight was overwritten when the flush finished; overlapping flushes could post the same entry twice.
+- **Offline queue retried forever** — permanent rejections (`400`, `401`, `404`, …) are no longer queued or shown as "Saved offline"; they report `onFailed` immediately, and already-queued ones are dropped on the next flush.
+- **Survey analytics leak** — a survey's "Send feedback" now logs `meerkatkit_feedback` itself, so the next unrelated feedback flow on that screen is no longer attributed to the survey.
+- **macOS crash on close** — standalone feedback windows were released twice when closed.
+- **API result alert** — waits for the feedback form to finish dismissing; fast responses could be dropped by UIKit mid-transition.
+- **Banner auto-hide** — an earlier banner's timer no longer hides a newer banner with the same title early.
+- **Device names** — `iPhone18,4` is "iPhone Air" (was "iPhone 17 Plus"); Macs report their model (`Mac (Mac14,2)`) instead of "Unknown Device"; uncatalogued devices keep their identifier (`iPhone (iPhone19,1)`).
+- Empty language code no longer crashes the localizer; an empty `logProvider` result falls back to `crashLogPath`; `appStoreID` accepts the `id123…` form and rejects non-numeric values; a survey response without stars clears the previously stored star rating; lower-case `appversion` in `headerMetadata` resolves.
+
+### Changed
+
+- **Offline queue storage** — moved from `UserDefaults` to a file in Application Support (Caches on tvOS), since entries carry base64 screenshots and photos. Existing queued entries are migrated automatically. The queue is capped at 50 submissions and is also flushed after a successful submission.
+
 ## [0.4.13] — 2026-09-08
 
 ### Changed

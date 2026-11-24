@@ -27,7 +27,8 @@ enum FeedbackEmailMetadataLines {
         extraLabels: [String: String],
         consumedKeys: inout Set<String>
     ) -> String? {
-        let normalized = key.lowercased()
+        // `placement` is an alias of `screen`: both render the same "Screen" line.
+        let normalized = key.lowercased() == "placement" ? "screen" : key.lowercased()
         if consumedKeys.contains(normalized) {
             return nil
         }
@@ -35,8 +36,10 @@ enum FeedbackEmailMetadataLines {
         if normalized == "appversion" {
             consumedKeys.insert("appversion")
             consumedKeys.insert("buildnumber")
-            guard let version = metadata["appVersion"], !version.isEmpty else { return nil }
-            let build = metadata["buildNumber"]
+            guard let version = value(for: "appversion", in: metadata), !version.isEmpty else {
+                return nil
+            }
+            let build = value(for: "buildnumber", in: metadata)
             let value: String
             if let build, !build.isEmpty, build != "unknown", build != "—" {
                 value = "\(version) (\(build))"
@@ -54,6 +57,11 @@ enum FeedbackEmailMetadataLines {
         guard let value = resolvedValue, !value.isEmpty, value != "—" else { return nil }
         consumedKeys.insert(normalized)
         return "\(label(for: key, locale: locale, extraLabels: extraLabels)): \(value)"
+    }
+
+    /// Case-insensitive lookup, so `headerMetadata: ["appversion"]` still finds its value.
+    private static func value(for normalizedKey: String, in metadata: [String: String]) -> String? {
+        metadata.first { $0.key.lowercased() == normalizedKey }?.value
     }
 
     private static func label(

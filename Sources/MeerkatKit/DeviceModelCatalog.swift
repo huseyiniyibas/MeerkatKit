@@ -13,6 +13,13 @@ enum DeviceModelCatalog {
         }
         #endif
 
+        #if os(macOS)
+        // `uname` only reports the CPU architecture on a Mac.
+        if let model = macModelIdentifier() {
+            return model
+        }
+        #endif
+
         var systemInfo = utsname()
         uname(&systemInfo)
         return withUnsafePointer(to: &systemInfo.machine) { pointer in
@@ -30,10 +37,14 @@ enum DeviceModelCatalog {
         return fallbackName(for: identifier)
     }
 
-    private static func fallbackName(for identifier: String) -> String {
+    /// Name for identifiers missing from the catalog. Keeps the raw identifier so reports
+    /// from devices newer than this release can still be told apart.
+    static func fallbackName(for identifier: String) -> String {
         if identifier == "arm64" || identifier == "x86_64" {
             #if os(visionOS)
             return "visionOS Simulator"
+            #elseif os(macOS)
+            return "Mac"
             #elseif canImport(UIKit) && !os(watchOS)
             return "iOS Simulator"
             #else
@@ -41,19 +52,34 @@ enum DeviceModelCatalog {
             #endif
         }
         if identifier.hasPrefix("RealityDevice") || identifier.hasPrefix("AppleVisionPro") {
-            return "Apple Vision Pro"
+            return "Apple Vision Pro (\(identifier))"
         }
         if identifier.hasPrefix("iPhone") {
-            return "iPhone"
+            return "iPhone (\(identifier))"
         }
         if identifier.hasPrefix("iPad") {
-            return "iPad"
+            return "iPad (\(identifier))"
         }
         if identifier.hasPrefix("AppleTV") {
-            return "Apple TV"
+            return "Apple TV (\(identifier))"
+        }
+        if identifier.hasPrefix("Mac") || identifier.hasPrefix("iMac") {
+            return "Mac (\(identifier))"
         }
         return identifier
     }
+
+    #if os(macOS)
+    private static func macModelIdentifier() -> String? {
+        var size = 0
+        guard sysctlbyname("hw.model", nil, &size, nil, 0) == 0, size > 0 else { return nil }
+        var buffer = [CChar](repeating: 0, count: size)
+        guard sysctlbyname("hw.model", &buffer, &size, nil, 0) == 0 else { return nil }
+        let bytes = buffer.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }
+        let model = String(decoding: bytes, as: UTF8.self)
+        return model.isEmpty ? nil : model
+    }
+    #endif
 
     private static let map: [String: String] = [
         "iPhone11,2": "iPhone XS",
@@ -89,7 +115,7 @@ enum DeviceModelCatalog {
         "iPhone18,1": "iPhone 17 Pro",
         "iPhone18,2": "iPhone 17 Pro Max",
         "iPhone18,3": "iPhone 17",
-        "iPhone18,4": "iPhone 17 Plus",
+        "iPhone18,4": "iPhone Air",
         "iPad13,1": "iPad Air (4th generation)",
         "iPad13,18": "iPad (10th generation)",
         "iPad14,1": "iPad mini (6th generation)",

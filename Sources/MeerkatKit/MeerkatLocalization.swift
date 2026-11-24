@@ -72,7 +72,7 @@ enum MeerkatLocalizer {
 
     static func text(_ key: MeerkatLocalizedKey, languageCode: String) -> String {
         let lang = languageCode.lowercased()
-        let base = String(lang.split(separator: "-")[0]).lowercased()
+        let base = lang.split(separator: "-").first.map(String.init) ?? "en"
         let table = dictionary[lang] ?? dictionary[base] ?? dictionary["en"]!
         return table[key] ?? dictionary["en"]![key]!
     }

@@ -61,7 +61,11 @@ public struct MeerkatSatisfactionSurveyModifier: ViewModifier {
             case .appStore:
                 MeerkatAppStoreReview.request()
             case let .feedback(stars, message):
+                // The survey submits straight to delivery (no template picker), so commit the
+                // continuation here. Leaving it pending would attribute the next unrelated
+                // feedback flow on this screen to the survey.
                 MeerkatSurveyAnalytics.noteContinuation(screen: screen)
+                MeerkatSurveyAnalytics.templateCommitted(screen: screen, template: .general)
                 MeerkatFeedback.submitFeedback(
                     screen: screen,
                     template: .general,

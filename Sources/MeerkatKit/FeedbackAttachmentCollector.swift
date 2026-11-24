@@ -16,6 +16,9 @@ enum FeedbackAttachmentCollector {
                 FeedbackAttachment(filename: "screenshot.png", mimeType: "image/png", data: png)
             )
         }
+        // A pending system screenshot belongs to this submission only. Drop it here so a
+        // declined (or never offered) screenshot is not attached to a later, unrelated report.
+        MeerkatFeedbackPendingScreenshot.clear()
 
         attachments.append(contentsOf: photoAttachments(from: userInput))
         appendLog(to: &attachments, logProvider: logProvider, crashLogPath: crashLogPath)

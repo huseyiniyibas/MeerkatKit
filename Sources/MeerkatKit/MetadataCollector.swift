@@ -58,7 +58,7 @@ enum MetadataCollector {
             if userIdentity.isAnonymous, normalized == "userid" || normalized == "email" {
                 continue
             }
-            metadata[key] = resolveValue(for: key)
+            metadata[key] = resolveValue(for: key, placement: placement)
         }
 
         if let appStoreID = configuredAppStoreID, !appStoreID.isEmpty {
@@ -89,7 +89,9 @@ enum MetadataCollector {
            !footerHasAppStoreID {
             keys.append("appStoreID")
         }
-        if !keys.contains(where: { $0.lowercased() == "screen" }) {
+        // `placement` is an alias of `screen`; respect wherever the developer listed either.
+        let isScreenKey: (String) -> Bool = { ["screen", "placement"].contains($0.lowercased()) }
+        if !keys.contains(where: isScreenKey), !footerKeys.contains(where: isScreenKey) {
             keys.insert("screen", at: min(3, keys.count))
         }
         return keys
@@ -99,7 +101,7 @@ enum MetadataCollector {
         footerKeys.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
     }
 
-    private static func resolveValue(for key: String) -> String {
+    private static func resolveValue(for key: String, placement: String) -> String {
         switch key.lowercased() {
         case "appname":
             return appName
@@ -120,7 +122,7 @@ enum MetadataCollector {
         case "devicename":
             return deviceName
         case "screen", "placement":
-            return "—"
+            return placement
         case "bundleid":
             return Bundle.main.bundleIdentifier ?? "unknown"
         default:

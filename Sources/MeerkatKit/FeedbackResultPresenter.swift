@@ -26,13 +26,16 @@ enum FeedbackResultPresenter {
         let message = MeerkatLocalizer.text(messageKey(for: outcome), locale: locale)
 
         #if os(iOS) || os(visionOS) || os(tvOS)
-        guard let presenter = TopViewControllerFinder.topViewController() else { return }
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(
-            title: MeerkatLocalizer.text(.apiResultDismiss, locale: locale),
-            style: .default
-        ))
-        presenter.present(alert, animated: true)
+        let dismissTitle = MeerkatLocalizer.text(.apiResultDismiss, locale: locale)
+        Task { @MainActor in
+            // A fast response can arrive while the feedback form is still dismissing;
+            // UIKit silently drops a presentation started mid-transition.
+            await TopViewControllerFinder.waitUntilPresentationStackSettles()
+            guard let presenter = TopViewControllerFinder.topViewController() else { return }
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: dismissTitle, style: .default))
+            presenter.present(alert, animated: true)
+        }
         #elseif os(macOS)
         let alert = NSAlert()
         alert.messageText = title
@@ -84,11 +87,17 @@ final class FeedbackResultBannerController: ObservableObject {
 
     @Published private(set) var banner: FeedbackResultBanner?
 
+    private var generation = 0
+
     func show(title: String, message: String, isSuccess: Bool) {
         banner = FeedbackResultBanner(title: title, message: message, isSuccess: isSuccess)
+        // Only the most recent banner's timer may hide it; an earlier timer would otherwise
+        // cut short a newer banner that happens to share the same title.
+        generation += 1
+        let shownGeneration = generation
         Task {
             try? await Task.sleep(for: .seconds(3))
-            if banner?.title == title {
+            if generation == shownGeneration {
                 banner = nil
             }
         }

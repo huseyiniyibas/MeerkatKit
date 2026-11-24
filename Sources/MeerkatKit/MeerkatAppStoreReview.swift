@@ -14,8 +14,12 @@ import AppKit
 /// otherwise falls back to the native `SKStoreReviewController` prompt.
 enum MeerkatAppStoreReview {
     static func writeReviewURL(appStoreID: String) -> URL? {
-        let trimmed = appStoreID.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return nil }
+        var trimmed = appStoreID.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Accept the `id1234567890` form copied from an App Store URL.
+        if trimmed.lowercased().hasPrefix("id") {
+            trimmed = String(trimmed.dropFirst(2))
+        }
+        guard !trimmed.isEmpty, trimmed.allSatisfy({ $0.isASCII && $0.isNumber }) else { return nil }
         return URL(string: "https://apps.apple.com/app/id\(trimmed)?action=write-review")
     }
 
@@ -42,7 +46,9 @@ enum MeerkatAppStoreReview {
     private static func requestNativeReview() {
         #if canImport(StoreKit)
         #if os(iOS) || os(visionOS) || os(tvOS)
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        guard let scene = scenes.first(where: { $0.activationState == .foregroundActive })
+            ?? scenes.first else {
             return
         }
         SKStoreReviewController.requestReview(in: scene)

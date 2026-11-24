@@ -16,7 +16,8 @@ enum FeedbackLogAttachment {
         logProvider: (() -> String?)?,
         crashLogPath: String?
     ) -> FeedbackAttachment? {
-        let text = logProvider?() ?? readCrashLog(at: crashLogPath)
+        let provided = logProvider?()
+        let text = (provided?.isEmpty == false ? provided : nil) ?? readCrashLog(at: crashLogPath)
         guard let text, !text.isEmpty else { return nil }
         return FeedbackAttachment(
             filename: "logs.txt",
