@@ -45,7 +45,9 @@ enum MeerkatAppStoreReview {
     @MainActor
     private static func requestNativeReview() {
         #if canImport(StoreKit)
-        #if os(iOS) || os(visionOS) || os(tvOS)
+        // tvOS has no in-app review prompt (`requestReview(in:)` does not exist there), so
+        // without an App Store ID there is nothing to show on that platform.
+        #if os(iOS) || os(visionOS)
         let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
         guard let scene = scenes.first(where: { $0.activationState == .foregroundActive })
             ?? scenes.first else {
