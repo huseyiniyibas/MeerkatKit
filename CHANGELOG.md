@@ -13,7 +13,7 @@ Package semver (`0.0.x`) is unrelated to iOS/macOS deployment targets.
 - **Offline queue lost submissions** — feedback queued while a flush was in flight was overwritten when the flush finished; overlapping flushes could post the same entry twice.
 - **Offline queue retried forever** — permanent rejections (`400`, `401`, `404`, …) are no longer queued or shown as "Saved offline"; they report `onFailed` immediately, and already-queued ones are dropped on the next flush.
 - **Survey analytics leak** — a survey's "Send feedback" now logs `meerkatkit_feedback` itself, so the next unrelated feedback flow on that screen is no longer attributed to the survey.
-- **tvOS build** — the package has not compiled for tvOS since 0.4.13 (`SKStoreReviewController.requestReview(in:)` does not exist there). tvOS now only opens the App Store page when an `appStoreID` is configured.
+- **tvOS build** — the package has not compiled for tvOS since 0.4.13 (`SKStoreReviewController.requestReview(in:)` and `UIColor.systemBackground` do not exist there). tvOS now only opens the App Store page when an `appStoreID` is configured.
 - **macOS crash on close** — standalone feedback windows were released twice when closed.
 - **API result alert** — waits for the feedback form to finish dismissing; fast responses could be dropped by UIKit mid-transition.
 - **Banner auto-hide** — an earlier banner's timer no longer hides a newer banner with the same title early.
